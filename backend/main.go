@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	API_HOSTNAME = "0.0.0.0"
-	DB_HOSTNAME  = "db"
+	apiHostname      = "0.0.0.0"
+	databaseHostname = "db"
 )
 
 func init() {
@@ -23,13 +23,13 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
-		if err := api.Start(API_HOSTNAME, 3000); err != nil {
+		if err := api.Start(apiHostname, 3000); err != nil {
 			log.Println(err)
 		}
 		wg.Done()
 	}()
 	go func() {
-		if err := db.Start(DB_HOSTNAME, 5432); err != nil {
+		if err := db.Start(databaseHostname, 5432); err != nil {
 			log.Println(err)
 		}
 		wg.Done()
