@@ -19,6 +19,7 @@ services:
   backend:
     image: golang:1.25
     restart: on-failure
+    env_file: .env
     depends_on:
       - db
     build: backend
