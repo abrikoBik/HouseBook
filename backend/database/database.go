@@ -1,17 +1,18 @@
-// Package db contains all database microservice properties and functions: start, stop, etc.
-package db
+// Package database contains all database microservice properties and functions: start, stop, etc.
+package database
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"os"
 
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/uptrace/bun/driver/pgdriver"
 )
 
 var (
-	Context context.Context
-	Conn    pgxpool.Conn
+	Context  context.Context
+	Database *sql.DB
 )
 
 func Start(hostname string, port uint16) error {
@@ -22,10 +23,9 @@ func Start(hostname string, port uint16) error {
 		port,
 		os.Getenv("POSTGRES_DB"),
 	)
-	Conn, err := pgxpool.New(Context, url)
-	if err != nil {
-		return err
-	}
+	Conn := sql.OpenDB(pgdriver.NewConnector(
+		pgdriver.WithDSN(url),
+	))
 	defer Conn.Close()
 	return nil
 }

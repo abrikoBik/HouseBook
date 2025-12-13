@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"housebook/api"
-	"housebook/db"
+	"housebook/database"
 	"log"
 	"sync"
 )
@@ -16,7 +16,7 @@ const (
 func init() {
 	ctx := context.Background()
 	api.Context = ctx
-	db.Context = ctx
+	database.Context = ctx
 }
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 		wg.Done()
 	}()
 	go func() {
-		if err := db.Start(databaseHostname, 5432); err != nil {
+		if err := database.Start(databaseHostname, 5432); err != nil {
 			log.Println(err)
 		}
 		wg.Done()
