@@ -1,44 +1,70 @@
 package models
 
-import "github.com/uptrace/bun"
+import (
+	"housebook/database"
+	"net/http"
+
+	"github.com/uptrace/bun"
+)
 
 type User struct {
 	bun.BaseModel `bun:"table:users"`
 
-	ID    int64  `bun:",pk,autoincrement"`
-	Login string `bun:",unique,notnull"`
+	ID    int64  `bun:",pk,autoincrement" json:"id"`
+	Login string `bun:",unique,notnull" json:"login"`
 	// Full name
-	Name string `bun:",notnull"`
+	Name string `bun:",notnull" json:"name"`
 }
 
-// TODO: decide if this struct is really needed
 type UserRequest struct {
-	Login string
-	Name  string
+	*User
+}
+
+type UserResponse struct {
+	*User
+}
+
+func (user *User) Render(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
+func (user *User) Bind(r *http.Request) error {
+	return nil
 }
 
 func (user *User) Insert(request UserRequest) error {
 	user.Login = request.Login
 	user.Name = request.Name
-	_, err := db.NewInsert().Model(user).Exec(ctx)
+	_, err := database.BunDatabase.
+		NewInsert().
+		Model(user).
+		Exec(database.Context)
 	return err
 }
 
-// TODO: add selection by login
 func (user *User) Select(id int64) error {
-	return db.NewSelect().Model(user).Where("id = ?", id).Scan(ctx)
+	// TODO: add selection by login
+	return database.BunDatabase.
+		NewSelect().
+		Model(user).
+		Where("id = ?", id).
+		Scan(database.Context)
 }
 
 func (user *User) Update(request UserRequest, columns []string) error {
-	q := db.NewUpdate().Model(user)
+	q := database.BunDatabase.NewUpdate().Model(user)
 	for _, column := range columns {
 		q = q.Column(column)
 	}
-	_, err := q.WherePK().Exec(ctx)
+	_, err := q.WherePK().Exec(database.Context)
 	return err
 }
 
 func (user *User) Delete() error {
-	_, err := db.NewDelete().Model(user).WherePK().Exec(ctx)
+	_, err := database.BunDatabase.
+		NewDelete().
+		Model(user).
+		WherePK().
+		Exec(database.Context)
 	return err
 }

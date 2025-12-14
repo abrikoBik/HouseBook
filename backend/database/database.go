@@ -7,25 +7,29 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
 )
 
 var (
-	Context  context.Context
-	Database *sql.DB
+	Context     context.Context
+	Database    *sql.DB
+	BunDatabase *bun.DB
 )
 
 func Start(hostname string, port uint16) error {
-	url := fmt.Sprintf("postgres://%s:%s@%s:%d/%s",
+	// TODO: remove sslmode=disable
+	url := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
 		os.Getenv("POSTGRES_USER"),
 		os.Getenv("POSTGRES_PASSWORD"),
 		hostname,
 		port,
 		os.Getenv("POSTGRES_DB"),
 	)
-	Conn := sql.OpenDB(pgdriver.NewConnector(
+	Database = sql.OpenDB(pgdriver.NewConnector(
 		pgdriver.WithDSN(url),
 	))
-	defer Conn.Close()
+	BunDatabase = bun.NewDB(Database, pgdialect.New())
 	return nil
 }

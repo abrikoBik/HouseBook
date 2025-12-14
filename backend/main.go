@@ -4,8 +4,6 @@ import (
 	"context"
 	"housebook/api"
 	"housebook/database"
-	"log"
-	"sync"
 )
 
 const (
@@ -13,26 +11,21 @@ const (
 	databaseHostname = "db"
 )
 
+var (
+	ctx context.Context
+)
+
 func init() {
-	ctx := context.Background()
-	api.Context = ctx
+	ctx = context.Background()
 	database.Context = ctx
+	api.Context = ctx
 }
 
 func main() {
-	var wg sync.WaitGroup
-	wg.Add(2)
-	go func() {
-		if err := api.Start(apiHostname, 3000); err != nil {
-			log.Println(err)
-		}
-		wg.Done()
-	}()
-	go func() {
-		if err := database.Start(databaseHostname, 5432); err != nil {
-			log.Println(err)
-		}
-		wg.Done()
-	}()
-	wg.Wait()
+	if err := database.Start(databaseHostname, 5432); err != nil {
+		panic(err)
+	}
+	if err := api.Start(apiHostname, 3000); err != nil {
+		panic(err)
+	}
 }

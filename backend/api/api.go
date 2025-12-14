@@ -8,16 +8,21 @@ import (
 	"housebook/api/endpoints"
 	"net"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
 )
 
 var (
 	Context  context.Context
 	Listener net.Listener
 	Server   http.Server
-	Mux      *http.ServeMux
+	Router   chi.Router
 )
 
 func Start(hostname string, port uint16) error {
+	if Context == nil {
+		return errors.New("context is nil")
+	}
 	Listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", hostname, port))
 	if err != nil {
 		return err
@@ -25,9 +30,9 @@ func Start(hostname string, port uint16) error {
 	defer Listener.Close()
 	Server.Addr = Listener.Addr().String()
 
-	Mux = http.NewServeMux()
-	endpoints.Register(Mux)
-	Server.Handler = Mux
+	Router = chi.NewRouter()
+	Server.Handler = Router
+	endpoints.Register(Router)
 
 	if err := Server.Serve(Listener); !errors.Is(err, http.ErrServerClosed) {
 		return err

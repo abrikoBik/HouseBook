@@ -3,13 +3,17 @@ package endpoints
 
 import (
 	"housebook/api/handlers"
-	"net/http"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
-const (
-	Health = "/health"
-)
+func Register(router chi.Router) {
+	router.Use(middleware.RequestID)
+	router.Use(middleware.Logger)
+	router.Use(middleware.Recoverer)
 
-func Register(mux *http.ServeMux) {
-	mux.HandleFunc(Health, handlers.Health)
+	router.Get("/health", handlers.Health)
+	routeUsers(router)
+	routeBooks(router)
 }

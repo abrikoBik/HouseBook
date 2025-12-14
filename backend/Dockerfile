@@ -8,6 +8,8 @@ RUN --mount=type=cache,target="/root/.cache/go-build" go build -o /usr/bin/house
 # TODO: replace with scratch container in production
 FROM golang:1.25 AS runner
 WORKDIR /usr/bin
-COPY --from=builder /usr/bin/housebook .
+RUN go install github.com/jackc/tern/v2@v2.3.4
+COPY --from=builder /usr/src/housebook /usr/src/housebook
+COPY --from=builder /usr/bin/housebook /usr/bin/housebook
 EXPOSE 3000
 CMD ["/usr/bin/housebook"]
