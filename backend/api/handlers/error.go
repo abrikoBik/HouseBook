@@ -10,6 +10,8 @@ import (
 type ErrorResponse struct {
 	Status int    `json:"-"`
 	Error  string `json:"error"`
+	// TODO: remove in production
+	Debug string `json:"debug"`
 }
 
 func (err *ErrorResponse) Render(w http.ResponseWriter, r *http.Request) error {
@@ -19,18 +21,33 @@ func (err *ErrorResponse) Render(w http.ResponseWriter, r *http.Request) error {
 }
 
 func ErrorBadRequest(err error) *ErrorResponse {
-	return &ErrorResponse{Status: http.StatusBadRequest, Error: err.Error()}
+	return &ErrorResponse{
+		Status: http.StatusBadRequest,
+		Error:  "bad request",
+		Debug:  err.Error(),
+	}
 }
 
 func ErrorRender(err error) *ErrorResponse {
-	return &ErrorResponse{Status: http.StatusInternalServerError, Error: err.Error()}
+	return &ErrorResponse{
+		Status: http.StatusInternalServerError,
+		Error:  "render error",
+		Debug:  err.Error(),
+	}
 }
 
 func ErrorNotFound(err error) *ErrorResponse {
-	return &ErrorResponse{Status: http.StatusNotFound, Error: err.Error()}
+	return &ErrorResponse{
+		Status: http.StatusNotFound,
+		Error:  "not found",
+		Debug:  err.Error(),
+	}
 }
 
 func ErrorGeneric(err error) *ErrorResponse {
-	// TODO: add logging
-	return &ErrorResponse{Status: http.StatusInternalServerError, Error: err.Error()}
+	return &ErrorResponse{
+		Status: http.StatusInternalServerError,
+		Error:  "unknown error",
+		Debug:  err.Error(),
+	}
 }
