@@ -52,7 +52,33 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateBook(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotImplemented)
+	var (
+		book = &models.Book{}
+		data = &models.BookRequest{}
+	)
+	id, err := util.PathUUID(consts.UUIDPathValue, r)
+	if err != nil {
+		render.Render(w, r, ErrorBadRequest(err))
+		return
+	}
+	book.UUID = *id
+	if err := book.Select(*id); err != nil {
+		render.Render(w, r, ErrorGeneric(err))
+		return
+	}
+	if err := render.Bind(r, data); err != nil {
+		render.Render(w, r, ErrorBadRequest(err))
+		return
+	}
+	if err := book.Update(*data); err != nil {
+		render.Render(w, r, ErrorGeneric(err))
+		return
+	}
+	render.Status(r, http.StatusOK)
+	if err := render.Render(w, r, bookResponse(book)); err != nil {
+		render.Render(w, r, ErrorRender(err))
+		return
+	}
 }
 
 func DeleteBook(w http.ResponseWriter, r *http.Request) {

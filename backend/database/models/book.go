@@ -54,10 +54,20 @@ func (book *Book) Select(id uuid.UUID) error {
 		Scan(database.Context)
 }
 
-func (book *Book) Update(request BookRequest, columns []string) error {
+func (book *Book) Update(request BookRequest) error {
 	q := database.BunDatabase.NewUpdate().Model(book)
-	for _, column := range columns {
-		q = q.Column(column)
+	// TODO: clean up
+	if request.Title != "" {
+		book.Title = request.Title
+		q = q.Column("title")
+	}
+	if request.Author != "" {
+		book.Author = request.Author
+		q = q.Column("author")
+	}
+	if request.ISBN != "" {
+		book.ISBN = request.ISBN
+		q = q.Column("isbn")
 	}
 	_, err := q.WherePK().Exec(database.Context)
 	return err
