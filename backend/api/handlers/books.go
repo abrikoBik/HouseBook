@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"database/sql"
+	"errors"
 	"housebook/consts"
 	"housebook/database/models"
 	"housebook/util"
@@ -41,6 +43,10 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := book.Select(*id); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			render.Render(w, r, ErrorNotFound(err))
+			return
+		}
 		render.Render(w, r, ErrorGeneric(err))
 		return
 	}
@@ -71,6 +77,10 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := book.Update(*data); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			render.Render(w, r, ErrorNotFound(err))
+			return
+		}
 		render.Render(w, r, ErrorGeneric(err))
 		return
 	}
@@ -93,9 +103,5 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 		render.Render(w, r, ErrorGeneric(err))
 		return
 	}
-	render.Status(r, http.StatusOK)
-	if err := render.Render(w, r, bookResponse(&book)); err != nil {
-		render.Render(w, r, ErrorRender(err))
-		return
-	}
+	w.WriteHeader(http.StatusOK)
 }
