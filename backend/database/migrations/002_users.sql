@@ -5,8 +5,8 @@ create table users (
     login text unique not null,
     name text not null,
 
-    salt varchar(16) not null,
-    hash varchar(32) not null
+    salt bytea not null,
+    hash bytea not null
 );
 
 ---- create above / drop below ----
