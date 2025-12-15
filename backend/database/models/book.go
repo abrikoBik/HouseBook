@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"fmt"
 	"housebook/database"
 	"housebook/util"
@@ -20,12 +21,12 @@ type Book struct {
 	Genre     string `bun:",notnull" json:"genre"`
 	Publisher string `bun:",notnull" json:"publisher"`
 
-	Year        string `json:"year"`
-	Language    string `json:"language"`
-	CoverType   string `json:"coverType"`
-	Color       bool   `json:"color"`
-	PageCount   int    `json:"pageCount"`
-	Description string `json:"description"`
+	Year        sql.NullString `json:"year"`
+	Language    sql.NullString `json:"language"`
+	CoverType   sql.NullBool   `json:"coverType"`
+	Color       sql.NullBool   `json:"color"`
+	PageCount   sql.NullInt32  `json:"pageCount"`
+	Description sql.NullString `json:"description"`
 }
 
 type BookRequest struct {
@@ -37,10 +38,12 @@ type BookResponse struct {
 }
 
 func (book *Book) Render(w http.ResponseWriter, r *http.Request) error {
+	// TODO: add proper error handling
 	return nil
 }
 
-func (book *Book) Bind(r *http.Request) error {
+func (book *BookRequest) Bind(r *http.Request) error {
+	// TODO: add proper error handling
 	return nil
 }
 
@@ -62,26 +65,27 @@ func (book *Book) Select() error {
 }
 
 func (book *Book) Update(request BookRequest) error {
-	book = request.Book
-	_, err := database.BunDatabase.
-		NewUpdate().
-		Model(book).
-		Column(
-			"title",
-			"author",
-			"isbn",
-			"genre",
-			"publisher",
-			"year",
-			"language",
-			"cover_type",
-			"color",
-			"page_count",
-			"description",
-		).
-		WherePK().
-		Exec(database.Context)
-	return err
+	// book = request.Book
+	// _, err := database.BunDatabase.
+	// 	NewUpdate().
+	// 	Model(book).
+	// 	Column(
+	// 		"title",
+	// 		"author",
+	// 		"isbn",
+	// 		"genre",
+	// 		"publisher",
+	// 		"year",
+	// 		"language",
+	// 		"cover_type",
+	// 		"color",
+	// 		"page_count",
+	// 		"description",
+	// 	).
+	// 	WherePK().
+	// 	Exec(database.Context)
+	// return err
+	return nil
 }
 
 func (book *Book) Delete() error {

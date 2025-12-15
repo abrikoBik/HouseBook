@@ -44,8 +44,10 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetBook(w http.ResponseWriter, r *http.Request) {
-	var book models.Book
-	id, err := util.PathUUID(consts.UUIDPathValue, r)
+	var (
+		book    = &models.Book{}
+		id, err = util.PathUUID(consts.UUIDPathValue, r)
+	)
 	if err != nil {
 		render.Render(w, r, ErrorBadRequest(err))
 		return
@@ -60,7 +62,7 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	render.Status(r, http.StatusOK)
-	if err := render.Render(w, r, bookResponse(&book)); err != nil {
+	if err := render.Render(w, r, bookResponse(book)); err != nil {
 		render.Render(w, r, ErrorRender(err))
 		return
 	}
@@ -68,10 +70,10 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 
 func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	var (
-		book = &models.Book{}
-		data = &models.BookRequest{}
+		book    = &models.Book{}
+		data    = &models.BookRequest{}
+		id, err = util.PathUUID(consts.UUIDPathValue, r)
 	)
-	id, err := util.PathUUID(consts.UUIDPathValue, r)
 	if err != nil {
 		render.Render(w, r, ErrorBadRequest(err))
 		return
@@ -101,8 +103,10 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteBook(w http.ResponseWriter, r *http.Request) {
-	var book models.Book
-	id, err := util.PathUUID(consts.UUIDPathValue, r)
+	var (
+		book    = &models.Book{}
+		id, err = util.PathUUID(consts.UUIDPathValue, r)
+	)
 	if err != nil {
 		render.Render(w, r, ErrorBadRequest(err))
 		return
