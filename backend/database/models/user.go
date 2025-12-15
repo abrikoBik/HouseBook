@@ -16,8 +16,8 @@ type User struct {
 	Login string `bun:",unique,notnull" json:"login"`
 	Name  string `bun:",notnull" json:"name"`
 
-	Salt []byte `bun:",notnull"`
-	Hash []byte `bun:",notnull"`
+	Salt []byte `bun:",notnull" json:"-"`
+	Hash []byte `bun:",notnull" json:"-"`
 }
 
 type UserRequest struct {
