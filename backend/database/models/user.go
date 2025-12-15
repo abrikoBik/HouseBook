@@ -67,6 +67,7 @@ func (user *User) Select() error {
 }
 
 func (user *User) Update(request UserRequest) error {
+	// TODO: reimplement
 	// q := database.BunDatabase.NewUpdate().Model(user)
 	// for _, column := range columns {
 	// 	q = q.Column(column)

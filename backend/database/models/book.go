@@ -65,6 +65,7 @@ func (book *Book) Select() error {
 }
 
 func (book *Book) Update(request BookRequest) error {
+	// TODO: reimplement
 	// book = request.Book
 	// _, err := database.BunDatabase.
 	// 	NewUpdate().
