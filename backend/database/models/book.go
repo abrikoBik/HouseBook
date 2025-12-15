@@ -18,9 +18,10 @@ type Book struct {
 	Author    string `bun:",notnull" json:"author"`
 	ISBN      string `bun:",unique,notnull" json:"isbn"`
 	Genre     string `bun:",notnull" json:"genre"`
-	Language  string `bun:",notnull" json:"language"`
 	Publisher string `bun:",notnull" json:"publisher"`
 
+	Year        string `json:"year"`
+	Language    string `json:"language"`
 	CoverType   string `json:"coverType"`
 	Color       bool   `json:"color"`
 	PageCount   int    `json:"pageCount"`
@@ -70,8 +71,9 @@ func (book *Book) Update(request BookRequest) error {
 			"author",
 			"isbn",
 			"genre",
-			"language",
 			"publisher",
+			"year",
+			"language",
 			"cover_type",
 			"color",
 			"page_count",
