@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"fmt"
 	"housebook/database"
 	"housebook/util"
@@ -20,12 +21,12 @@ type Book struct {
 	Genre     string `bun:",notnull" json:"genre"`
 	Publisher string `bun:",notnull" json:"publisher"`
 
-	Year        string `json:"year"`
-	Language    string `json:"language"`
-	CoverType   string `json:"coverType"`
-	Color       bool   `json:"color"`
-	PageCount   int    `json:"pageCount"`
-	Description string `json:"description"`
+	Year        sql.NullString `json:"year"`
+	Language    sql.NullString `json:"language"`
+	CoverType   sql.NullBool   `json:"coverType"`
+	Color       sql.NullBool   `json:"color"`
+	PageCount   sql.NullInt32  `json:"pageCount"`
+	Description sql.NullString `json:"description"`
 }
 
 type BookRequest struct {
