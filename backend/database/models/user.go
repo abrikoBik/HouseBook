@@ -11,12 +11,17 @@ type User struct {
 	bun.BaseModel `bun:"table:users"`
 	ID            int64 `bun:",pk,autoincrement" json:"id"`
 
+	Email string `bun:",unique,notnull" json:"email"`
 	Login string `bun:",unique,notnull" json:"login"`
 	Name  string `bun:",notnull" json:"name"`
+
+	Salt []byte `bun:",notnull"`
+	Hash []byte `bun:",notnull"`
 }
 
 type UserRequest struct {
 	*User
+	Password string `json:"password"`
 }
 
 type UserResponse struct {
@@ -32,8 +37,7 @@ func (user *User) Bind(r *http.Request) error {
 }
 
 func (user *User) Insert(request UserRequest) error {
-	user.Login = request.Login
-	user.Name = request.Name
+	user = request.User
 	_, err := database.BunDatabase.
 		NewInsert().
 		Model(user).
