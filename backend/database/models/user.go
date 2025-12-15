@@ -30,10 +30,12 @@ type UserResponse struct {
 }
 
 func (user *User) Render(w http.ResponseWriter, r *http.Request) error {
+	// TODO: add proper error handling
 	return nil
 }
 
 func (user *UserRequest) Bind(r *http.Request) error {
+	// TODO: add proper error handling
 	return nil
 }
 
@@ -56,13 +58,11 @@ func (user *User) Insert(request UserRequest) error {
 	return err
 }
 
-func (user *User) Select(id int64) error {
-	// TODO: add selection by login
+func (user *User) Select() error {
 	return database.BunDatabase.
 		NewSelect().
 		Model(user).
-		// TODO: WherePK()
-		Where("id = ?", id).
+		WherePK().
 		Scan(database.Context)
 }
 

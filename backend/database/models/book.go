@@ -37,10 +37,12 @@ type BookResponse struct {
 }
 
 func (book *Book) Render(w http.ResponseWriter, r *http.Request) error {
+	// TODO: add proper error handling
 	return nil
 }
 
-func (book *Book) Bind(r *http.Request) error {
+func (book *BookRequest) Bind(r *http.Request) error {
+	// TODO: add proper error handling
 	return nil
 }
 

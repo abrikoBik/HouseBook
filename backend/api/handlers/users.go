@@ -40,7 +40,8 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		render.Render(w, r, ErrorBadRequest(err))
 		return
 	}
-	if err := user.Select(id); err != nil {
+	user.ID = id
+	if err := user.Select(); err != nil {
 		render.Render(w, r, ErrorGeneric(err))
 		return
 	}
