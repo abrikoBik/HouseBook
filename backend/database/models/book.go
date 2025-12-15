@@ -50,12 +50,11 @@ func (book *Book) Insert(request BookRequest) error {
 	return err
 }
 
-func (book *Book) Select(id uuid.UUID) error {
-	// TODO: add selection by ISBN
+func (book *Book) Select() error {
 	return database.BunDatabase.
 		NewSelect().
 		Model(book).
-		Where("uuid = ?", id).
+		WherePK().
 		Scan(database.Context)
 }
 

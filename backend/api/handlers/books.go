@@ -42,7 +42,8 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 		render.Render(w, r, ErrorBadRequest(err))
 		return
 	}
-	if err := book.Select(*id); err != nil {
+	book.UUID = *id
+	if err := book.Select(); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			render.Render(w, r, ErrorNotFound(err))
 			return
@@ -68,7 +69,7 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	book.UUID = *id
-	if err := book.Select(*id); err != nil {
+	if err := book.Select(); err != nil {
 		render.Render(w, r, ErrorGeneric(err))
 		return
 	}
@@ -104,4 +105,8 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+func SearchBook(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
 }
