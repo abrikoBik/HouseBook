@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"housebook/database"
 	"net/http"
 
@@ -13,7 +14,7 @@ type Book struct {
 	UUID          uuid.UUID `bun:",pk,type:uuid,default:uuid_generate_v4()" json:"uuid"`
 
 	Title     string `bun:",notnull" json:"title"`
-	Author    string `bun:",notnull" json:"author"` // TODO: create a separate Author model
+	Author    string `bun:",notnull" json:"author"`
 	ISBN      string `bun:",unique,notnull" json:"isbn"`
 	Genre     string `bun:",notnull" json:"genre"`
 	Language  string `bun:",notnull" json:"language"`
@@ -87,4 +88,22 @@ func (book *Book) Delete() error {
 		WherePK().
 		Exec(database.Context)
 	return err
+}
+
+func SearchBooks(params map[string]string) (books []*Book, err error) {
+	q := database.BunDatabase.NewSelect().Model(&books)
+	// s := map[string]string{
+	// 	"title":     book.Title,
+	// 	"author":    book.Author,
+	// 	"genre":     book.Genre,
+	// 	"language":  book.Language,
+	// 	"publisher": book.Publisher,
+	// }
+	for n, v := range params {
+		if v != "" {
+			q = q.Where(fmt.Sprintf("%s = ?", n), v)
+		}
+	}
+	err = q.Scan(database.Context)
+	return
 }
