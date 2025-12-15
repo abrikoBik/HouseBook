@@ -9,11 +9,10 @@ import (
 
 type User struct {
 	bun.BaseModel `bun:"table:users"`
+	ID            int64 `bun:",pk,autoincrement" json:"id"`
 
-	ID    int64  `bun:",pk,autoincrement" json:"id"`
 	Login string `bun:",unique,notnull" json:"login"`
-	// Full name
-	Name string `bun:",notnull" json:"name"`
+	Name  string `bun:",notnull" json:"name"`
 }
 
 type UserRequest struct {

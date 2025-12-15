@@ -7,12 +7,20 @@ import (
 	"housebook/database/models"
 	"housebook/util"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/render"
 )
 
 func bookResponse(book *models.Book) *models.BookResponse {
 	return &models.BookResponse{Book: book}
+}
+
+func bookListResponse(books []*models.Book) (result []render.Renderer) {
+	for _, book := range books {
+		result = append(result, bookResponse(book))
+	}
+	return
 }
 
 func CreateBook(w http.ResponseWriter, r *http.Request) {
@@ -42,7 +50,8 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 		render.Render(w, r, ErrorBadRequest(err))
 		return
 	}
-	if err := book.Select(*id); err != nil {
+	book.UUID = *id
+	if err := book.Select(); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			render.Render(w, r, ErrorNotFound(err))
 			return
@@ -68,7 +77,7 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	book.UUID = *id
-	if err := book.Select(*id); err != nil {
+	if err := book.Select(); err != nil {
 		render.Render(w, r, ErrorGeneric(err))
 		return
 	}
@@ -104,4 +113,59 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+func SearchBooks(w http.ResponseWriter, r *http.Request) {
+	var (
+		params = util.SearchTable{}
+		query  = r.URL.Query()
+	)
+	for _, param := range consts.BookSearchParams {
+		params[param] = query.Get(param)
+	}
+	books, err := models.SearchBooks(params)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			render.Render(w, r, ErrorNotFound(err))
+			return
+		}
+		render.Render(w, r, ErrorGeneric(err))
+		return
+	}
+	render.Status(r, http.StatusOK)
+	if err := render.RenderList(w, r, bookListResponse(books)); err != nil {
+		render.Render(w, r, ErrorRender(err))
+		return
+	}
+}
+
+func ListBooks(w http.ResponseWriter, r *http.Request) {
+	var (
+		limit, offset int
+		err           error
+		query         = r.URL.Query()
+	)
+	if limit, err = strconv.Atoi(query.Get("limit")); err != nil {
+		render.Render(w, r, ErrorBadRequest(err))
+		return
+	}
+	if offset, err = strconv.Atoi(query.Get("offset")); err != nil {
+		render.Render(w, r, ErrorBadRequest(err))
+		return
+	}
+	books, err := models.ListBooks(limit, offset)
+	if err != nil {
+		// TODO: decide if 404 is applicable here
+		if errors.Is(err, sql.ErrNoRows) {
+			render.Render(w, r, ErrorNotFound(err))
+			return
+		}
+		render.Render(w, r, ErrorGeneric(err))
+		return
+	}
+	render.Status(r, http.StatusOK)
+	if err := render.RenderList(w, r, bookListResponse(books)); err != nil {
+		render.Render(w, r, ErrorRender(err))
+		return
+	}
 }
