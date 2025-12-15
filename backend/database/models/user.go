@@ -66,13 +66,14 @@ func (user *User) Select() error {
 		Scan(database.Context)
 }
 
-func (user *User) Update(request UserRequest, columns []string) error {
-	q := database.BunDatabase.NewUpdate().Model(user)
-	for _, column := range columns {
-		q = q.Column(column)
-	}
-	_, err := q.WherePK().Exec(database.Context)
-	return err
+func (user *User) Update(request UserRequest) error {
+	// q := database.BunDatabase.NewUpdate().Model(user)
+	// for _, column := range columns {
+	// 	q = q.Column(column)
+	// }
+	// _, err := q.WherePK().Exec(database.Context)
+	// return err
+	return nil
 }
 
 func (user *User) Delete() error {

@@ -64,26 +64,27 @@ func (book *Book) Select() error {
 }
 
 func (book *Book) Update(request BookRequest) error {
-	book = request.Book
-	_, err := database.BunDatabase.
-		NewUpdate().
-		Model(book).
-		Column(
-			"title",
-			"author",
-			"isbn",
-			"genre",
-			"publisher",
-			"year",
-			"language",
-			"cover_type",
-			"color",
-			"page_count",
-			"description",
-		).
-		WherePK().
-		Exec(database.Context)
-	return err
+	// book = request.Book
+	// _, err := database.BunDatabase.
+	// 	NewUpdate().
+	// 	Model(book).
+	// 	Column(
+	// 		"title",
+	// 		"author",
+	// 		"isbn",
+	// 		"genre",
+	// 		"publisher",
+	// 		"year",
+	// 		"language",
+	// 		"cover_type",
+	// 		"color",
+	// 		"page_count",
+	// 		"description",
+	// 	).
+	// 	WherePK().
+	// 	Exec(database.Context)
+	// return err
+	return nil
 }
 
 func (book *Book) Delete() error {
