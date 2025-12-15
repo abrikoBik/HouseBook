@@ -2,6 +2,7 @@ package models
 
 import (
 	"housebook/database"
+	"housebook/util"
 	"net/http"
 
 	"github.com/uptrace/bun"
@@ -32,13 +33,23 @@ func (user *User) Render(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func (user *User) Bind(r *http.Request) error {
+func (user *UserRequest) Bind(r *http.Request) error {
 	return nil
 }
 
 func (user *User) Insert(request UserRequest) error {
 	user = request.User
-	_, err := database.BunDatabase.
+	salt, err := util.RandomBytes(16)
+	if err != nil {
+		return err
+	}
+	user.Salt = salt
+	hash, err := util.GenerateHash([]byte(request.Password), salt)
+	if err != nil {
+		return err
+	}
+	user.Hash = hash
+	_, err = database.BunDatabase.
 		NewInsert().
 		Model(user).
 		Exec(database.Context)
@@ -50,6 +61,7 @@ func (user *User) Select(id int64) error {
 	return database.BunDatabase.
 		NewSelect().
 		Model(user).
+		// TODO: WherePK()
 		Where("id = ?", id).
 		Scan(database.Context)
 }
