@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"housebook/database"
+	"housebook/util"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -90,15 +91,8 @@ func (book *Book) Delete() error {
 	return err
 }
 
-func SearchBooks(params map[string]string) (books []*Book, err error) {
+func SearchBooks(params util.SearchTable) (books []*Book, err error) {
 	q := database.BunDatabase.NewSelect().Model(&books)
-	// s := map[string]string{
-	// 	"title":     book.Title,
-	// 	"author":    book.Author,
-	// 	"genre":     book.Genre,
-	// 	"language":  book.Language,
-	// 	"publisher": book.Publisher,
-	// }
 	for n, v := range params {
 		if v != "" {
 			q = q.Where(fmt.Sprintf("%s = ?", n), v)

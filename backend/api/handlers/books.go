@@ -116,7 +116,7 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 
 func SearchBooks(w http.ResponseWriter, r *http.Request) {
 	var (
-		params = map[string]string{}
+		params = util.SearchTable{}
 		query  = r.URL.Query()
 	)
 	for _, param := range consts.BookSearchParams {
