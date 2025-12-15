@@ -11,12 +11,8 @@ const (
 	databaseHostname = "db"
 )
 
-var (
-	ctx context.Context
-)
-
 func init() {
-	ctx = context.Background()
+	ctx := context.Background()
 	database.Context = ctx
 	api.Context = ctx
 }
