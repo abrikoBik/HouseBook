@@ -1,7 +1,6 @@
 FROM golang:1.25 AS builder
 WORKDIR /usr/src/housebook
 COPY . .
-# RUN go mod download
 ENV GOCACHE=/root/.cache/go-build
 ENV GOMODCACHE=/root/.cache/go-mod
 RUN --mount=type=cache,target="/root/.cache/go-build" --mount=type=cache,target="/root/.cache/go-mod" go build -o /usr/bin/housebook
