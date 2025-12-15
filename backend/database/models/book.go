@@ -101,3 +101,13 @@ func SearchBooks(params util.SearchTable) (books []*Book, err error) {
 	err = q.Scan(database.Context)
 	return
 }
+
+func ListBooks(limit, offset int) (books []*Book, err error) {
+	err = database.BunDatabase.
+		NewSelect().
+		Model(&books).
+		Limit(limit).
+		Offset(offset).
+		Scan(database.Context)
+	return
+}

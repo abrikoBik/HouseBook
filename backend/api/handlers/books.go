@@ -7,6 +7,7 @@ import (
 	"housebook/database/models"
 	"housebook/util"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/render"
 )
@@ -136,5 +137,35 @@ func SearchBooks(w http.ResponseWriter, r *http.Request) {
 		render.Render(w, r, ErrorRender(err))
 		return
 	}
-	w.WriteHeader(http.StatusNotImplemented)
+}
+
+func ListBooks(w http.ResponseWriter, r *http.Request) {
+	var (
+		limit, offset int
+		err           error
+		query         = r.URL.Query()
+	)
+	if limit, err = strconv.Atoi(query.Get("limit")); err != nil {
+		render.Render(w, r, ErrorBadRequest(err))
+		return
+	}
+	if offset, err = strconv.Atoi(query.Get("offset")); err != nil {
+		render.Render(w, r, ErrorBadRequest(err))
+		return
+	}
+	books, err := models.ListBooks(limit, offset)
+	if err != nil {
+		// TODO: decide if 404 is applicable here
+		if errors.Is(err, sql.ErrNoRows) {
+			render.Render(w, r, ErrorNotFound(err))
+			return
+		}
+		render.Render(w, r, ErrorGeneric(err))
+		return
+	}
+	render.Status(r, http.StatusOK)
+	if err := render.RenderList(w, r, bookListResponse(books)); err != nil {
+		render.Render(w, r, ErrorRender(err))
+		return
+	}
 }
