@@ -10,12 +10,19 @@ import (
 
 type Book struct {
 	bun.BaseModel `bun:"table:books"`
+	UUID          uuid.UUID `bun:",pk,type:uuid,default:uuid_generate_v4()" json:"uuid"`
 
-	UUID  uuid.UUID `bun:",pk,type:uuid,default:uuid_generate_v4()" json:"uuid"`
-	Title string    `bun:",notnull" json:"title"`
-	// TODO: create a separate Author model
-	Author string `bun:",notnull" json:"author"`
-	ISBN   string `bun:",unique,notnull" json:"isbn"`
+	Title     string `bun:",notnull" json:"title"`
+	Author    string `bun:",notnull" json:"author"` // TODO: create a separate Author model
+	ISBN      string `bun:",unique,notnull" json:"isbn"`
+	Genre     string `bun:",notnull" json:"genre"`
+	Language  string `bun:",notnull" json:"language"`
+	Publisher string `bun:",notnull" json:"publisher"`
+
+	CoverType   string `json:"coverType"`
+	Color       bool   `json:"color"`
+	PageCount   int    `json:"pageCount"`
+	Description string `json:"description"`
 }
 
 type BookRequest struct {
@@ -35,9 +42,7 @@ func (book *Book) Bind(r *http.Request) error {
 }
 
 func (book *Book) Insert(request BookRequest) error {
-	book.Title = request.Title
-	book.Author = request.Author
-	book.ISBN = request.ISBN
+	book = request.Book
 	_, err := database.BunDatabase.
 		NewInsert().
 		Model(book).
@@ -55,21 +60,24 @@ func (book *Book) Select(id uuid.UUID) error {
 }
 
 func (book *Book) Update(request BookRequest) error {
-	q := database.BunDatabase.NewUpdate().Model(book)
-	// TODO: clean up
-	if request.Title != "" {
-		book.Title = request.Title
-		q = q.Column("title")
-	}
-	if request.Author != "" {
-		book.Author = request.Author
-		q = q.Column("author")
-	}
-	if request.ISBN != "" {
-		book.ISBN = request.ISBN
-		q = q.Column("isbn")
-	}
-	_, err := q.WherePK().Exec(database.Context)
+	book = request.Book
+	_, err := database.BunDatabase.
+		NewUpdate().
+		Model(book).
+		Column(
+			"title",
+			"author",
+			"isbn",
+			"genre",
+			"language",
+			"publisher",
+			"cover_type",
+			"color",
+			"page_count",
+			"description",
+		).
+		WherePK().
+		Exec(database.Context)
 	return err
 }
 
