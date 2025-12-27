@@ -16,12 +16,24 @@ services:
     networks:
       - back
 
+  storage:
+    image: hb/golang:1.25
+    restart: on-failure
+    env_file: .env
+    build: storage
+    volumes:
+      - storage:/var/lib/storage
+    networks:
+      - back
+      - front
+
   backend:
     image: hb/golang:1.25
     restart: on-failure
     env_file: .env
     depends_on:
       - db
+      - storage
     build: backend
     networks:
       - back
@@ -32,6 +44,7 @@ services:
     restart: on-failure
     depends_on:
       - backend
+      - storage
     build: frontend
     develop:
       watch:
@@ -47,6 +60,7 @@ services:
     depends_on:
       - frontend
       - backend
+      - storage
     configs:
       - source: caddy
         target: /etc/caddy/Caddyfile      
@@ -59,6 +73,7 @@ services:
 
 volumes:
   db:
+  storage:
 
 networks:
   back:
