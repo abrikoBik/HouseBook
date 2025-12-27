@@ -1,12 +1,12 @@
 package models
 
 import (
-	"database/sql"
 	"fmt"
 	"housebook/database"
 	"housebook/util"
 	"net/http"
 
+	"github.com/emvi/null"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 )
@@ -21,12 +21,11 @@ type Book struct {
 	Genre     string `bun:",notnull" json:"genre"`
 	Publisher string `bun:",notnull" json:"publisher"`
 
-	Year        sql.NullString `json:"year"`
-	Language    sql.NullString `json:"language"`
-	CoverType   sql.NullBool   `json:"coverType"`
-	Color       sql.NullBool   `json:"color"`
-	PageCount   sql.NullInt32  `json:"pageCount"`
-	Description sql.NullString `json:"description"`
+	Year        null.Int32  `json:"year"`
+	Language    null.String `json:"language"`
+	CoverType   null.Bool   `json:"coverType"`
+	PageCount   null.Int32  `json:"pageCount"`
+	Description null.String `json:"description"`
 }
 
 type BookRequest struct {

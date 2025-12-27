@@ -11,7 +11,6 @@ create table books (
     year numeric,
     language text,
     cover_type text,
-    color boolean,
     page_count numeric,
     description text
 );
