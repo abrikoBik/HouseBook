@@ -24,6 +24,9 @@ type Trade struct {
 
 type TradeRequest struct {
 	*Trade
+	SellerID int64      `json:"sellerID"`
+	BuyerID  int64      `json:"buyerID"`
+	BookIDs  uuid.UUIDs `json:"bookIDs"`
 }
 
 type TradeResponse struct {
