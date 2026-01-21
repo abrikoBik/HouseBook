@@ -22,6 +22,8 @@ func tradeListResponse(trades []*models.Trade) (result []render.Renderer) {
 	return
 }
 
+// TODO: UpdateTrade for closing trades
+
 func CreateTrade(w http.ResponseWriter, r *http.Request) {
 	var (
 		trade = &models.Trade{}
