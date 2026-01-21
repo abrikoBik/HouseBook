@@ -119,7 +119,7 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func SearchBooks(w http.ResponseWriter, r *http.Request) {
+func SearchBook(w http.ResponseWriter, r *http.Request) {
 	var (
 		params = util.SearchTable{}
 		query  = r.URL.Query()
