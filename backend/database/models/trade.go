@@ -14,9 +14,9 @@ type Trade struct {
 	bun.BaseModel `bun:"table:trades"`
 	UUID          uuid.UUID `bun:",pk,type:uuid,default:uuid_generate_v4()" json:"uuid"`
 
-	Seller User   `bun:",notnull" json:"seller"`
-	Buyer  User   `bun:",notnull" json:"buyer"`
-	Books  []Book `bun:",notnull" json:"books"`
+	Seller User   `bun:"rel:has-one,join:id=id" json:"seller"`
+	Buyer  User   `bun:"rel:has-one,join:id=id" json:"buyer"`
+	Books  []Book `bun:"rel:has-many,join:id=id" json:"books"`
 
 	CreatedAt   time.Time `bun:",nullzero,notnull,default:current_timestamp" json:"createdAt"`
 	CompletedAt null.Time `json:"completedAt"`
@@ -57,6 +57,9 @@ func (trade *Trade) Select() error {
 		NewSelect().
 		Model(trade).
 		WherePK().
+		Relation("Seller").
+		Relation("Buyer").
+		Relation("Books").
 		Scan(database.Context)
 }
 
