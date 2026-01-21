@@ -7,7 +7,6 @@ import (
 	"housebook/database/models"
 	"housebook/util"
 	"net/http"
-	"strconv"
 
 	"github.com/go-chi/render"
 )
@@ -132,20 +131,13 @@ func SearchTrade(w http.ResponseWriter, r *http.Request) {
 
 func ListTrades(w http.ResponseWriter, r *http.Request) {
 	var (
-		limit, offset int
-		err           error
-		query         = r.URL.Query()
+		query              = r.URL.Query()
+		limit, offset, err = util.SearchParams(query)
 	)
-	// TODO: convert to a function
-	if limit, err = strconv.Atoi(query.Get("limit")); err != nil {
+	if err != nil {
 		render.Render(w, r, ErrorBadRequest(err))
 		return
 	}
-	if offset, err = strconv.Atoi(query.Get("offset")); err != nil {
-		render.Render(w, r, ErrorBadRequest(err))
-		return
-	}
-
 	trades, err := models.List[models.Trade](limit, offset)
 	if err != nil {
 		// TODO: decide if 404 is applicable here

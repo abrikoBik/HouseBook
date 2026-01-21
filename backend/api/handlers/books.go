@@ -7,7 +7,6 @@ import (
 	"housebook/database/models"
 	"housebook/util"
 	"net/http"
-	"strconv"
 
 	"github.com/go-chi/render"
 )
@@ -145,15 +144,10 @@ func SearchBook(w http.ResponseWriter, r *http.Request) {
 
 func ListBooks(w http.ResponseWriter, r *http.Request) {
 	var (
-		limit, offset int
-		err           error
-		query         = r.URL.Query()
+		query              = r.URL.Query()
+		limit, offset, err = util.SearchParams(query)
 	)
-	if limit, err = strconv.Atoi(query.Get("limit")); err != nil {
-		render.Render(w, r, ErrorBadRequest(err))
-		return
-	}
-	if offset, err = strconv.Atoi(query.Get("offset")); err != nil {
+	if err != nil {
 		render.Render(w, r, ErrorBadRequest(err))
 		return
 	}
