@@ -1,9 +1,7 @@
 package models
 
 import (
-	"fmt"
 	"housebook/database"
-	"housebook/util"
 	"net/http"
 
 	"github.com/emvi/null"
@@ -95,25 +93,4 @@ func (book *Book) Delete() error {
 		WherePK().
 		Exec(database.Context)
 	return err
-}
-
-func SearchBooks(params util.SearchTable) (books []*Book, err error) {
-	q := database.BunDatabase.NewSelect().Model(&books)
-	for n, v := range params {
-		if v != "" {
-			q = q.Where(fmt.Sprintf("%s = ?", n), v)
-		}
-	}
-	err = q.Scan(database.Context)
-	return
-}
-
-func ListBooks(limit, offset int) (books []*Book, err error) {
-	err = database.BunDatabase.
-		NewSelect().
-		Model(&books).
-		Limit(limit).
-		Offset(offset).
-		Scan(database.Context)
-	return
 }

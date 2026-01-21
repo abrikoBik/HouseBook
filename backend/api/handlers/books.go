@@ -127,7 +127,7 @@ func SearchBook(w http.ResponseWriter, r *http.Request) {
 	for _, param := range consts.BookSearchParams {
 		params[param] = query.Get(param)
 	}
-	books, err := models.SearchBooks(params)
+	books, err := models.Search[models.Book](params)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			render.Render(w, r, ErrorNotFound(err))
@@ -157,7 +157,7 @@ func ListBooks(w http.ResponseWriter, r *http.Request) {
 		render.Render(w, r, ErrorBadRequest(err))
 		return
 	}
-	books, err := models.ListBooks(limit, offset)
+	books, err := models.List[models.Book](limit, offset)
 	if err != nil {
 		// TODO: decide if 404 is applicable here
 		if errors.Is(err, sql.ErrNoRows) {

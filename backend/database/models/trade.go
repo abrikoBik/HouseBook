@@ -1,9 +1,7 @@
 package models
 
 import (
-	"fmt"
 	"housebook/database"
-	"housebook/util"
 	"net/http"
 	"time"
 
@@ -66,27 +64,4 @@ func (trade *Trade) Delete() error {
 		WherePK().
 		Exec(database.Context)
 	return err
-}
-
-// TODO: make generic
-func SearchTrades(params util.SearchTable) (trades []*Trade, err error) {
-	q := database.BunDatabase.NewSelect().Model(&trades)
-	for n, v := range params {
-		if v != "" {
-			q = q.Where(fmt.Sprintf("%s = ?", n), v)
-		}
-	}
-	err = q.Scan(database.Context)
-	return
-}
-
-// TODO: make generic
-func ListTrades(limit, offset int) (trades []*Trade, err error) {
-	err = database.BunDatabase.
-		NewSelect().
-		Model(&trades).
-		Limit(limit).
-		Offset(offset).
-		Scan(database.Context)
-	return
 }
