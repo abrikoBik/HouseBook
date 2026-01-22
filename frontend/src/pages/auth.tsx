@@ -1,10 +1,17 @@
+import Logo from "../assets/LogoWText.svg"
+import "../styles/auth.css"
+
 const Auth = () => {
     return (
-        <body>
-            <div>
-                
-            </div>
-        </body>
+        <section>
+            <section>
+                <img src={Logo} alt="logo" />
+                <h1>С возвращением!</h1>
+            </section>
+            <section>
+
+            </section>
+        </section>
     )
 }
 
