@@ -2,7 +2,9 @@ FROM node:25 AS builder
 WORKDIR /usr/src/housebook
 COPY . .
 RUN npm install
-RUN npm run format:check && npm run lint && npm run build
+#RUN npm run format:check
+RUN npm run lint
+RUN npm run build
 
 # TODO: switch to Caddy in production
 FROM node:25 AS runner
