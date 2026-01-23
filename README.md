@@ -15,6 +15,18 @@ POSTGRES_PASSWORD=password
 $ docker compose exec backend /go/bin/tern migrate -m /usr/src/housebook/database/migrations -c /usr/src/housebook/database/migrations/tern.conf
 ```
 
+## Форматирование
+Перед любым коммитом необходимо подогнать весь код под единый формат.
+Для бэкенда в папке `backend`:
+```shell
+$ go fmt
+```
+
+Для фронтенда в папке `frontend`:
+```shell
+$ npm run format
+```
+
 ## Сборка проекта
 ```shell
 $ docker compose build

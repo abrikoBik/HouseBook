@@ -1,33 +1,33 @@
 .desc {
-    color: black;
-    font-size: 32px;
+  color: black;
+  font-size: 32px;
 }
 #body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 #cover {
-    justify-content: center;
-    align-items: center;
-    display: flex;
-    flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
 }
 #description {
-    flex-wrap: wrap;
-    display: flex;
-    flex-direction: row;
+  flex-wrap: wrap;
+  display: flex;
+  flex-direction: row;
 }
 #about {
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
 #language {
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
 #type {
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
