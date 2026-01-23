@@ -6,7 +6,6 @@ import (
 	"housebook/consts"
 	"housebook/database/models"
 	"housebook/util"
-	"log"
 	"net/http"
 
 	"github.com/go-chi/render"
