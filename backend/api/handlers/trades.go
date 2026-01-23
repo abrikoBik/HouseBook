@@ -6,6 +6,7 @@ import (
 	"housebook/consts"
 	"housebook/database/models"
 	"housebook/util"
+	"log"
 	"net/http"
 
 	"github.com/go-chi/render"
@@ -27,7 +28,7 @@ func tradeListResponse(trades []*models.Trade) (result []render.Renderer) {
 func CreateTrade(w http.ResponseWriter, r *http.Request) {
 	var (
 		trade = &models.Trade{}
-		data  = &models.TradeRequest{}
+		data  = &models.TradeRequest{Trade: trade}
 	)
 	if err := render.Bind(r, data); err != nil {
 		render.Render(w, r, ErrorBadRequest(err))
@@ -35,8 +36,8 @@ func CreateTrade(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// look up all entities by id
-	data.Seller.ID = data.SellerID
-	data.Buyer.ID = data.BuyerID
+	data.Seller = models.User{ID: data.SellerID}
+	data.Buyer = models.User{ID: data.BuyerID}
 	if err := data.Seller.Select(); err != nil {
 		render.Render(w, r, ErrorGeneric(err))
 		return
