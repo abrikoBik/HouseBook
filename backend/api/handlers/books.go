@@ -7,7 +7,6 @@ import (
 	"housebook/database/models"
 	"housebook/util"
 	"net/http"
-	"strconv"
 
 	"github.com/go-chi/render"
 )
@@ -119,7 +118,7 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func SearchBooks(w http.ResponseWriter, r *http.Request) {
+func SearchBook(w http.ResponseWriter, r *http.Request) {
 	var (
 		params = util.SearchTable{}
 		query  = r.URL.Query()
@@ -127,7 +126,7 @@ func SearchBooks(w http.ResponseWriter, r *http.Request) {
 	for _, param := range consts.BookSearchParams {
 		params[param] = query.Get(param)
 	}
-	books, err := models.SearchBooks(params)
+	books, err := models.Search[models.Book](params)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			render.Render(w, r, ErrorNotFound(err))
@@ -145,19 +144,14 @@ func SearchBooks(w http.ResponseWriter, r *http.Request) {
 
 func ListBooks(w http.ResponseWriter, r *http.Request) {
 	var (
-		limit, offset int
-		err           error
-		query         = r.URL.Query()
+		query              = r.URL.Query()
+		limit, offset, err = util.SearchParams(query)
 	)
-	if limit, err = strconv.Atoi(query.Get("limit")); err != nil {
+	if err != nil {
 		render.Render(w, r, ErrorBadRequest(err))
 		return
 	}
-	if offset, err = strconv.Atoi(query.Get("offset")); err != nil {
-		render.Render(w, r, ErrorBadRequest(err))
-		return
-	}
-	books, err := models.ListBooks(limit, offset)
+	books, err := models.List[models.Book](limit, offset)
 	if err != nil {
 		// TODO: decide if 404 is applicable here
 		if errors.Is(err, sql.ErrNoRows) {
