@@ -4,14 +4,14 @@ import (
 	"database/sql"
 	"errors"
 	"housebook/consts"
-	"housebook/database/models"
+	"housebook/database/db"
 	"housebook/util"
 	"net/http"
 
 	"github.com/go-chi/render"
 )
 
-func bookResponse(book *models.Book) *models.BookResponse {
+func bookResponse(book *db.Book) *db.Book {
 	return &models.BookResponse{Book: book}
 }
 

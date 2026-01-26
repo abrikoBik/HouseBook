@@ -2,36 +2,52 @@ package models
 
 import (
 	"housebook/database"
+	"housebook/database/generated"
 	"net/http"
 
-	"github.com/emvi/null"
 	"github.com/google/uuid"
-	"github.com/uptrace/bun"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Book struct {
-	bun.BaseModel `bun:"table:books"`
-	UUID          uuid.UUID `bun:",pk,type:uuid,default:uuid_generate_v4()" json:"uuid"`
+	UUID uuid.UUID `json:"id"`
 
-	Title     string `bun:",notnull" json:"title"`
-	Author    string `bun:",notnull" json:"author"`
-	ISBN      string `bun:",unique,notnull" json:"isbn"`
-	Genre     string `bun:",notnull" json:"genre"`
-	Publisher string `bun:",notnull" json:"publisher"`
+	Title     string `json:"title"`
+	Author    string `json:"author"`
+	ISBN      string `json:"isbn"`
+	Genre     string `json:"genre"`
+	Publisher string `json:"publisher"`
 
-	Year        null.Int32  `json:"year"`
-	Language    null.String `json:"language"`
-	CoverType   null.Bool   `json:"coverType"`
-	PageCount   null.Int32  `json:"pageCount"`
-	Description null.String `json:"description"`
+	Year        int    `json:"year,omitempty"`
+	Language    string `json:"language,omitempty"`
+	CoverType   string `json:"coverType,omitempty"`
+	PageCount   string `json:"pageCount,omitempty"`
+	Description string `json:"description,omitempty"`
 }
 
 type BookRequest struct {
-	*Book
+	Book
+	UUID uuid.UUID `json:"-"`
 }
 
 type BookResponse struct {
-	*Book
+	Book
+}
+
+func (book *Book) Create(request BookRequest) (generated.Book, error) {
+	params := generated.CreateBookParams{
+		Title:       request.Title,
+		Author:      request.Author,
+		Isbn:        request.ISBN,
+		Genre:       request.Genre,
+		Publisher:   request.Publisher,
+		Year:        request.Year,
+		Language:    request.Language,
+		CoverType:   request.CoverType,
+		PageCount:   request.PageCount,
+		Description: request.Description,
+	}
+	return database.Queries.CreateBook(database.Context, params)
 }
 
 func (book *Book) Render(w http.ResponseWriter, r *http.Request) error {
@@ -42,55 +58,4 @@ func (book *Book) Render(w http.ResponseWriter, r *http.Request) error {
 func (book *BookRequest) Bind(r *http.Request) error {
 	// TODO: add proper error handling
 	return nil
-}
-
-func (book *Book) Insert(request BookRequest) error {
-	book = request.Book
-	_, err := database.BunDatabase.
-		NewInsert().
-		Model(book).
-		Exec(database.Context)
-	return err
-}
-
-func (book *Book) Select() error {
-	return database.BunDatabase.
-		NewSelect().
-		Model(book).
-		WherePK().
-		Scan(database.Context)
-}
-
-func (book *Book) Update(request BookRequest) error {
-	// TODO: reimplement
-	// book = request.Book
-	// _, err := database.BunDatabase.
-	// 	NewUpdate().
-	// 	Model(book).
-	// 	Column(
-	// 		"title",
-	// 		"author",
-	// 		"isbn",
-	// 		"genre",
-	// 		"publisher",
-	// 		"year",
-	// 		"language",
-	// 		"cover_type",
-	// 		"color",
-	// 		"page_count",
-	// 		"description",
-	// 	).
-	// 	WherePK().
-	// 	Exec(database.Context)
-	// return err
-	return nil
-}
-
-func (book *Book) Delete() error {
-	_, err := database.BunDatabase.
-		NewDelete().
-		Model(book).
-		WherePK().
-		Exec(database.Context)
-	return err
 }

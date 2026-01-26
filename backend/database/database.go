@@ -3,33 +3,33 @@ package database
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
+	"housebook/database/generated"
 	"os"
 
-	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/dialect/pgdialect"
-	"github.com/uptrace/bun/driver/pgdriver"
+	"github.com/jackc/pgx/v5"
 )
 
 var (
-	Context     context.Context
-	Database    *sql.DB
-	BunDatabase *bun.DB
+	Context    context.Context
+	Connection *pgx.Conn
+	Queries    *generated.Queries
 )
 
 func Start(hostname string, port uint16) error {
 	// TODO: remove sslmode=disable
-	url := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
+	connString := fmt.Sprintf("user=%s password=%s hostname=%s port=%d db-name=%s sslmode=disable",
 		os.Getenv("POSTGRES_USER"),
 		os.Getenv("POSTGRES_PASSWORD"),
 		hostname,
 		port,
 		os.Getenv("POSTGRES_DB"),
 	)
-	Database = sql.OpenDB(pgdriver.NewConnector(
-		pgdriver.WithDSN(url),
-	))
-	BunDatabase = bun.NewDB(Database, pgdialect.New())
+	Connection, err := pgx.Connect(Context, connString)
+	if err != nil {
+		return err
+	}
+	defer Connection.Close(Context)
+	Queries = generated.New(Connection)
 	return nil
 }

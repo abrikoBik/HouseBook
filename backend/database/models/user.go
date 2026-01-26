@@ -1,87 +1,22 @@
 package models
 
-import (
-	"housebook/database"
-	"housebook/util"
-	"net/http"
-
-	"github.com/uptrace/bun"
-)
-
 type User struct {
-	bun.BaseModel `bun:"table:users"`
-	ID            int64 `bun:",pk,autoincrement" json:"id"`
+	ID int64 `json:"id"`
 
-	Email string `bun:",unique,notnull" json:"email"`
-	Login string `bun:",unique,notnull" json:"login"`
-	Name  string `bun:",notnull" json:"name"`
+	Email string `json:"email"`
+	Login string `json:"login"`
+	Name  string `json:"name"`
 
-	Salt []byte `bun:",notnull" json:"-"`
-	Hash []byte `bun:",notnull" json:"-"`
+	Salt []byte `json:"-"`
+	Hash []byte `json:"-"`
 }
 
 type UserRequest struct {
-	*User
+	User
+	ID       int64  `json:"-"`
 	Password string `json:"password"`
 }
 
 type UserResponse struct {
-	*User
-}
-
-func (user *User) Render(w http.ResponseWriter, r *http.Request) error {
-	// TODO: add proper error handling
-	return nil
-}
-
-func (user *UserRequest) Bind(r *http.Request) error {
-	// TODO: add proper error handling
-	return nil
-}
-
-func (user *User) Insert(request UserRequest) error {
-	user = request.User
-	salt, err := util.RandomBytes(16)
-	if err != nil {
-		return err
-	}
-	user.Salt = salt
-	hash, err := util.GenerateHash([]byte(request.Password), salt)
-	if err != nil {
-		return err
-	}
-	user.Hash = hash
-	_, err = database.BunDatabase.
-		NewInsert().
-		Model(user).
-		Exec(database.Context)
-	return err
-}
-
-func (user *User) Select() error {
-	return database.BunDatabase.
-		NewSelect().
-		Model(user).
-		WherePK().
-		Scan(database.Context)
-}
-
-func (user *User) Update(request UserRequest) error {
-	// TODO: reimplement
-	// q := database.BunDatabase.NewUpdate().Model(user)
-	// for _, column := range columns {
-	// 	q = q.Column(column)
-	// }
-	// _, err := q.WherePK().Exec(database.Context)
-	// return err
-	return nil
-}
-
-func (user *User) Delete() error {
-	_, err := database.BunDatabase.
-		NewDelete().
-		Model(user).
-		WherePK().
-		Exec(database.Context)
-	return err
+	User
 }
