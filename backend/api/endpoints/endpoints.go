@@ -16,4 +16,5 @@ func Register(router chi.Router) {
 	router.Get("/health", handlers.Health)
 	routeUsers(router)
 	routeBooks(router)
+	routeTrades(router)
 }

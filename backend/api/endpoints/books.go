@@ -17,6 +17,6 @@ func routeBooks(router chi.Router) {
 		r.Get("/{uuid}", handlers.GetBook)
 		r.Patch("/{uuid}", handlers.UpdateBook)
 		r.Delete("/{uuid}", handlers.DeleteBook)
-		r.Get("/search", handlers.SearchBooks)
+		r.Get("/search", handlers.SearchBook)
 	})
 }
