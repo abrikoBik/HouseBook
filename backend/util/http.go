@@ -3,6 +3,7 @@ package util
 import (
 	"errors"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
@@ -27,4 +28,15 @@ func PathUUID(name string, request *http.Request) (*uuid.UUID, error) {
 	}
 	id, err := uuid.Parse(s)
 	return &id, err
+}
+
+// SearchParams takes a URL query and extracts limit and offset fields from it.
+func SearchParams(query url.Values) (limit int, offset int, err error) {
+	if limit, err = strconv.Atoi(query.Get("limit")); err != nil {
+		return 0, 0, err
+	}
+	if offset, err = strconv.Atoi(query.Get("offset")); err != nil {
+		return 0, 0, err
+	}
+	return
 }

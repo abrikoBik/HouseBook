@@ -17,7 +17,7 @@ services:
       - back
 
   storage:
-    image: hb/golang:1.25
+    image: housebook-storage
     restart: on-failure
     env_file: .env
     build: storage
@@ -28,7 +28,7 @@ services:
       - front
 
   backend:
-    image: hb/golang:1.25
+    image: housebook-backend
     restart: on-failure
     env_file: .env
     depends_on:
@@ -40,7 +40,7 @@ services:
       - front
 
   frontend:
-    image: hb/node:25
+    image: housebook-frontend
     restart: on-failure
     depends_on:
       - backend

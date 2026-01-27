@@ -1,0 +1,33 @@
+.desc {
+  color: black;
+  font-size: 32px;
+}
+#bodyBook {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+#cover {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+}
+#description {
+  flex-wrap: wrap;
+  display: flex;
+  flex-direction: row;
+}
+#about {
+  display: flex;
+  flex-direction: row;
+}
+#language {
+  display: flex;
+  flex-direction: row;
+}
+#type {
+  display: flex;
+  flex-direction: row;
+}

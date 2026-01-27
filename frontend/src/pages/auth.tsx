@@ -8,7 +8,7 @@ const Auth = () => {
   const [visibility, setVisibility] = useState<boolean>(false);
 
   return (
-    <section id="body">
+    <section id="bodyAuth">
       <section id="AuthSection">
         <div id="LabelContainer">
           <img src={Logo} alt="logo" id="LabelPhoto" />
