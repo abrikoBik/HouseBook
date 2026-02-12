@@ -1,11 +1,15 @@
 h1 {
-  font-family: "Lucida Sans Typewriter", "Lucida Sans Regular", "Lucida Sans", "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  font-family:
+    "Lucida Sans Typewriter", "Lucida Sans Regular", "Lucida Sans",
+    "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   font-size: 24px;
   margin-bottom: 1rem;
 }
 
 h4 {
-  font-family: "Lucida Sans Typewriter", "Lucida Sans Regular", "Lucida Sans", "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  font-family:
+    "Lucida Sans Typewriter", "Lucida Sans Regular", "Lucida Sans",
+    "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   font-size: 16px;
   margin: 0;
 }
@@ -50,7 +54,7 @@ body {
   height: auto;
 }
 
-@media (max-width:950px) {
+@media (max-width: 950px) {
   #PhotoSection {
     width: 0;
   }
@@ -63,16 +67,15 @@ body {
 }
 
 @media (max-width: 1200px) {
-  #ForgotPasswordContainer{
-
-    &>div>label {
+  #ForgotPasswordContainer {
+    & > div > label {
       font-size: 0.75rem;
       height: 2rem;
       line-height: 2rem;
       text-align: center;
     }
 
-    &>a {
+    & > a {
       font-size: 0.75rem;
       height: 2rem;
       line-height: 2rem;
@@ -154,8 +157,40 @@ body {
   margin-top: 1rem;
   gap: 1rem;
   width: 100%;
+}
 
+.FormToAuth {
+  animation: ToAuth 0.35s ease-in-out;
   overflow-y: scroll;
+}
+
+.FormToRegister {
+  animation: ToRegister 0.55s ease-in-out;
+  overflow-y: scroll;
+}
+
+@keyframes ToAuth {
+  0% {
+    overflow-y: hidden;
+    height: 0;
+  }
+
+  100% {
+    overflow-y: scroll;
+    height:100%;
+  }
+}
+
+@keyframes ToRegister {
+  0% {
+    overflow-y: hidden;
+    height: 0;
+  }
+
+  100% {
+    overflow-y: scroll;
+    height:100%;
+  }
 }
 
 .AuthInput {
@@ -164,11 +199,12 @@ body {
 }
 
 .AuthInput > input {
+  background-color: #FDFBF7;
   height: 2.5rem;
   width: 100%;
   border-radius: 32px;
   border: solid 2px #b1b1b1;
-  padding-left: 2rem;
+  padding-left: 3rem;
   padding-right: 3rem;
   font-size: 1rem;
   font-weight: 400px;
@@ -188,7 +224,7 @@ body {
 }
 
 .PersonIcon {
-  right: 1rem;
+  left: 1rem;
 }
 
 .VisibilityIcon {

@@ -5,7 +5,8 @@ import { useState } from "react";
 
 const Auth = () => {
   const [active, setActive] = useState<boolean>(false);
-  const [visibility, setVisibility] = useState<boolean>(false);
+  const [visibility, setVisibility] = useState<boolean>(true);
+  const [checkPassVisibility, setCheckVisibility] = useState<boolean>(true);
 
   return (
     <section id="bodyAuth">
@@ -36,17 +37,18 @@ const Auth = () => {
           ></div>
         </div>
 
-        <form id="Form" action="submit">
+        <form id="Form" className={`${active == true ? "FormToAuth" : "FormToRegister"}`} action="submit">
           {!active ? (
             <>
               <div className="AuthInput">
-                <input type="text" placeholder="Введите ваш логин" />
+                <input id="login" type="text" placeholder="Введите ваш логин" />
                 <span className="material-symbols-outlined NoSelection PersonIcon">
                   person
                 </span>
               </div>
               <div className="AuthInput">
                 <input
+                  id="password"
                   type={`${visibility ? "password" : "text"}`}
                   placeholder="Введите ваш пароль"
                 />
@@ -55,6 +57,11 @@ const Auth = () => {
                   onClick={() => setVisibility(!visibility)}
                 >
                   {visibility ? "visibility" : "visibility_off"}
+                </span>
+                <span
+                  className="material-symbols-outlined NoSelection PersonIcon"
+                >
+                  password_2
                 </span>
               </div>
               <div id="ForgotPasswordContainer">
@@ -80,25 +87,26 @@ const Auth = () => {
           ) : (
             <>
               <div className="AuthInput">
-                <input type="text" placeholder="Введите email" />
+                <input id="email" type="text" placeholder="Введите email" />
                 <span className="material-symbols-outlined NoSelection PersonIcon">
                   mail
                 </span>
               </div>
               <div className="AuthInput">
-                <input type="text" placeholder="Введите логин" />
+                <input id="login" type="text" placeholder="Введите логин" />
                 <span className="material-symbols-outlined NoSelection PersonIcon">
                   person
                 </span>
               </div>
               <div className="AuthInput">
-                <input type="text" placeholder="Введите ФИО" />
+                <input id="name" type="text" placeholder="Введите ФИО" />
                 <span className="material-symbols-outlined NoSelection PersonIcon">
                   badge
                 </span>
               </div>
               <div className="AuthInput">
                 <input
+                  id="password"
                   type={`${visibility ? "password" : "text"}`}
                   placeholder="Введите пароль"
                 />
@@ -108,17 +116,28 @@ const Auth = () => {
                 >
                   {visibility ? "visibility" : "visibility_off"}
                 </span>
+                <span
+                  className="material-symbols-outlined NoSelection PersonIcon"
+                >
+                  password_2
+                </span>
               </div>
               <div className="AuthInput">
                 <input
-                  type={`${visibility ? "password" : "text"}`}
+                  id="checkPass"
+                  type={`${checkPassVisibility ? "password" : "text"}`}
                   placeholder="Введите пароль повторно"
                 />
                 <span
                   className="material-symbols-outlined NoSelection VisibilityIcon"
-                  onClick={() => setVisibility(!visibility)}
+                  onClick={() => setCheckVisibility(!checkPassVisibility)}
                 >
-                  {visibility ? "visibility" : "visibility_off"}
+                  {checkPassVisibility ? "visibility" : "visibility_off"}
+                </span>
+                <span
+                  className="material-symbols-outlined NoSelection PersonIcon"
+                >
+                  password_2
                 </span>
               </div>
               <button type="submit" id="SubmitButton">
