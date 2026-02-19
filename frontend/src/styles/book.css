@@ -1,33 +1,81 @@
-.desc {
-  color: black;
-  font-size: 32px;
-}
-#bodyBook {
+#bookBody {
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
-}
-#cover {
   justify-content: center;
   align-items: center;
-  display: flex;
-  flex-direction: row;
+  padding-left: 10vw; 
+  padding-right: 5vw;
+  padding-top: 5vw;
 }
-#description {
-  flex-wrap: wrap;
+
+#cover {
   display: flex;
+  z-index: 200;
   flex-direction: row;
+  margin-bottom: -15%;
+  &>div>div>h1 {
+    font-weight: bold;
+    font-size: 64px;
+  }
+
+  &>div>:nth-child(2) {
+    display: flex;
+    margin-top: auto;
+    width: 100%;
+    padding-bottom: 8%;
+    box-shadow: 0px 2px #ECEAE6;
+  }
+
 }
-#about {
+
+#cover>div {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  margin-left: 8rem;
+}  
+
+#bronya {
+  background-color: #272A34;
+  color: white;
+  border: 0;
+  border-radius: 20px;
+  padding: 2%;
+  padding-left: 5%;
+  padding-right: 5%;
+  font-size: 20px;
+  font-weight: normal;
+
+  &:hover {
+    background-color: #3b404f;
+    cursor: pointer;
+  }
 }
-#language {
+
+#favoriteIcon {
   display: flex;
-  flex-direction: row;
+  align-items: center;
+  margin-left: auto;
+  padding-left: 2.2%;
+  padding-right: 2.2%;
+  border-radius: 100%;
+  background-color: #F3F1EB;
+
+  &>img {
+    width: auto;
+    height: auto;
+    max-width: 1.3rem;
+    min-height: 1.3rem;
+  }
+
+  &:hover {
+    background-color: #dadce1;
+    cursor: pointer;
+  }
 }
-#type {
-  display: flex;
-  flex-direction: row;
+
+.bookDescription {
+  background-color: #FDFBF7;
+  padding: 5%;
+  padding-top: 20%;
+  border-radius: 25px;
 }
