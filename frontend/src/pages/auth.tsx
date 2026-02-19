@@ -126,7 +126,7 @@ const Auth = () => {
           </form>
         )}
       </section>
-      <img src={AuthPhoto} alt="authPhoto" id="PhotoSection"/>
+      <img src={AuthPhoto} alt="authPhoto" id="PhotoSection" />
     </section>
   );
 };
