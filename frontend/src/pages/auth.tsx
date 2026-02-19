@@ -37,7 +37,11 @@ const Auth = () => {
           ></div>
         </div>
 
-        <form id="Form" className={`${active == true ? "FormToAuth" : "FormToRegister"}`} action="submit">
+        <form
+          id="Form"
+          className={`${active == true ? "FormToAuth" : "FormToRegister"}`}
+          action="submit"
+        >
           {!active ? (
             <>
               <div className="AuthInput">
@@ -58,9 +62,7 @@ const Auth = () => {
                 >
                   {visibility ? "visibility" : "visibility_off"}
                 </span>
-                <span
-                  className="material-symbols-outlined NoSelection PersonIcon"
-                >
+                <span className="material-symbols-outlined NoSelection PersonIcon">
                   password_2
                 </span>
               </div>
@@ -116,9 +118,7 @@ const Auth = () => {
                 >
                   {visibility ? "visibility" : "visibility_off"}
                 </span>
-                <span
-                  className="material-symbols-outlined NoSelection PersonIcon"
-                >
+                <span className="material-symbols-outlined NoSelection PersonIcon">
                   password_2
                 </span>
               </div>
@@ -134,9 +134,7 @@ const Auth = () => {
                 >
                   {checkPassVisibility ? "visibility" : "visibility_off"}
                 </span>
-                <span
-                  className="material-symbols-outlined NoSelection PersonIcon"
-                >
+                <span className="material-symbols-outlined NoSelection PersonIcon">
                   password_2
                 </span>
               </div>
