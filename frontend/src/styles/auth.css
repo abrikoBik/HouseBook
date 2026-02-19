@@ -1,22 +1,26 @@
 h1 {
+  font-family:
+    "Lucida Sans Typewriter", "Lucida Sans Regular", "Lucida Sans",
+    "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   font-size: 24px;
   margin-bottom: 1rem;
 }
 
 h4 {
+  font-family:
+    "Lucida Sans Typewriter", "Lucida Sans Regular", "Lucida Sans",
+    "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   font-size: 16px;
   margin: 0;
 }
 
-body {
-  overflow: hidden;
-}
-
-#body {
+#bodyAuth {
+  margin: 0;
   display: flex;
-  flex-direction: row;
-  width: 100vw;
+  justify-content: center;
+  align-items: center;
   height: 100vh;
+  overflow: hidden;
 }
 
 #AuthSection {
@@ -28,9 +32,10 @@ body {
   padding-top: 4rem;
   padding-left: 5rem;
   padding-right: 5rem;
+  padding-bottom: 1rem;
 
   background-color: #fdfbf7;
-  height: 80.5%;
+  height: 78.5%;
   width: 25%;
 
   border-radius: 35px;
@@ -40,10 +45,47 @@ body {
 
 #PhotoSection {
   display: block;
-  max-width: 90%;
-  max-height: 80%;
+  max-width: 95%;
+  max-height: 88%;
   width: auto;
   height: auto;
+}
+
+@media (max-width: 950px) {
+  #PhotoSection {
+    width: 0;
+  }
+
+  #AuthSection {
+    width: 100%;
+    margin-left: 5%;
+    margin-right: 5%;
+  }
+}
+
+@media (max-width: 1200px) {
+  #ForgotPasswordContainer {
+    & > div > label {
+      font-size: 0.75rem;
+      height: 2rem;
+      line-height: 2rem;
+      text-align: center;
+    }
+
+    & > a {
+      font-size: 0.75rem;
+      height: 2rem;
+      line-height: 2rem;
+      text-align: center;
+    }
+  }
+}
+
+@media (max-width: 450px) {
+  #AuthSection {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
 }
 
 #LabelContainer {
@@ -114,16 +156,52 @@ body {
   width: 100%;
 }
 
+.FormToAuth {
+  animation: ToAuth 0.35s ease-in-out;
+  overflow-y: scroll;
+}
+
+.FormToRegister {
+  animation: ToRegister 0.55s ease-in-out;
+  overflow-y: scroll;
+}
+
+@keyframes ToAuth {
+  0% {
+    overflow-y: hidden;
+    height: 0;
+  }
+
+  100% {
+    overflow-y: scroll;
+    height: 100%;
+  }
+}
+
+@keyframes ToRegister {
+  0% {
+    overflow-y: hidden;
+    height: 0;
+  }
+
+  100% {
+    overflow-y: scroll;
+    height: 100%;
+  }
+}
+
 .AuthInput {
   display: flex;
+  position: relative;
 }
 
 .AuthInput > input {
+  background-color: #fdfbf7;
   height: 2.5rem;
   width: 100%;
   border-radius: 32px;
   border: solid 2px #b1b1b1;
-  padding-left: 2rem;
+  padding-left: 3rem;
   padding-right: 3rem;
   font-size: 1rem;
   font-weight: 400px;
@@ -133,17 +211,21 @@ body {
   }
 }
 
-.PersonIcon {
+.PersonIcon,
+.VisibilityIcon {
   position: absolute;
-  transform: translate(1430%, 40%);
-  color: #b1b1b1;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+  color: #9e9e9e;
+}
+
+.PersonIcon {
+  left: 1rem;
 }
 
 .VisibilityIcon {
-  position: absolute;
-  height: 16px;
-  transform: translate(1430%, 70%);
-  color: #b1b1b1;
+  right: 1rem;
 }
 
 #ForgotPasswordContainer {

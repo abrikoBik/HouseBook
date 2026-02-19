@@ -5,10 +5,11 @@ import { useState } from "react";
 
 const Auth = () => {
   const [active, setActive] = useState<boolean>(false);
-  const [visibility, setVisibility] = useState<boolean>(false);
+  const [visibility, setVisibility] = useState<boolean>(true);
+  const [checkPassVisibility, setCheckVisibility] = useState<boolean>(true);
 
   return (
-    <section id="body">
+    <section id="bodyAuth">
       <section id="AuthSection">
         <div id="LabelContainer">
           <img src={Logo} alt="logo" id="LabelPhoto" />
@@ -36,97 +37,115 @@ const Auth = () => {
           ></div>
         </div>
 
-        {!active ? (
-          <form id="Form" action="submit">
-            <div className="AuthInput">
-              <input type="text" placeholder="Введите ваш логин" />
-              <span className="material-symbols-outlined NoSelection PersonIcon">
-                person
-              </span>
-            </div>
-            <div className="AuthInput">
-              <input
-                type={`${visibility ? "password" : "text"}`}
-                placeholder="Введите ваш пароль"
-              />
-              <span
-                className="material-symbols-outlined NoSelection VisibilityIcon"
-                onClick={() => setVisibility(!visibility)}
-              >
-                {visibility ? "visibility" : "visibility_off"}
-              </span>
-            </div>
-            <div id="ForgotPasswordContainer">
-              <div>
-                <div>
-                  <input type="checkbox" id="AuthCheckBox" />
-                  <span className="material-symbols-outlined checkBoxIcon NoSelection">
-                    check
-                  </span>
-                </div>
-                <label htmlFor="AuthCheckBox" className="NoSelection">
-                  Запомнить меня
-                </label>
+        <form
+          id="Form"
+          className={`${active == true ? "FormToAuth" : "FormToRegister"}`}
+          action="submit"
+        >
+          {!active ? (
+            <>
+              <div className="AuthInput">
+                <input id="login" type="text" placeholder="Введите ваш логин" />
+                <span className="material-symbols-outlined NoSelection PersonIcon">
+                  person
+                </span>
               </div>
-              <a href="/auth" className="NoSelection">
-                Забыли пароль?
-              </a>
-            </div>
-            <button type="submit" id="SubmitButton">
-              Авторизоваться
-            </button>
-          </form>
-        ) : (
-          <form id="Form" action="submit">
-            <div className="AuthInput">
-              <input type="text" placeholder="Введите email" />
-              <span className="material-symbols-outlined NoSelection PersonIcon">
-                mail
-              </span>
-            </div>
-            <div className="AuthInput">
-              <input type="text" placeholder="Введите логин" />
-              <span className="material-symbols-outlined NoSelection PersonIcon">
-                person
-              </span>
-            </div>
-            <div className="AuthInput">
-              <input type="text" placeholder="Введите ФИО" />
-              <span className="material-symbols-outlined NoSelection PersonIcon">
-                badge
-              </span>
-            </div>
-            <div className="AuthInput">
-              <input
-                type={`${visibility ? "password" : "text"}`}
-                placeholder="Введите пароль"
-              />
-              <span
-                className="material-symbols-outlined NoSelection VisibilityIcon"
-                onClick={() => setVisibility(!visibility)}
-              >
-                {visibility ? "visibility" : "visibility_off"}
-              </span>
-            </div>
-            <div className="AuthInput">
-              <input
-                type={`${visibility ? "password" : "text"}`}
-                placeholder="Введите пароль повторно"
-              />
-              <span
-                className="material-symbols-outlined NoSelection VisibilityIcon"
-                onClick={() => setVisibility(!visibility)}
-              >
-                {visibility ? "visibility" : "visibility_off"}
-              </span>
-            </div>
-            <button type="submit" id="SubmitButton">
-              Авторизоваться
-            </button>
-          </form>
-        )}
+              <div className="AuthInput">
+                <input
+                  id="password"
+                  type={`${visibility ? "password" : "text"}`}
+                  placeholder="Введите ваш пароль"
+                />
+                <span
+                  className="material-symbols-outlined NoSelection VisibilityIcon"
+                  onClick={() => setVisibility(!visibility)}
+                >
+                  {visibility ? "visibility" : "visibility_off"}
+                </span>
+                <span className="material-symbols-outlined NoSelection PersonIcon">
+                  password_2
+                </span>
+              </div>
+              <div id="ForgotPasswordContainer">
+                <div>
+                  <div>
+                    <input type="checkbox" id="AuthCheckBox" />
+                    <span className="material-symbols-outlined checkBoxIcon NoSelection">
+                      check
+                    </span>
+                  </div>
+                  <label htmlFor="AuthCheckBox" className="NoSelection">
+                    Запомнить меня
+                  </label>
+                </div>
+                <a href="/auth" className="NoSelection">
+                  Забыли пароль?
+                </a>
+              </div>
+              <button type="submit" id="SubmitButton">
+                Авторизоваться
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="AuthInput">
+                <input id="email" type="text" placeholder="Введите email" />
+                <span className="material-symbols-outlined NoSelection PersonIcon">
+                  mail
+                </span>
+              </div>
+              <div className="AuthInput">
+                <input id="login" type="text" placeholder="Введите логин" />
+                <span className="material-symbols-outlined NoSelection PersonIcon">
+                  person
+                </span>
+              </div>
+              <div className="AuthInput">
+                <input id="name" type="text" placeholder="Введите ФИО" />
+                <span className="material-symbols-outlined NoSelection PersonIcon">
+                  badge
+                </span>
+              </div>
+              <div className="AuthInput">
+                <input
+                  id="password"
+                  type={`${visibility ? "password" : "text"}`}
+                  placeholder="Введите пароль"
+                />
+                <span
+                  className="material-symbols-outlined NoSelection VisibilityIcon"
+                  onClick={() => setVisibility(!visibility)}
+                >
+                  {visibility ? "visibility" : "visibility_off"}
+                </span>
+                <span className="material-symbols-outlined NoSelection PersonIcon">
+                  password_2
+                </span>
+              </div>
+              <div className="AuthInput">
+                <input
+                  id="checkPass"
+                  type={`${checkPassVisibility ? "password" : "text"}`}
+                  placeholder="Введите пароль повторно"
+                />
+                <span
+                  className="material-symbols-outlined NoSelection VisibilityIcon"
+                  onClick={() => setCheckVisibility(!checkPassVisibility)}
+                >
+                  {checkPassVisibility ? "visibility" : "visibility_off"}
+                </span>
+                <span className="material-symbols-outlined NoSelection PersonIcon">
+                  password_2
+                </span>
+              </div>
+              <button type="submit" id="SubmitButton">
+                Авторизоваться
+              </button>
+            </>
+          )}
+        </form>
       </section>
-      <img src={AuthPhoto} alt="authPhoto" id="PhotoSection" />
+      <img src={AuthPhoto} alt="authphoto" id="PhotoSection" />
     </section>
   );
 };
