@@ -12,7 +12,7 @@ POSTGRES_PASSWORD=password
 > Перед запуском миграций необходимо запустить контейнеры `backend` и `db`.
 
 ```shell
-$ docker compose exec backend /go/bin/tern migrate -m /usr/src/housebook/database/migrations -c /usr/src/housebook/database/migrations/tern.conf
+$ docker compose exec backend tern migrate -m /app/migrations -c /app/migrations/tern.conf
 ```
 
 ## Форматирование
