@@ -162,12 +162,6 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, e
 const searchBooks = `-- name: SearchBooks :many
 select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description from books
 where
-    -- title = coalesce(sqlc.narg('title'), title) and
-    -- author = coalesce(sqlc.narg('author'), author) and
-    -- genre = coalesce(sqlc.narg('genre'), genre) and
-    -- publisher = coalesce(sqlc.narg('publisher'), publisher) and
-    -- year = coalesce(sqlc.narg('year'), year) and
-    -- language = coalesce(sqlc.narg('language'), language)
     (title = $3 or $3 = '') and
     (author = $4 or $4 = '') and
     (genre = $5 or $5 = '') and

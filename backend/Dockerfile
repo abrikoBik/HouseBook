@@ -1,9 +1,10 @@
 FROM golang:1.25 AS builder
 WORKDIR /app
-RUN go install github.com/jackc/tern/v2@v2.3.4
+RUN go install github.com/jackc/tern/v2@latest && go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 COPY go.mod go.sum .
 RUN go mod download
 COPY . .
+RUN /go/bin/sqlc -f database/sqlc.yml vet && /go/bin/sqlc -f database/sqlc.yml compile && /go/bin/sqlc -f database/sqlc.yml diff
 RUN --mount=type=cache,id=backend-cache,target="/root/.cache/go-build" go build -o housebook
 
 FROM debian:trixie-slim AS runner

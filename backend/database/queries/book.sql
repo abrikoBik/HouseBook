@@ -57,17 +57,11 @@ where id = @id;
 -- name: SearchBooks :many
 select * from books
 where
-    -- title = coalesce(sqlc.narg('title'), title) and
-    -- author = coalesce(sqlc.narg('author'), author) and
-    -- genre = coalesce(sqlc.narg('genre'), genre) and
-    -- publisher = coalesce(sqlc.narg('publisher'), publisher) and
-    -- year = coalesce(sqlc.narg('year'), year) and
-    -- language = coalesce(sqlc.narg('language'), language)
     (title = sqlc.narg('title') or sqlc.narg('title') = '') and
     (author = sqlc.narg('author') or sqlc.narg('author') = '') and
     (genre = sqlc.narg('genre') or sqlc.narg('genre') = '') and
     (publisher = sqlc.narg('publisher') or sqlc.narg('publisher') = '') and
-    (sqlc.narg('year') = 0 or year = sqlc.narg('year')) and
+    (year = sqlc.narg('year') or sqlc.narg('year') = 0) and
     (language = sqlc.narg('language') or sqlc.narg('language') = '')
 limit $1
 offset $2;
