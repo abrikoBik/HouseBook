@@ -13,9 +13,27 @@ import (
 
 const createBook = `-- name: CreateBook :one
 insert into books (
-    title, author, isbn, genre, publisher, year, language, cover_type, page_count, description
+    title,
+    author,
+    isbn,
+    genre,
+    publisher,
+    year,
+    language,
+    cover_type,
+    page_count,
+    description
 ) values (
-    $1,    $2,     $3,   $4,    $5,        $6,   $7,       $8,         $9,         $10
+    $1,
+    $2,
+    $3,
+    $4,
+    $5,
+    $6,
+    $7,
+    $8,
+    $9,
+    $10
 )
 returning id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description
 `
@@ -28,8 +46,8 @@ type CreateBookParams struct {
 	Publisher   string         `db:"publisher" json:"publisher"`
 	Year        pgtype.Numeric `db:"year" json:"year"`
 	Language    pgtype.Text    `db:"language" json:"language"`
-	CoverType   pgtype.Text    `db:"cover_type" json:"cover_type"`
-	PageCount   pgtype.Numeric `db:"page_count" json:"page_count"`
+	Covertype   pgtype.Text    `db:"covertype" json:"covertype"`
+	Pagecount   pgtype.Numeric `db:"pagecount" json:"pagecount"`
 	Description pgtype.Text    `db:"description" json:"description"`
 }
 
@@ -42,8 +60,8 @@ func (q *Queries) CreateBook(ctx context.Context, arg CreateBookParams) (Book, e
 		arg.Publisher,
 		arg.Year,
 		arg.Language,
-		arg.CoverType,
-		arg.PageCount,
+		arg.Covertype,
+		arg.Pagecount,
 		arg.Description,
 	)
 	var i Book
@@ -141,40 +159,110 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, e
 	return items, nil
 }
 
+const searchBooks = `-- name: SearchBooks :many
+select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description from books
+where
+    -- title = coalesce(sqlc.narg('title'), title) and
+    -- author = coalesce(sqlc.narg('author'), author) and
+    -- genre = coalesce(sqlc.narg('genre'), genre) and
+    -- publisher = coalesce(sqlc.narg('publisher'), publisher) and
+    -- year = coalesce(sqlc.narg('year'), year) and
+    -- language = coalesce(sqlc.narg('language'), language)
+    (title = $3 or $3 = '') and
+    (author = $4 or $4 = '') and
+    (genre = $5 or $5 = '') and
+    (publisher = $6 or $6 = '') and
+    (year = $7 or $7 = 0) and
+    (language = $8 or $8 = '')
+limit $1
+offset $2
+`
+
+type SearchBooksParams struct {
+	Limit     int32          `db:"limit" json:"limit"`
+	Offset    int32          `db:"offset" json:"offset"`
+	Title     pgtype.Text    `db:"title" json:"title"`
+	Author    pgtype.Text    `db:"author" json:"author"`
+	Genre     pgtype.Text    `db:"genre" json:"genre"`
+	Publisher pgtype.Text    `db:"publisher" json:"publisher"`
+	Year      pgtype.Numeric `db:"year" json:"year"`
+	Language  pgtype.Text    `db:"language" json:"language"`
+}
+
+func (q *Queries) SearchBooks(ctx context.Context, arg SearchBooksParams) ([]Book, error) {
+	rows, err := q.db.Query(ctx, searchBooks,
+		arg.Limit,
+		arg.Offset,
+		arg.Title,
+		arg.Author,
+		arg.Genre,
+		arg.Publisher,
+		arg.Year,
+		arg.Language,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Book
+	for rows.Next() {
+		var i Book
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Author,
+			&i.Isbn,
+			&i.Genre,
+			&i.Publisher,
+			&i.Year,
+			&i.Language,
+			&i.CoverType,
+			&i.PageCount,
+			&i.Description,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateBook = `-- name: UpdateBook :one
 update books
 set
-    title = coalesce($2, title),
-    author = coalesce($3, author),
-    isbn = coalesce($4, isbn),
-    genre = coalesce($5, genre),
-    publisher = coalesce($6, publisher),
-    year = coalesce($7, year),
-    language = coalesce($8, language),
-    cover_type = coalesce($9, cover_type),
-    page_count = coalesce($10, page_count),
-    description = coalesce($11, description)
-where id = $1
+    title = coalesce($1, title),
+    author = coalesce($2, author),
+    isbn = coalesce($3, isbn),
+    genre = coalesce($4, genre),
+    publisher = coalesce($5, publisher),
+    year = coalesce($6, year),
+    language = coalesce($7, language),
+    cover_type = coalesce($8, cover_type),
+    page_count = coalesce($9, page_count),
+    description = coalesce($10, description)
+where id = $11
 returning id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description
 `
 
 type UpdateBookParams struct {
-	ID          pgtype.UUID    `db:"id" json:"id"`
-	Title       string         `db:"title" json:"title"`
-	Author      string         `db:"author" json:"author"`
-	Isbn        string         `db:"isbn" json:"isbn"`
-	Genre       string         `db:"genre" json:"genre"`
-	Publisher   string         `db:"publisher" json:"publisher"`
+	Title       pgtype.Text    `db:"title" json:"title"`
+	Author      pgtype.Text    `db:"author" json:"author"`
+	Isbn        pgtype.Text    `db:"isbn" json:"isbn"`
+	Genre       pgtype.Text    `db:"genre" json:"genre"`
+	Publisher   pgtype.Text    `db:"publisher" json:"publisher"`
 	Year        pgtype.Numeric `db:"year" json:"year"`
 	Language    pgtype.Text    `db:"language" json:"language"`
-	CoverType   pgtype.Text    `db:"cover_type" json:"cover_type"`
-	PageCount   pgtype.Numeric `db:"page_count" json:"page_count"`
+	CoverType   pgtype.Text    `db:"coverType" json:"coverType"`
+	PageCount   pgtype.Numeric `db:"pageCount" json:"pageCount"`
 	Description pgtype.Text    `db:"description" json:"description"`
+	ID          pgtype.UUID    `db:"id" json:"id"`
 }
 
 func (q *Queries) UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, error) {
 	row := q.db.QueryRow(ctx, updateBook,
-		arg.ID,
 		arg.Title,
 		arg.Author,
 		arg.Isbn,
@@ -185,6 +273,7 @@ func (q *Queries) UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, e
 		arg.CoverType,
 		arg.PageCount,
 		arg.Description,
+		arg.ID,
 	)
 	var i Book
 	err := row.Scan(

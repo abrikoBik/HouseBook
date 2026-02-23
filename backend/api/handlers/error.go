@@ -44,6 +44,14 @@ func ErrorNotFound(err error) *ErrorResponse {
 	}
 }
 
+func ErrorDatabase(err error) *ErrorResponse {
+	return &ErrorResponse{
+		Status: http.StatusInternalServerError,
+		Error:  "database error",
+		Debug:  err.Error(),
+	}
+}
+
 func ErrorGeneric(err error) *ErrorResponse {
 	return &ErrorResponse{
 		Status: http.StatusInternalServerError,

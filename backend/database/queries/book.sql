@@ -1,6 +1,6 @@
 -- name: GetBook :one
 select * from books
-where id = $1
+where id = @id
 limit 1;
 
 -- name: ListBooks :many
@@ -10,28 +10,64 @@ offset $2;
 
 -- name: CreateBook :one
 insert into books (
-    title, author, isbn, genre, publisher, year, language, cover_type, page_count, description
+    title,
+    author,
+    isbn,
+    genre,
+    publisher,
+    year,
+    language,
+    cover_type,
+    page_count,
+    description
 ) values (
-    $1,    $2,     $3,   $4,    $5,        $6,   $7,       $8,         $9,         $10
+    @title,
+    @author,
+    @isbn,
+    @genre,
+    @publisher,
+    @year,
+    @language,
+    @coverType,
+    @pageCount,
+    @description
 )
 returning *;
 
 -- name: UpdateBook :one
 update books
 set
-    title = coalesce($2, title),
-    author = coalesce($3, author),
-    isbn = coalesce($4, isbn),
-    genre = coalesce($5, genre),
-    publisher = coalesce($6, publisher),
-    year = coalesce($7, year),
-    language = coalesce($8, language),
-    cover_type = coalesce($9, cover_type),
-    page_count = coalesce($10, page_count),
-    description = coalesce($11, description)
-where id = $1
+    title = coalesce(sqlc.narg('title'), title),
+    author = coalesce(sqlc.narg('author'), author),
+    isbn = coalesce(sqlc.narg('isbn'), isbn),
+    genre = coalesce(sqlc.narg('genre'), genre),
+    publisher = coalesce(sqlc.narg('publisher'), publisher),
+    year = coalesce(sqlc.narg('year'), year),
+    language = coalesce(sqlc.narg('language'), language),
+    cover_type = coalesce(sqlc.narg('coverType'), cover_type),
+    page_count = coalesce(sqlc.narg('pageCount'), page_count),
+    description = coalesce(sqlc.narg('description'), description)
+where id = @id
 returning *;
 
 -- name: DeleteBook :exec
 delete from books
-where id = $1;
+where id = @id;
+
+-- name: SearchBooks :many
+select * from books
+where
+    -- title = coalesce(sqlc.narg('title'), title) and
+    -- author = coalesce(sqlc.narg('author'), author) and
+    -- genre = coalesce(sqlc.narg('genre'), genre) and
+    -- publisher = coalesce(sqlc.narg('publisher'), publisher) and
+    -- year = coalesce(sqlc.narg('year'), year) and
+    -- language = coalesce(sqlc.narg('language'), language)
+    (title = sqlc.narg('title') or sqlc.narg('title') = '') and
+    (author = sqlc.narg('author') or sqlc.narg('author') = '') and
+    (genre = sqlc.narg('genre') or sqlc.narg('genre') = '') and
+    (publisher = sqlc.narg('publisher') or sqlc.narg('publisher') = '') and
+    (sqlc.narg('year') = 0 or year = sqlc.narg('year')) and
+    (language = sqlc.narg('language') or sqlc.narg('language') = '')
+limit $1
+offset $2;
