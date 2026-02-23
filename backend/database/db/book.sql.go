@@ -100,10 +100,17 @@ func (q *Queries) GetBook(ctx context.Context, id pgtype.UUID) (Book, error) {
 
 const listBooks = `-- name: ListBooks :many
 select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description from books
+limit $1
+offset $2
 `
 
-func (q *Queries) ListBooks(ctx context.Context) ([]Book, error) {
-	rows, err := q.db.Query(ctx, listBooks)
+type ListBooksParams struct {
+	Limit  int32 `db:"limit" json:"limit"`
+	Offset int32 `db:"offset" json:"offset"`
+}
+
+func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, error) {
+	rows, err := q.db.Query(ctx, listBooks, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -137,16 +144,16 @@ func (q *Queries) ListBooks(ctx context.Context) ([]Book, error) {
 const updateBook = `-- name: UpdateBook :one
 update books
 set
-    title = $2,
-    author = $3,
-    isbn = $4,
-    genre = $5,
-    publisher = $6,
-    year = $7,
-    language = $8,
-    cover_type = $9,
-    page_count = $10,
-    description = $11
+    title = coalesce($2, title),
+    author = coalesce($3, author),
+    isbn = coalesce($4, isbn),
+    genre = coalesce($5, genre),
+    publisher = coalesce($6, publisher),
+    year = coalesce($7, year),
+    language = coalesce($8, language),
+    cover_type = coalesce($9, cover_type),
+    page_count = coalesce($10, page_count),
+    description = coalesce($11, description)
 where id = $1
 returning id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description
 `

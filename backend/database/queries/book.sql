@@ -4,7 +4,9 @@ where id = $1
 limit 1;
 
 -- name: ListBooks :many
-select * from books;
+select * from books
+limit $1
+offset $2;
 
 -- name: CreateBook :one
 insert into books (
@@ -17,16 +19,16 @@ returning *;
 -- name: UpdateBook :one
 update books
 set
-    title = $2,
-    author = $3,
-    isbn = $4,
-    genre = $5,
-    publisher = $6,
-    year = $7,
-    language = $8,
-    cover_type = $9,
-    page_count = $10,
-    description = $11
+    title = coalesce($2, title),
+    author = coalesce($3, author),
+    isbn = coalesce($4, isbn),
+    genre = coalesce($5, genre),
+    publisher = coalesce($6, publisher),
+    year = coalesce($7, year),
+    language = coalesce($8, language),
+    cover_type = coalesce($9, cover_type),
+    page_count = coalesce($10, page_count),
+    description = coalesce($11, description)
 where id = $1
 returning *;
 
