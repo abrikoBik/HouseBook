@@ -17,15 +17,14 @@ var (
 	Listener net.Listener
 	Server   http.Server
 	Router   chi.Router
+	err      error
 )
 
-func Start(hostname string, port uint16) error {
-	if Context == nil {
-		return errors.New("context is nil")
-	}
-	Listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", hostname, port))
+func Start(ctx context.Context, hostname string, port uint16, callback func()) {
+	Context = ctx
+	Listener, err = net.Listen("tcp", fmt.Sprintf("%s:%d", hostname, port))
 	if err != nil {
-		return err
+		panic(err)
 	}
 	defer Listener.Close()
 	Server.Addr = Listener.Addr().String()
@@ -34,9 +33,14 @@ func Start(hostname string, port uint16) error {
 	Server.Handler = Router
 	endpoints.Register(Router)
 
+	callback()
 	if err := Server.Serve(Listener); !errors.Is(err, http.ErrServerClosed) {
-		return err
+		panic(err)
 	}
 	defer Server.Shutdown(Context)
-	return nil
+}
+
+func Stop(callback func()) {
+	Server.Close()
+	callback()
 }

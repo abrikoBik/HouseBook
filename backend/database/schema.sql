@@ -1,5 +1,6 @@
 create extension if not exists "uuid-ossp";
 
+-- TODO: original owner + current owner
 create table books (
     id uuid primary key default uuid_generate_v4(),
 

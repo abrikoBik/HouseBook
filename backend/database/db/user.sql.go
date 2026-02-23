@@ -3,7 +3,7 @@
 //   sqlc v1.30.0
 // source: user.sql
 
-package generated
+package db
 
 import (
 	"context"
@@ -19,11 +19,11 @@ returning id, email, login, name, salt, hash
 `
 
 type CreateUserParams struct {
-	Email string
-	Login string
-	Name  string
-	Salt  []byte
-	Hash  []byte
+	Email string `db:"email" json:"email"`
+	Login string `db:"login" json:"login"`
+	Name  string `db:"name" json:"name"`
+	Salt  []byte `db:"salt" json:"salt"`
+	Hash  []byte `db:"hash" json:"hash"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -89,12 +89,12 @@ returning id, email, login, name, salt, hash
 `
 
 type UpdateUserParams struct {
-	ID    int64
-	Email string
-	Login string
-	Name  string
-	Salt  []byte
-	Hash  []byte
+	ID    int64  `db:"id" json:"id"`
+	Email string `db:"email" json:"email"`
+	Login string `db:"login" json:"login"`
+	Name  string `db:"name" json:"name"`
+	Salt  []byte `db:"salt" json:"salt"`
+	Hash  []byte `db:"hash" json:"hash"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {

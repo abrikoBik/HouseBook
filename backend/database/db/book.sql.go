@@ -3,7 +3,7 @@
 //   sqlc v1.30.0
 // source: book.sql
 
-package generated
+package db
 
 import (
 	"context"
@@ -21,16 +21,16 @@ returning id, title, author, isbn, genre, publisher, year, language, cover_type,
 `
 
 type CreateBookParams struct {
-	Title       string
-	Author      string
-	Isbn        string
-	Genre       string
-	Publisher   string
-	Year        pgtype.Numeric
-	Language    pgtype.Text
-	CoverType   pgtype.Text
-	PageCount   pgtype.Numeric
-	Description pgtype.Text
+	Title       string         `db:"title" json:"title"`
+	Author      string         `db:"author" json:"author"`
+	Isbn        string         `db:"isbn" json:"isbn"`
+	Genre       string         `db:"genre" json:"genre"`
+	Publisher   string         `db:"publisher" json:"publisher"`
+	Year        pgtype.Numeric `db:"year" json:"year"`
+	Language    pgtype.Text    `db:"language" json:"language"`
+	CoverType   pgtype.Text    `db:"cover_type" json:"cover_type"`
+	PageCount   pgtype.Numeric `db:"page_count" json:"page_count"`
+	Description pgtype.Text    `db:"description" json:"description"`
 }
 
 func (q *Queries) CreateBook(ctx context.Context, arg CreateBookParams) (Book, error) {
@@ -152,17 +152,17 @@ returning id, title, author, isbn, genre, publisher, year, language, cover_type,
 `
 
 type UpdateBookParams struct {
-	ID          pgtype.UUID
-	Title       string
-	Author      string
-	Isbn        string
-	Genre       string
-	Publisher   string
-	Year        pgtype.Numeric
-	Language    pgtype.Text
-	CoverType   pgtype.Text
-	PageCount   pgtype.Numeric
-	Description pgtype.Text
+	ID          pgtype.UUID    `db:"id" json:"id"`
+	Title       string         `db:"title" json:"title"`
+	Author      string         `db:"author" json:"author"`
+	Isbn        string         `db:"isbn" json:"isbn"`
+	Genre       string         `db:"genre" json:"genre"`
+	Publisher   string         `db:"publisher" json:"publisher"`
+	Year        pgtype.Numeric `db:"year" json:"year"`
+	Language    pgtype.Text    `db:"language" json:"language"`
+	CoverType   pgtype.Text    `db:"cover_type" json:"cover_type"`
+	PageCount   pgtype.Numeric `db:"page_count" json:"page_count"`
+	Description pgtype.Text    `db:"description" json:"description"`
 }
 
 func (q *Queries) UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, error) {
