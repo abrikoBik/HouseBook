@@ -4,17 +4,6 @@ import (
 	"net/http"
 )
 
-// func tradeResponse(trade *models.Trade) *models.TradeResponse {
-// 	return &models.TradeResponse{Trade: trade}
-// }
-
-// func tradeListResponse(trades []*models.Trade) (result []render.Renderer) {
-// 	for _, trade := range trades {
-// 		result = append(result, tradeResponse(trade))
-// 	}
-// 	return
-// }
-
 // TODO: UpdateTrade for closing trades
 
 func CreateTrade(w http.ResponseWriter, r *http.Request) {
