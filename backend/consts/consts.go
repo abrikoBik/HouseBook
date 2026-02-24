@@ -8,10 +8,3 @@ const (
 	DBPort       = 5432
 	ServiceCount = 2
 )
-
-type Logger string
-
-var (
-	ErrLogger Logger = "errLogger"
-	OutLogger Logger = "outLogger"
-)
