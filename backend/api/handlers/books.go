@@ -28,9 +28,7 @@ func CreateBook(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	if err := database.Pool.Ping(database.Context); err != nil {
-		toWrite := ErrorDatabase(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+	if PingDB(r, writer) != nil {
 		return
 	}
 	book, err := q.CreateBook(database.Context, data)
@@ -67,9 +65,7 @@ func GetBook(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	if err := database.Pool.Ping(database.Context); err != nil {
-		toWrite := ErrorDatabase(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+	if PingDB(r, writer) != nil {
 		return
 	}
 	book, err := q.GetBook(database.Context, uuid)
@@ -107,9 +103,7 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	if err := database.Pool.Ping(database.Context); err != nil {
-		toWrite := ErrorDatabase(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+	if PingDB(r, writer) != nil {
 		return
 	}
 	book, err := q.UpdateBook(database.Context, data)
@@ -140,9 +134,7 @@ func DeleteBook(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	if err := database.Pool.Ping(database.Context); err != nil {
-		toWrite := ErrorDatabase(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+	if PingDB(r, writer) != nil {
 		return
 	}
 	if err := q.DeleteBook(database.Context, uuid); err != nil {
@@ -182,9 +174,7 @@ func SearchBook(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	if err := database.Pool.Ping(database.Context); err != nil {
-		toWrite := ErrorDatabase(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+	if PingDB(r, writer) != nil {
 		return
 	}
 	books, err := q.SearchBooks(database.Context, params)
@@ -224,9 +214,7 @@ func ListBooks(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	if err := database.Pool.Ping(database.Context); err != nil {
-		toWrite := ErrorDatabase(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+	if PingDB(r, writer) != nil {
 		return
 	}
 	books, err := q.ListBooks(database.Context, params)

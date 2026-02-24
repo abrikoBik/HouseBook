@@ -34,9 +34,7 @@ func CreateUser(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	if err := database.Pool.Ping(database.Context); err != nil {
-		toWrite := ErrorDatabase(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+	if PingDB(r, writer) != nil {
 		return
 	}
 	requestData.Salt, err = util.RandomBytes(16)
@@ -85,9 +83,7 @@ func GetUser(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	if err := database.Pool.Ping(database.Context); err != nil {
-		toWrite := ErrorDatabase(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+	if PingDB(r, writer) != nil {
 		return
 	}
 	user, err := q.GetUser(database.Context, id)
@@ -125,9 +121,7 @@ func UpdateUser(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	if err := database.Pool.Ping(database.Context); err != nil {
-		toWrite := ErrorDatabase(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+	if PingDB(r, writer) != nil {
 		return
 	}
 	book, err := q.UpdateUser(database.Context, data)
@@ -158,9 +152,7 @@ func DeleteUser(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	if err := database.Pool.Ping(database.Context); err != nil {
-		toWrite := ErrorDatabase(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+	if PingDB(r, writer) != nil {
 		return
 	}
 	if err := q.DeleteUser(database.Context, id); err != nil {
