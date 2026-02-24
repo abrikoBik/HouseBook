@@ -2,6 +2,7 @@ package util
 
 import (
 	"errors"
+	"housebook/database/db"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -31,8 +32,8 @@ func PathUUID(name string, request *http.Request) (result pgtype.UUID, err error
 	return
 }
 
-// SearchParams takes a URL query and extracts limit and offset fields from it.
-func SearchParams(query url.Values) (int32, int32, error) {
+// GetSearchPagination takes a URL query and extracts limit and offset fields from it for pagination.
+func GetSearchPagination(query url.Values) (int32, int32, error) {
 	limit, err := strconv.Atoi(query.Get("limit"))
 	if err != nil {
 		return 0, 0, err
@@ -42,4 +43,21 @@ func SearchParams(query url.Values) (int32, int32, error) {
 		return 0, 0, err
 	}
 	return int32(limit), int32(offset), nil
+}
+
+// GetSearchParams scans search parameters from query into a db.SearchBooksParams struct.
+func GetSearchParams(query url.Values) (result db.SearchBooksParams, err error) {
+	// seems to be the only way to do it
+	err = errors.Join(err, result.Author.Scan(query.Get("author")))
+	err = errors.Join(err, result.Genre.Scan(query.Get("genre")))
+	err = errors.Join(err, result.Language.Scan(query.Get("language")))
+	err = errors.Join(err, result.Publisher.Scan(query.Get("publisher")))
+	err = errors.Join(err, result.Title.Scan(query.Get("title")))
+	// ugly hack
+	y := query.Get("year")
+	if y == "" {
+		y = "0"
+	}
+	err = errors.Join(err, result.Year.Scan(y))
+	return
 }

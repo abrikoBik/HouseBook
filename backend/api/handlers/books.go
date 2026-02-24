@@ -159,14 +159,14 @@ func SearchBook(writer http.ResponseWriter, request *http.Request) {
 		q      = db.New(database.Pool)
 	)
 	// TODO: eliminate doubled code
-	params, err = consts.GetSearchParams(query)
+	params, err = util.GetSearchParams(query)
 	if err != nil {
 		log.Println(err)
 		toWrite := ErrorBadRequest(err)
 		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
-	params.Limit, params.Offset, err = util.SearchParams(query)
+	params.Limit, params.Offset, err = util.GetSearchPagination(query)
 	if err != nil {
 		log.Println(err)
 		toWrite := ErrorBadRequest(err)
@@ -207,7 +207,7 @@ func ListBooks(writer http.ResponseWriter, request *http.Request) {
 		r      = render.New()
 		q      = db.New(database.Pool)
 	)
-	params.Limit, params.Offset, err = util.SearchParams(query)
+	params.Limit, params.Offset, err = util.GetSearchPagination(query)
 	if err != nil {
 		toWrite := ErrorBadRequest(err)
 		r.JSON(writer, toWrite.Status, toWrite)
