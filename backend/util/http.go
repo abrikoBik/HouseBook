@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 // PathID adds basic error checking, as well as integer conversion for the respective URL parameter.
@@ -20,23 +20,26 @@ func PathID(name string, request *http.Request) (int64, error) {
 	return id, err
 }
 
-// PathUUID adds basic error checking, as well as uuid.UUID conversion for the respective URL parameter.
-func PathUUID(name string, request *http.Request) (*uuid.UUID, error) {
+// PathUUID adds basic error checking, as well as pgtype.UUID conversion for the respective URL parameter.
+func PathUUID(name string, request *http.Request) (result pgtype.UUID, err error) {
 	s := chi.URLParam(request, name)
 	if s == "" {
-		return nil, errors.New("id not provided")
+		err = errors.New("uuid not provided")
+		return
 	}
-	id, err := uuid.Parse(s)
-	return &id, err
+	err = result.Scan(s)
+	return
 }
 
 // SearchParams takes a URL query and extracts limit and offset fields from it.
-func SearchParams(query url.Values) (limit int, offset int, err error) {
-	if limit, err = strconv.Atoi(query.Get("limit")); err != nil {
+func SearchParams(query url.Values) (int32, int32, error) {
+	limit, err := strconv.Atoi(query.Get("limit"))
+	if err != nil {
 		return 0, 0, err
 	}
-	if offset, err = strconv.Atoi(query.Get("offset")); err != nil {
+	offset, err := strconv.Atoi(query.Get("offset"))
+	if err != nil {
 		return 0, 0, err
 	}
-	return
+	return int32(limit), int32(offset), nil
 }

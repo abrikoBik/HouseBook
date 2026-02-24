@@ -2,168 +2,239 @@ package handlers
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"housebook/consts"
-	"housebook/database/models"
+	"housebook/database"
+	"housebook/database/db"
 	"housebook/util"
+	"log"
 	"net/http"
 
-	"github.com/go-chi/render"
+	"github.com/unrolled/render"
 )
 
-func bookResponse(book *models.Book) *models.BookResponse {
-	return &models.BookResponse{Book: book}
-}
-
-func bookListResponse(books []*models.Book) (result []render.Renderer) {
-	for _, book := range books {
-		result = append(result, bookResponse(book))
-	}
-	return
-}
-
-func CreateBook(w http.ResponseWriter, r *http.Request) {
+func CreateBook(writer http.ResponseWriter, request *http.Request) {
+	// TODO: create a small package for all rendering-related stuff
 	var (
-		book = &models.Book{}
-		data = &models.BookRequest{}
+		err  error
+		data db.CreateBookParams
+		r    = render.New()
+		q    = db.New(database.Pool)
 	)
-	if err := render.Bind(r, data); err != nil {
-		render.Render(w, r, ErrorBadRequest(err))
+	if err := json.NewDecoder(request.Body).Decode(&data); err != nil {
+		toWrite := ErrorBadRequest(err)
+		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
-	if err := book.Insert(*data); err != nil {
-		render.Render(w, r, ErrorGeneric(err))
-		return
-	}
-	render.Status(r, http.StatusCreated)
-	if err := render.Render(w, r, bookResponse(book)); err != nil {
-		render.Render(w, r, ErrorRender(err))
-		return
-	}
-}
 
-func GetBook(w http.ResponseWriter, r *http.Request) {
-	var (
-		book    = &models.Book{}
-		id, err = util.PathUUID(consts.UUIDPathValue, r)
-	)
+	if PingDB(r, writer) != nil {
+		return
+	}
+	book, err := q.CreateBook(database.Context, data)
 	if err != nil {
-		render.Render(w, r, ErrorBadRequest(err))
-		return
-	}
-	book.UUID = *id
-	if err := book.Select(); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			render.Render(w, r, ErrorNotFound(err))
-			return
+		var toWrite *ErrorResponse
+		// TODO: handle more errors
+		switch err {
+		default:
+			toWrite = ErrorGeneric(err)
 		}
-		render.Render(w, r, ErrorGeneric(err))
+		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
-	render.Status(r, http.StatusOK)
-	if err := render.Render(w, r, bookResponse(book)); err != nil {
-		render.Render(w, r, ErrorRender(err))
+
+	writer.WriteHeader(http.StatusCreated)
+	if err := json.NewEncoder(writer).Encode(book); err != nil {
+		toWrite := ErrorRender(err)
+		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
 }
 
-func UpdateBook(w http.ResponseWriter, r *http.Request) {
+func GetBook(writer http.ResponseWriter, request *http.Request) {
 	var (
-		book    = &models.Book{}
-		data    = &models.BookRequest{}
-		id, err = util.PathUUID(consts.UUIDPathValue, r)
+		err error
+		r   = render.New()
+		q   = db.New(database.Pool)
 	)
+	// TODO: commonize
+	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
 	if err != nil {
-		render.Render(w, r, ErrorBadRequest(err))
+		toWrite := ErrorBadRequest(err)
+		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
-	book.UUID = *id
-	if err := book.Select(); err != nil {
-		render.Render(w, r, ErrorGeneric(err))
+
+	if PingDB(r, writer) != nil {
 		return
 	}
-	if err := render.Bind(r, data); err != nil {
-		render.Render(w, r, ErrorBadRequest(err))
-		return
-	}
-	if err := book.Update(*data); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			render.Render(w, r, ErrorNotFound(err))
-			return
+	book, err := q.GetBook(database.Context, uuid)
+	if err != nil {
+		var toWrite *ErrorResponse
+		switch err {
+		case sql.ErrNoRows:
+			toWrite = ErrorNotFound(err)
+		default:
+			toWrite = ErrorGeneric(err)
 		}
-		render.Render(w, r, ErrorGeneric(err))
+		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
-	render.Status(r, http.StatusOK)
-	if err := render.Render(w, r, bookResponse(book)); err != nil {
-		render.Render(w, r, ErrorRender(err))
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(book); err != nil {
+		toWrite := ErrorRender(err)
+		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
 }
 
-func DeleteBook(w http.ResponseWriter, r *http.Request) {
+func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 	var (
-		book    = &models.Book{}
-		id, err = util.PathUUID(consts.UUIDPathValue, r)
+		err  error
+		data db.UpdateBookParams
+		r    = render.New()
+		q    = db.New(database.Pool)
 	)
+	data.ID, err = util.PathUUID(consts.UUIDPathValue, request)
+	if err = errors.Join(err, json.NewDecoder(request.Body).Decode(&data)); err != nil {
+		toWrite := ErrorBadRequest(err)
+		r.JSON(writer, toWrite.Status, toWrite)
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	book, err := q.UpdateBook(database.Context, data)
 	if err != nil {
-		render.Render(w, r, ErrorBadRequest(err))
+		toWrite := ErrorGeneric(err)
+		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
-	book.UUID = *id
-	if err := book.Delete(); err != nil {
-		render.Render(w, r, ErrorGeneric(err))
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(book); err != nil {
+		toWrite := ErrorRender(err)
+		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
 }
 
-func SearchBook(w http.ResponseWriter, r *http.Request) {
+func DeleteBook(writer http.ResponseWriter, request *http.Request) {
 	var (
-		params = util.SearchTable{}
-		query  = r.URL.Query()
+		err error
+		r   = render.New()
+		q   = db.New(database.Pool)
 	)
-	for _, param := range consts.BookSearchParams {
-		params[param] = query.Get(param)
-	}
-	books, err := models.Search[models.Book](params)
+	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			render.Render(w, r, ErrorNotFound(err))
-			return
+		toWrite := ErrorBadRequest(err)
+		r.JSON(writer, toWrite.Status, toWrite)
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	if err := q.DeleteBook(database.Context, uuid); err != nil {
+		var toWrite *ErrorResponse
+		switch err {
+		default:
+			toWrite = ErrorGeneric(err)
 		}
-		render.Render(w, r, ErrorGeneric(err))
+		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
-	render.Status(r, http.StatusOK)
-	if err := render.RenderList(w, r, bookListResponse(books)); err != nil {
-		render.Render(w, r, ErrorRender(err))
+
+	writer.WriteHeader(http.StatusOK)
+}
+
+func SearchBook(writer http.ResponseWriter, request *http.Request) {
+	var (
+		err    error
+		params db.SearchBooksParams
+		query  = request.URL.Query()
+		r      = render.New()
+		q      = db.New(database.Pool)
+	)
+	// TODO: eliminate doubled code
+	params, err = consts.GetSearchParams(query)
+	if err != nil {
+		log.Println(err)
+		toWrite := ErrorBadRequest(err)
+		r.JSON(writer, toWrite.Status, toWrite)
+		return
+	}
+	params.Limit, params.Offset, err = util.SearchParams(query)
+	if err != nil {
+		log.Println(err)
+		toWrite := ErrorBadRequest(err)
+		r.JSON(writer, toWrite.Status, toWrite)
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	books, err := q.SearchBooks(database.Context, params)
+	if err != nil {
+		var toWrite *ErrorResponse
+		switch err {
+		case sql.ErrNoRows:
+			// TODO: decide if 404 is applicable here
+			toWrite = ErrorNotFound(err)
+		default:
+			toWrite = ErrorGeneric(err)
+		}
+		r.JSON(writer, toWrite.Status, toWrite)
+		return
+	}
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(books); err != nil {
+		toWrite := ErrorRender(err)
+		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
 }
 
-func ListBooks(w http.ResponseWriter, r *http.Request) {
+func ListBooks(writer http.ResponseWriter, request *http.Request) {
 	var (
-		query              = r.URL.Query()
-		limit, offset, err = util.SearchParams(query)
+		err    error
+		params db.ListBooksParams
+		query  = request.URL.Query()
+		r      = render.New()
+		q      = db.New(database.Pool)
 	)
+	params.Limit, params.Offset, err = util.SearchParams(query)
 	if err != nil {
-		render.Render(w, r, ErrorBadRequest(err))
+		toWrite := ErrorBadRequest(err)
+		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
-	books, err := models.List[models.Book](limit, offset)
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	books, err := q.ListBooks(database.Context, params)
 	if err != nil {
-		// TODO: decide if 404 is applicable here
-		if errors.Is(err, sql.ErrNoRows) {
-			render.Render(w, r, ErrorNotFound(err))
-			return
+		var toWrite *ErrorResponse
+		switch err {
+		case sql.ErrNoRows:
+			// TODO: decide if 404 is applicable here
+			toWrite = ErrorNotFound(err)
+		default:
+			toWrite = ErrorGeneric(err)
 		}
-		render.Render(w, r, ErrorGeneric(err))
+		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
-	render.Status(r, http.StatusOK)
-	if err := render.RenderList(w, r, bookListResponse(books)); err != nil {
-		render.Render(w, r, ErrorRender(err))
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(books); err != nil {
+		toWrite := ErrorRender(err)
+		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
 }

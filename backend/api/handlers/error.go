@@ -2,8 +2,6 @@ package handlers
 
 import (
 	"net/http"
-
-	"github.com/go-chi/render"
 )
 
 // ErrorResponse is a helper struct for rendering errors.
@@ -12,12 +10,6 @@ type ErrorResponse struct {
 	Error  string `json:"error"`
 	// TODO: remove in production
 	Debug string `json:"debug"`
-}
-
-func (err *ErrorResponse) Render(w http.ResponseWriter, r *http.Request) error {
-	// TODO: add logging
-	render.Status(r, err.Status)
-	return nil
 }
 
 func ErrorBadRequest(err error) *ErrorResponse {
@@ -40,6 +32,14 @@ func ErrorNotFound(err error) *ErrorResponse {
 	return &ErrorResponse{
 		Status: http.StatusNotFound,
 		Error:  "not found",
+		Debug:  err.Error(),
+	}
+}
+
+func ErrorDatabase(err error) *ErrorResponse {
+	return &ErrorResponse{
+		Status: http.StatusInternalServerError,
+		Error:  "database error",
 		Debug:  err.Error(),
 	}
 }

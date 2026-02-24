@@ -3,33 +3,38 @@ package database
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"os"
 
-	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/dialect/pgdialect"
-	"github.com/uptrace/bun/driver/pgdriver"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 var (
-	Context     context.Context
-	Database    *sql.DB
-	BunDatabase *bun.DB
+	Context context.Context
+	Pool    *pgxpool.Pool
+	err     error
 )
 
-func Start(hostname string, port uint16) error {
+func Start(ctx context.Context, hostname string, port uint16, callback func()) {
+	Context = ctx
 	// TODO: remove sslmode=disable
-	url := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
+	connString := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
 		os.Getenv("POSTGRES_USER"),
 		os.Getenv("POSTGRES_PASSWORD"),
 		hostname,
 		port,
 		os.Getenv("POSTGRES_DB"),
 	)
-	Database = sql.OpenDB(pgdriver.NewConnector(
-		pgdriver.WithDSN(url),
-	))
-	BunDatabase = bun.NewDB(Database, pgdialect.New())
-	return nil
+	if Pool, err = pgxpool.New(Context, connString); err != nil {
+		panic(err)
+	}
+	if err = Pool.Ping(Context); err != nil {
+		panic(err)
+	}
+	callback()
+}
+
+func Stop(callback func()) {
+	Pool.Close()
+	callback()
 }
