@@ -50,8 +50,7 @@ func CreateUser(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	data = requestData.CreateUserParams
-
-	book, err := q.CreateUser(database.Context, data)
+	user, err := q.CreateUser(database.Context, data)
 	if err != nil {
 		var toWrite *ErrorResponse
 		switch err {
@@ -61,9 +60,10 @@ func CreateUser(writer http.ResponseWriter, request *http.Request) {
 		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
+	Logger.Info().Int64("id", user.ID).Msg("user created")
 
 	writer.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(writer).Encode(book); err != nil {
+	if err := json.NewEncoder(writer).Encode(user); err != nil {
 		toWrite := ErrorRender(err)
 		r.JSON(writer, toWrite.Status, toWrite)
 		return
@@ -98,6 +98,7 @@ func GetUser(writer http.ResponseWriter, request *http.Request) {
 		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
+	Logger.Info().Int64("id", user.ID).Msg("user retrieved")
 
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(user); err != nil {
@@ -124,15 +125,16 @@ func UpdateUser(writer http.ResponseWriter, request *http.Request) {
 	if PingDB(r, writer) != nil {
 		return
 	}
-	book, err := q.UpdateUser(database.Context, data)
+	user, err := q.UpdateUser(database.Context, data)
 	if err != nil {
 		toWrite := ErrorGeneric(err)
 		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
+	Logger.Info().Int64("id", user.ID).Msg("user updated")
 
 	writer.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(writer).Encode(book); err != nil {
+	if err := json.NewEncoder(writer).Encode(user); err != nil {
 		toWrite := ErrorRender(err)
 		r.JSON(writer, toWrite.Status, toWrite)
 		return
@@ -164,6 +166,7 @@ func DeleteUser(writer http.ResponseWriter, request *http.Request) {
 		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
+	Logger.Info().Int64("id", id).Msg("user deleted")
 
 	writer.WriteHeader(http.StatusOK)
 }

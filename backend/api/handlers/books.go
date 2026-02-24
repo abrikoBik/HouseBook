@@ -42,6 +42,7 @@ func CreateBook(writer http.ResponseWriter, request *http.Request) {
 		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
+	Logger.Info().Interface("id", book.ID).Msg("book created")
 
 	writer.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(writer).Encode(book); err != nil {
@@ -80,6 +81,7 @@ func GetBook(writer http.ResponseWriter, request *http.Request) {
 		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
+	Logger.Info().Interface("id", book.ID).Msg("book retrieved")
 
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(book); err != nil {
@@ -112,6 +114,7 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
+	Logger.Info().Interface("id", book.ID).Msg("book updated")
 
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(book); err != nil {
@@ -146,6 +149,7 @@ func DeleteBook(writer http.ResponseWriter, request *http.Request) {
 		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
+	Logger.Info().Interface("id", uuid).Msg("book deleted")
 
 	writer.WriteHeader(http.StatusOK)
 }
@@ -159,14 +163,14 @@ func SearchBook(writer http.ResponseWriter, request *http.Request) {
 		q      = db.New(database.Pool)
 	)
 	// TODO: eliminate doubled code
-	params, err = consts.GetSearchParams(query)
+	params, err = util.GetSearchParams(query)
 	if err != nil {
 		log.Println(err)
 		toWrite := ErrorBadRequest(err)
 		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
-	params.Limit, params.Offset, err = util.SearchParams(query)
+	params.Limit, params.Offset, err = util.GetSearchPagination(query)
 	if err != nil {
 		log.Println(err)
 		toWrite := ErrorBadRequest(err)
@@ -190,6 +194,7 @@ func SearchBook(writer http.ResponseWriter, request *http.Request) {
 		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
+	Logger.Info().Int("len(books)", len(books)).Msg("books searched")
 
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(books); err != nil {
@@ -207,7 +212,7 @@ func ListBooks(writer http.ResponseWriter, request *http.Request) {
 		r      = render.New()
 		q      = db.New(database.Pool)
 	)
-	params.Limit, params.Offset, err = util.SearchParams(query)
+	params.Limit, params.Offset, err = util.GetSearchPagination(query)
 	if err != nil {
 		toWrite := ErrorBadRequest(err)
 		r.JSON(writer, toWrite.Status, toWrite)
@@ -230,6 +235,7 @@ func ListBooks(writer http.ResponseWriter, request *http.Request) {
 		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
+	Logger.Info().Int("len(books)", len(books)).Msg("books listed")
 
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(books); err != nil {
