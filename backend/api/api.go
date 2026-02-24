@@ -31,7 +31,7 @@ func Start(ctx context.Context, hostname string, port uint16, callback func()) {
 
 	Listener, err = net.Listen("tcp", fmt.Sprintf("%s:%d", hostname, port))
 	if err != nil {
-		panic(err)
+		Logger.Panic().Err(err).Msg("panicking in API")
 	}
 	defer Listener.Close()
 	Server.Addr = Listener.Addr().String()
