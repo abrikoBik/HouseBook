@@ -7,13 +7,23 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createUser = `-- name: CreateUser :one
 insert into users (
-    email, login, name, salt, hash
+    email,
+    login,
+    name,
+    salt,
+    hash
 ) values (
-    $1,    $2,    $3,   $4,   $5
+    $1,
+    $2,
+    $3,
+    $4,
+    $5
 )
 returning id, email, login, name, salt, hash
 `
@@ -22,8 +32,8 @@ type CreateUserParams struct {
 	Email string `db:"email" json:"email"`
 	Login string `db:"login" json:"login"`
 	Name  string `db:"name" json:"name"`
-	Salt  []byte `db:"salt" json:"salt"`
-	Hash  []byte `db:"hash" json:"hash"`
+	Salt  []byte `db:"salt" json:"-"`
+	Hash  []byte `db:"hash" json:"-"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -79,32 +89,26 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 const updateUser = `-- name: UpdateUser :one
 update users
 set
-    email = $2,
-    login = $3,
-    name = $4,
-    salt = $5,
-    hash = $6
-where id = $1
+    email = coalesce($1, email),
+    login = coalesce($2, login),
+    name = coalesce($3, name)
+where id = $4
 returning id, email, login, name, salt, hash
 `
 
 type UpdateUserParams struct {
-	ID    int64  `db:"id" json:"id"`
-	Email string `db:"email" json:"email"`
-	Login string `db:"login" json:"login"`
-	Name  string `db:"name" json:"name"`
-	Salt  []byte `db:"salt" json:"salt"`
-	Hash  []byte `db:"hash" json:"hash"`
+	Email pgtype.Text `db:"email" json:"email"`
+	Login pgtype.Text `db:"login" json:"login"`
+	Name  pgtype.Text `db:"name" json:"name"`
+	ID    int64       `db:"id" json:"id"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
 	row := q.db.QueryRow(ctx, updateUser,
-		arg.ID,
 		arg.Email,
 		arg.Login,
 		arg.Name,
-		arg.Salt,
-		arg.Hash,
+		arg.ID,
 	)
 	var i User
 	err := row.Scan(

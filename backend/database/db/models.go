@@ -33,6 +33,6 @@ type User struct {
 	Email string `db:"email" json:"email"`
 	Login string `db:"login" json:"login"`
 	Name  string `db:"name" json:"name"`
-	Salt  []byte `db:"salt" json:"salt"`
-	Hash  []byte `db:"hash" json:"hash"`
+	Salt  []byte `db:"salt" json:"-"`
+	Hash  []byte `db:"hash" json:"-"`
 }
