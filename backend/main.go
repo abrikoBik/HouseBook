@@ -17,8 +17,10 @@ func main() {
 	var (
 		wg     sync.WaitGroup
 		exit   = make(chan os.Signal, 1)
-		logger = zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout})
-		ctx    = context.Background()
+		logger = zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout}).
+			With().Timestamp().
+			Logger()
+		ctx = context.Background()
 	)
 	ctx = logger.WithContext(ctx)
 	signal.Notify(exit, syscall.SIGTERM)
