@@ -3,7 +3,6 @@ package handlers
 
 import (
 	"context"
-	"housebook/consts"
 	"housebook/database"
 	"net/http"
 
@@ -12,14 +11,13 @@ import (
 )
 
 var (
-	Context              context.Context
-	ErrLogger, OutLogger zerolog.Logger
+	Context context.Context
+	Logger  *zerolog.Logger
 )
 
 func Config(ctx context.Context) {
 	Context = ctx
-	ErrLogger = Context.Value(consts.ErrLogger).(zerolog.Logger)
-	OutLogger = Context.Value(consts.OutLogger).(zerolog.Logger)
+	Logger = zerolog.Ctx(Context)
 }
 
 func Health(w http.ResponseWriter, r *http.Request) {

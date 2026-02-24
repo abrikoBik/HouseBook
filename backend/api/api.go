@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"housebook/api/endpoints"
 	"housebook/api/handlers"
-	"housebook/consts"
 	"net"
 	"net/http"
 
@@ -16,19 +15,18 @@ import (
 )
 
 var (
-	Context              context.Context
-	Listener             net.Listener
-	Server               http.Server
-	Router               chi.Router
-	ErrLogger, OutLogger zerolog.Logger
-	err                  error
+	Context  context.Context
+	Listener net.Listener
+	Server   http.Server
+	Router   chi.Router
+	Logger   *zerolog.Logger
+	err      error
 )
 
 func Start(ctx context.Context, hostname string, port uint16, callback func()) {
 	// TODO: move this from Start()?
 	Context = ctx
-	ErrLogger = Context.Value(consts.ErrLogger).(zerolog.Logger)
-	OutLogger = Context.Value(consts.OutLogger).(zerolog.Logger)
+	Logger = zerolog.Ctx(Context)
 	handlers.Config(ctx)
 
 	Listener, err = net.Listen("tcp", fmt.Sprintf("%s:%d", hostname, port))
@@ -42,16 +40,16 @@ func Start(ctx context.Context, hostname string, port uint16, callback func()) {
 	Server.Handler = Router
 	endpoints.Register(Router)
 
-	OutLogger.Info().Str("hostname", hostname).Uint16("port", port).Msg("starting API server")
+	Logger.Info().Str("hostname", hostname).Uint16("port", port).Msg("starting API server")
 	callback()
 	if err := Server.Serve(Listener); !errors.Is(err, http.ErrServerClosed) {
-		ErrLogger.Panic().Err(err).Msg("panicking in API")
+		Logger.Panic().Err(err).Msg("panicking in API")
 	}
 	defer Server.Shutdown(Context)
 }
 
 func Stop(callback func()) {
-	OutLogger.Info().Msg("stopping API server")
+	Logger.Info().Msg("stopping API server")
 	Server.Close()
 	callback()
 }

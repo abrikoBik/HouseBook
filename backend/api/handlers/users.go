@@ -60,7 +60,7 @@ func CreateUser(writer http.ResponseWriter, request *http.Request) {
 		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
-	OutLogger.Info().Int64("id", user.ID).Msg("user created")
+	Logger.Info().Int64("id", user.ID).Msg("user created")
 
 	writer.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(writer).Encode(user); err != nil {
@@ -98,7 +98,7 @@ func GetUser(writer http.ResponseWriter, request *http.Request) {
 		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
-	OutLogger.Info().Int64("id", user.ID).Msg("user retrieved")
+	Logger.Info().Int64("id", user.ID).Msg("user retrieved")
 
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(user); err != nil {
@@ -131,7 +131,7 @@ func UpdateUser(writer http.ResponseWriter, request *http.Request) {
 		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
-	OutLogger.Info().Int64("id", user.ID).Msg("user updated")
+	Logger.Info().Int64("id", user.ID).Msg("user updated")
 
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(user); err != nil {
@@ -166,7 +166,7 @@ func DeleteUser(writer http.ResponseWriter, request *http.Request) {
 		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
-	OutLogger.Info().Int64("id", id).Msg("user deleted")
+	Logger.Info().Int64("id", id).Msg("user deleted")
 
 	writer.WriteHeader(http.StatusOK)
 }

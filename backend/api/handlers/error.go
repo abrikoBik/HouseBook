@@ -13,7 +13,7 @@ type ErrorResponse struct {
 }
 
 func ErrorBadRequest(err error) *ErrorResponse {
-	ErrLogger.Err(err).Msg("bad request")
+	Logger.Err(err).Msg("bad request")
 	return &ErrorResponse{
 		Status: http.StatusBadRequest,
 		Error:  "bad request",
@@ -22,7 +22,7 @@ func ErrorBadRequest(err error) *ErrorResponse {
 }
 
 func ErrorRender(err error) *ErrorResponse {
-	ErrLogger.Err(err).Msg("render error")
+	Logger.Err(err).Msg("render error")
 	return &ErrorResponse{
 		Status: http.StatusInternalServerError,
 		Error:  "render error",
@@ -31,7 +31,7 @@ func ErrorRender(err error) *ErrorResponse {
 }
 
 func ErrorNotFound(err error) *ErrorResponse {
-	ErrLogger.Err(err).Msg("not found")
+	Logger.Err(err).Msg("not found")
 	return &ErrorResponse{
 		Status: http.StatusNotFound,
 		Error:  "not found",
@@ -40,7 +40,7 @@ func ErrorNotFound(err error) *ErrorResponse {
 }
 
 func ErrorDatabase(err error) *ErrorResponse {
-	ErrLogger.Err(err).Msg("database error")
+	Logger.Err(err).Msg("database error")
 	return &ErrorResponse{
 		Status: http.StatusInternalServerError,
 		Error:  "database error",
@@ -49,7 +49,7 @@ func ErrorDatabase(err error) *ErrorResponse {
 }
 
 func ErrorGeneric(err error) *ErrorResponse {
-	ErrLogger.Err(err).Msg("unknown error")
+	Logger.Err(err).Msg("unknown error")
 	return &ErrorResponse{
 		Status: http.StatusInternalServerError,
 		Error:  "unknown error",
