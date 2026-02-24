@@ -25,15 +25,15 @@ func main() {
 	)
 	signal.Notify(exit, syscall.SIGTERM)
 	wg.Add(consts.ServiceCount)
+	database.Start(ctx, consts.DBHostname, consts.DBPort, wg.Done)
 	go api.Start(ctx, consts.APIHostname, consts.APIPort, wg.Done)
-	go database.Start(ctx, consts.DBHostname, consts.DBPort, wg.Done)
 	wg.Wait()
-	outLogger.Info().Int("serviceCount", consts.ServiceCount).Msg("starting")
+	outLogger.Info().Int("serviceCount", consts.ServiceCount).Msg("started")
 
 	<-exit
 	outLogger.Info().Int("serviceCount", consts.ServiceCount).Msg("stopping")
 	wg.Add(consts.ServiceCount)
-	go api.Stop(wg.Done)
-	go database.Stop(wg.Done)
+	api.Stop(wg.Done)
+	database.Stop(wg.Done)
 	wg.Wait()
 }
