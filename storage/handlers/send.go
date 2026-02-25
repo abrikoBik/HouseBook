@@ -9,12 +9,15 @@ import (
 	"storage/consts"
 
 	"github.com/google/uuid"
+	"github.com/rs/zerolog"
 )
 
 func SendFile(writer http.ResponseWriter, request *http.Request) {
+	response := zerolog.New(writer)
 	id := request.PathValue("id")
 	if err := uuid.Validate(id); err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
+		response.Error().Err(err).Send()
 		return
 	}
 	path := filepath.Join(consts.StoragePath, id)
@@ -27,6 +30,7 @@ func SendFile(writer http.ResponseWriter, request *http.Request) {
 		} else {
 			writer.WriteHeader(http.StatusInternalServerError)
 		}
+		response.Error().Err(err).Send()
 		return
 	}
 	defer file.Close()
@@ -36,6 +40,7 @@ func SendFile(writer http.ResponseWriter, request *http.Request) {
 	if err != nil {
 		logger.Error().Err(err).Msg("exiting at io.Copy")
 		writer.WriteHeader(http.StatusInternalServerError)
+		response.Error().Err(err).Send()
 		return
 	}
 	logger.Info().Int64("written", written).Str("id", id).Send()
