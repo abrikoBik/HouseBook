@@ -66,12 +66,20 @@ func ReceiveFile(writer http.ResponseWriter, request *http.Request) {
 
 func SendFile(writer http.ResponseWriter, request *http.Request) {
 	id := request.PathValue("id")
+	if err := uuid.Validate(id); err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	path := filepath.Join(storagePath, id)
 	log.Println("sending", path)
 	file, err := os.Open(path)
 	if err != nil {
 		log.Println(err)
-		writer.WriteHeader(http.StatusInternalServerError)
+		if os.IsNotExist(err) {
+			writer.WriteHeader(http.StatusNotFound)
+		} else {
+			writer.WriteHeader(http.StatusInternalServerError)
+		}
 		return
 	}
 	defer file.Close()
