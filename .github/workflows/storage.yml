@@ -1,0 +1,14 @@
+name: Storage CI
+
+on:
+  push:
+    paths:
+      - "storage/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Docker Build
+      run: docker compose build backend
