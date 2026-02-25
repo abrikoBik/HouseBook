@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/base64"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -19,10 +18,10 @@ func SendFile(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	path := filepath.Join(consts.StoragePath, id)
-	log.Println("sending", path)
+	logger.Debug().Str("path", path).Send()
 	file, err := os.Open(path)
 	if err != nil {
-		log.Println(err)
+		logger.Error().Err(err).Msg("exiting at os.Open")
 		if os.IsNotExist(err) {
 			writer.WriteHeader(http.StatusNotFound)
 		} else {
@@ -35,9 +34,9 @@ func SendFile(writer http.ResponseWriter, request *http.Request) {
 	defer encoder.Close()
 	written, err := io.Copy(encoder, file)
 	if err != nil {
-		log.Println(err)
+		logger.Error().Err(err).Msg("exiting at io.Copy")
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	log.Println(written, "bytes written")
+	logger.Info().Int64("written", written).Str("id", id).Send()
 }

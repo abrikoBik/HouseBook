@@ -4,27 +4,30 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
+	"os"
 	"storage/consts"
 	"storage/handlers"
+
+	"github.com/rs/zerolog"
 )
 
 func main() {
-	ctx := context.Background()
+	logger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout}).With().Timestamp().Logger()
+	ctx := logger.WithContext(context.Background())
 	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", consts.Hostname, consts.Port))
 	if err != nil {
-		log.Panicln(err.Error())
+		logger.Panic().Err(err).Msg("panicking at net.Listen")
 	}
 	defer listener.Close()
 	server := http.Server{
 		Addr:    listener.Addr().String(),
 		Handler: handlers.Config(ctx),
 	}
-	log.Printf("listening at %s:%d\n", consts.Hostname, consts.Port)
+	logger.Info().Str("hostname", consts.Hostname).Int("port", consts.Port).Msg("serving")
 	if err := server.Serve(listener); !errors.Is(err, http.ErrServerClosed) {
-		log.Panicln(err.Error())
+		logger.Panic().Err(err).Msg("panicking at server.Serve")
 	}
 	defer server.Shutdown(ctx)
 }
