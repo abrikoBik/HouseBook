@@ -60,8 +60,8 @@ func ReceiveFile(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	log.Println(written, "bytes written")
-	writer.Write([]byte(id.String()))
 	writer.WriteHeader(http.StatusCreated)
+	writer.Write([]byte(id.String()))
 }
 
 func SendFile(writer http.ResponseWriter, request *http.Request) {
@@ -84,7 +84,6 @@ func SendFile(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	log.Println(written, "bytes written")
-	writer.WriteHeader(http.StatusOK)
 }
 
 func main() {
