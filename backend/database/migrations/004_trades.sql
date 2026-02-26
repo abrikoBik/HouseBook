@@ -1,11 +1,9 @@
-alter table trades
-add 
-    owner_id bigserial not null references users(id),
-    buyer_id bigserial not null references users(id);
+alter table trades add owner_id bigserial not null references users(id);
+alter table trades add buyer_id bigserial not null references users(id);
 
 create table trade_books (
     trade_id uuid primary key references trades(id) on delete cascade,
-    book_id uuid primary key references books(id),
+    book_id uuid references books(id),
     owner_id bigserial not null references users(id)
 );
 

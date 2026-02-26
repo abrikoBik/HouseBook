@@ -40,6 +40,6 @@ create table trades (
 
 create table trade_books (
     trade_id uuid primary key references trades(id) on delete cascade,
-    book_id uuid primary key references books(id),
+    book_id uuid references books(id),
     owner_id bigserial not null references users(id)
 );
