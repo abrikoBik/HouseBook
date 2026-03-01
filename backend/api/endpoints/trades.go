@@ -11,8 +11,8 @@ func routeTrades(router chi.Router) {
 	router.Route(consts.TradesEndpoint, func(r chi.Router) {
 		r.Get("/", handlers.ListTrades)
 		r.Post("/", handlers.CreateTrade)
-		r.Get("/{id}", handlers.GetTrade)
-		r.Delete("/{id}", handlers.DeleteUser)
-		r.Get("/search", handlers.SearchTrade)
+		r.Get("/{uuid}", handlers.GetTrade)
+		r.Post("/{uuid}", handlers.AddBookToTrade)
+		r.Delete("/{uuid}", handlers.DeleteTrade)
 	})
 }

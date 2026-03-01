@@ -1,17 +1,15 @@
 -- name: GetTrade :one
 select sqlc.embed(trades), sqlc.embed(users), sqlc.embed(books), sqlc.embed(trade_books) from trades
-join users on owner_id = users.id
-join users on buyer_id = users.id
-join trade_books on id = trade_books.trade_id
+join users on owner_id = users.id and buyer_id = users.id
+join trade_books on trades.id = trade_books.trade_id
 join books on book_id = books.id
 where trades.id = @id
 limit 1;
 
 -- name: ListTrades :many
 select sqlc.embed(trades), sqlc.embed(users), sqlc.embed(books), sqlc.embed(trade_books) from trades
-join users on owner_id = users.id
-join users on buyer_id = users.id
-join trade_books on id = trade.trade_id
+join users on owner_id = users.id and buyer_id = users.id
+join trade_books on trades.id = trade.trade_id
 join books on book_id = book.id
 limit $1
 offset $2;

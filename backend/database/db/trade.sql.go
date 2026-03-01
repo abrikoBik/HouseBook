@@ -96,10 +96,9 @@ func (q *Queries) DeleteTrade(ctx context.Context, id pgtype.UUID) error {
 }
 
 const getTrade = `-- name: GetTrade :one
-select trades.id, trades.owner_id, trades.buyer_id, trades.created_at, trades.completed_at, users.id, users.email, users.login, users.name, users.salt, users.hash, users.id, users.email, users.login, users.name, users.salt, users.hash, books.id, books.title, books.author, books.isbn, books.genre, books.publisher, books.year, books.language, books.cover_type, books.page_count, books.description, trade_books.trade_id, trade_books.book_id, trade_books.owner_id from trades
-join users on owner_id = users.id
-join users on buyer_id = users.id
-join trade_books on id = trade_books.trade_id
+select trades.id, trades.owner_id, trades.buyer_id, trades.created_at, trades.completed_at, users.id, users.email, users.login, users.name, users.salt, users.hash, books.id, books.title, books.author, books.isbn, books.genre, books.publisher, books.year, books.language, books.cover_type, books.page_count, books.description, trade_books.trade_id, trade_books.book_id, trade_books.owner_id from trades
+join users on owner_id = users.id and buyer_id = users.id
+join trade_books on trades.id = trade_books.trade_id
 join books on book_id = books.id
 where trades.id = $1
 limit 1
@@ -146,10 +145,9 @@ func (q *Queries) GetTrade(ctx context.Context, id pgtype.UUID) (GetTradeRow, er
 }
 
 const listTrades = `-- name: ListTrades :many
-select trades.id, trades.owner_id, trades.buyer_id, trades.created_at, trades.completed_at, users.id, users.email, users.login, users.name, users.salt, users.hash, users.id, users.email, users.login, users.name, users.salt, users.hash, books.id, books.title, books.author, books.isbn, books.genre, books.publisher, books.year, books.language, books.cover_type, books.page_count, books.description, trade_books.trade_id, trade_books.book_id, trade_books.owner_id from trades
-join users on owner_id = users.id
-join users on buyer_id = users.id
-join trade_books on id = trade.trade_id
+select trades.id, trades.owner_id, trades.buyer_id, trades.created_at, trades.completed_at, users.id, users.email, users.login, users.name, users.salt, users.hash, books.id, books.title, books.author, books.isbn, books.genre, books.publisher, books.year, books.language, books.cover_type, books.page_count, books.description, trade_books.trade_id, trade_books.book_id, trade_books.owner_id from trades
+join users on owner_id = users.id and buyer_id = users.id
+join trade_books on trades.id = trade.trade_id
 join books on book_id = book.id
 limit $1
 offset $2
