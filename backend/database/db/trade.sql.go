@@ -136,12 +136,6 @@ type ListTradeBooksRow struct {
 	OwnerID int64       `db:"owner_id" json:"owner_id"`
 }
 
-// select * from trades
-// left join trade_books on trades.id = trade_books.trade_id
-// left join books on trade_books.book_id = books.id
-// where trades.id = @id
-// limit $1
-// offset $2;
 func (q *Queries) ListTradeBooks(ctx context.Context, arg ListTradeBooksParams) ([]ListTradeBooksRow, error) {
 	rows, err := q.db.Query(ctx, listTradeBooks, arg.Limit, arg.Offset, arg.ID)
 	if err != nil {

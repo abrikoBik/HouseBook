@@ -1,5 +1,5 @@
 -- name: GetTrade :one
-select trades.* exclude id from trades
+select trades.* from trades
 join users as owner on trades.owner_id = owner.id
 join users as buyer on trades.buyer_id = buyer.id
 left join trade_books on trades.id = trade_books.trade_id
