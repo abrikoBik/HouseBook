@@ -24,8 +24,16 @@ type Book struct {
 
 type Trade struct {
 	ID          pgtype.UUID      `db:"id" json:"id"`
+	OwnerID     int64            `db:"owner_id" json:"owner_id"`
+	BuyerID     int64            `db:"buyer_id" json:"buyer_id"`
 	CreatedAt   pgtype.Timestamp `db:"created_at" json:"created_at"`
 	CompletedAt pgtype.Timestamp `db:"completed_at" json:"completed_at"`
+}
+
+type TradeBook struct {
+	TradeID pgtype.UUID `db:"trade_id" json:"trade_id"`
+	BookID  pgtype.UUID `db:"book_id" json:"book_id"`
+	OwnerID int64       `db:"owner_id" json:"owner_id"`
 }
 
 type User struct {

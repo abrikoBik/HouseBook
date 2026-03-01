@@ -31,6 +31,16 @@ create table users (
 create table trades (
     id uuid primary key default uuid_generate_v4(),
 
+    owner_id bigserial not null references users(id),
+    buyer_id bigserial not null references users(id),
+
     created_at timestamp not null default current_timestamp,
     completed_at timestamp
+);
+
+create table trade_books (
+    trade_id uuid references trades(id) on delete cascade,
+    book_id uuid references books(id),
+    owner_id bigserial not null references users(id),
+    primary key (trade_id, book_id)
 );

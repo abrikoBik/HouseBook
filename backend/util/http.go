@@ -33,16 +33,29 @@ func PathUUID(name string, request *http.Request) (result pgtype.UUID, err error
 }
 
 // GetSearchPagination takes a URL query and extracts limit and offset fields from it for pagination.
+// If limit and offset are not provided in the URL query, they are set to 10 and 0 respectively.
 func GetSearchPagination(query url.Values) (int32, int32, error) {
-	limit, err := strconv.Atoi(query.Get("limit"))
-	if err != nil {
-		return 0, 0, err
+	var (
+		limitQuery        = query.Get("limit")
+		offsetQuery       = query.Get("offset")
+		limit       int32 = 10
+		offset      int32
+	)
+	if limitQuery != "" {
+		converted, err := strconv.Atoi(limitQuery)
+		if err != nil {
+			return 0, 0, nil
+		}
+		limit = int32(converted)
 	}
-	offset, err := strconv.Atoi(query.Get("offset"))
-	if err != nil {
-		return 0, 0, err
+	if offsetQuery != "" {
+		converted, err := strconv.Atoi(offsetQuery)
+		if err != nil {
+			return 0, 0, nil
+		}
+		offset = int32(converted)
 	}
-	return int32(limit), int32(offset), nil
+	return limit, offset, nil
 }
 
 // GetSearchParams scans search parameters from query into a db.SearchBooksParams struct.
