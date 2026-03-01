@@ -50,3 +50,9 @@ returning *;
 -- name: DeleteTrade :exec
 delete from trades
 where id = @id;
+
+-- name: DeleteTradeBook :exec
+delete from trade_books
+where
+trade_id = @trade_id and
+book_id = @book_id;

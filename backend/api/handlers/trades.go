@@ -241,3 +241,45 @@ func ListTradeBooks(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 }
+
+func DeleteTradeBook(writer http.ResponseWriter, request *http.Request) {
+	var (
+		err    error
+		params db.DeleteTradeBookParams
+		r      = render.New()
+		q      = db.New(database.Pool)
+	)
+	tradeID, err := util.PathUUID("trade-uuid", request)
+	if err != nil {
+		toWrite := ErrorBadRequest(err)
+		r.JSON(writer, toWrite.Status, toWrite)
+		return
+	}
+	params.TradeID = tradeID
+	bookID, err := util.PathUUID("book-uuid", request)
+	if err != nil {
+		toWrite := ErrorBadRequest(err)
+		r.JSON(writer, toWrite.Status, toWrite)
+		return
+	}
+	params.BookID = bookID
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	if err := q.DeleteTradeBook(database.Context, params); err != nil {
+		var toWrite *ErrorResponse
+		switch err {
+		default:
+			toWrite = ErrorGeneric(err)
+		}
+		r.JSON(writer, toWrite.Status, toWrite)
+		return
+	}
+	Logger.Info().
+		Interface("tradeID", tradeID).
+		Interface("bookID", bookID).
+		Msg("book deleted from trade")
+
+	writer.WriteHeader(http.StatusOK)
+}

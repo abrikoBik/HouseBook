@@ -16,6 +16,6 @@ func routeTrades(router chi.Router) {
 
 		r.Get("/{uuid}/books", handlers.ListTradeBooks)
 		r.Post("/{uuid}/books", handlers.AddBookToTrade)
-		// r.Delete("/{uuid}/books", handlers.DeleteTradeBook)
+		r.Delete("/{trade-uuid}/books/{book-uuid}", handlers.DeleteTradeBook)
 	})
 }
