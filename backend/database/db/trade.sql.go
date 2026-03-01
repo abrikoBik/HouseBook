@@ -96,59 +96,74 @@ func (q *Queries) DeleteTrade(ctx context.Context, id pgtype.UUID) error {
 }
 
 const getTrade = `-- name: GetTrade :one
-select trades.id, trades.owner_id, trades.buyer_id, trades.created_at, trades.completed_at, users.id, users.email, users.login, users.name, users.salt, users.hash, books.id, books.title, books.author, books.isbn, books.genre, books.publisher, books.year, books.language, books.cover_type, books.page_count, books.description, trade_books.trade_id, trade_books.book_id, trade_books.owner_id from trades
-join users on owner_id = users.id and buyer_id = users.id
-join trade_books on trades.id = trade_books.trade_id
-join books on book_id = books.id
+select trades.id, trades.owner_id, trades.buyer_id, trades.created_at, trades.completed_at from trades
+join users as owner on trades.owner_id = owner.id
+join users as buyer on trades.buyer_id = buyer.id
+left join trade_books on trades.id = trade_books.trade_id
+left join books on trade_books.book_id = books.id
 where trades.id = $1
 limit 1
 `
 
-type GetTradeRow struct {
-	Trade     Trade     `db:"trade" json:"trade"`
-	User      User      `db:"user" json:"user"`
-	Book      Book      `db:"book" json:"book"`
-	TradeBook TradeBook `db:"trade_book" json:"trade_book"`
-}
-
-func (q *Queries) GetTrade(ctx context.Context, id pgtype.UUID) (GetTradeRow, error) {
+func (q *Queries) GetTrade(ctx context.Context, id pgtype.UUID) (Trade, error) {
 	row := q.db.QueryRow(ctx, getTrade, id)
-	var i GetTradeRow
+	var i Trade
 	err := row.Scan(
-		&i.Trade.ID,
-		&i.Trade.OwnerID,
-		&i.Trade.BuyerID,
-		&i.Trade.CreatedAt,
-		&i.Trade.CompletedAt,
-		&i.User.ID,
-		&i.User.Email,
-		&i.User.Login,
-		&i.User.Name,
-		&i.User.Salt,
-		&i.User.Hash,
-		&i.Book.ID,
-		&i.Book.Title,
-		&i.Book.Author,
-		&i.Book.Isbn,
-		&i.Book.Genre,
-		&i.Book.Publisher,
-		&i.Book.Year,
-		&i.Book.Language,
-		&i.Book.CoverType,
-		&i.Book.PageCount,
-		&i.Book.Description,
-		&i.TradeBook.TradeID,
-		&i.TradeBook.BookID,
-		&i.TradeBook.OwnerID,
+		&i.ID,
+		&i.OwnerID,
+		&i.BuyerID,
+		&i.CreatedAt,
+		&i.CompletedAt,
 	)
 	return i, err
 }
 
+const listTradeBooks = `-- name: ListTradeBooks :many
+select book_id, owner_id from trade_books
+where trade_id = $3
+limit $1
+offset $2
+`
+
+type ListTradeBooksParams struct {
+	Limit  int32       `db:"limit" json:"limit"`
+	Offset int32       `db:"offset" json:"offset"`
+	ID     pgtype.UUID `db:"id" json:"id"`
+}
+
+type ListTradeBooksRow struct {
+	BookID  pgtype.UUID `db:"book_id" json:"book_id"`
+	OwnerID int64       `db:"owner_id" json:"owner_id"`
+}
+
+// select * from trades
+// left join trade_books on trades.id = trade_books.trade_id
+// left join books on trade_books.book_id = books.id
+// where trades.id = @id
+// limit $1
+// offset $2;
+func (q *Queries) ListTradeBooks(ctx context.Context, arg ListTradeBooksParams) ([]ListTradeBooksRow, error) {
+	rows, err := q.db.Query(ctx, listTradeBooks, arg.Limit, arg.Offset, arg.ID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListTradeBooksRow
+	for rows.Next() {
+		var i ListTradeBooksRow
+		if err := rows.Scan(&i.BookID, &i.OwnerID); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listTrades = `-- name: ListTrades :many
-select trades.id, trades.owner_id, trades.buyer_id, trades.created_at, trades.completed_at, users.id, users.email, users.login, users.name, users.salt, users.hash, books.id, books.title, books.author, books.isbn, books.genre, books.publisher, books.year, books.language, books.cover_type, books.page_count, books.description, trade_books.trade_id, trade_books.book_id, trade_books.owner_id from trades
-join users on owner_id = users.id and buyer_id = users.id
-join trade_books on trades.id = trade.trade_id
-join books on book_id = book.id
+select id, owner_id, buyer_id, created_at, completed_at from trades
 limit $1
 offset $2
 `
@@ -158,48 +173,21 @@ type ListTradesParams struct {
 	Offset int32 `db:"offset" json:"offset"`
 }
 
-type ListTradesRow struct {
-	Trade     Trade     `db:"trade" json:"trade"`
-	User      User      `db:"user" json:"user"`
-	Book      Book      `db:"book" json:"book"`
-	TradeBook TradeBook `db:"trade_book" json:"trade_book"`
-}
-
-func (q *Queries) ListTrades(ctx context.Context, arg ListTradesParams) ([]ListTradesRow, error) {
+func (q *Queries) ListTrades(ctx context.Context, arg ListTradesParams) ([]Trade, error) {
 	rows, err := q.db.Query(ctx, listTrades, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListTradesRow
+	var items []Trade
 	for rows.Next() {
-		var i ListTradesRow
+		var i Trade
 		if err := rows.Scan(
-			&i.Trade.ID,
-			&i.Trade.OwnerID,
-			&i.Trade.BuyerID,
-			&i.Trade.CreatedAt,
-			&i.Trade.CompletedAt,
-			&i.User.ID,
-			&i.User.Email,
-			&i.User.Login,
-			&i.User.Name,
-			&i.User.Salt,
-			&i.User.Hash,
-			&i.Book.ID,
-			&i.Book.Title,
-			&i.Book.Author,
-			&i.Book.Isbn,
-			&i.Book.Genre,
-			&i.Book.Publisher,
-			&i.Book.Year,
-			&i.Book.Language,
-			&i.Book.CoverType,
-			&i.Book.PageCount,
-			&i.Book.Description,
-			&i.TradeBook.TradeID,
-			&i.TradeBook.BookID,
-			&i.TradeBook.OwnerID,
+			&i.ID,
+			&i.OwnerID,
+			&i.BuyerID,
+			&i.CreatedAt,
+			&i.CompletedAt,
 		); err != nil {
 			return nil, err
 		}

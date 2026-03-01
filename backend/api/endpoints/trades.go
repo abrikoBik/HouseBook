@@ -12,7 +12,10 @@ func routeTrades(router chi.Router) {
 		r.Get("/", handlers.ListTrades)
 		r.Post("/", handlers.CreateTrade)
 		r.Get("/{uuid}", handlers.GetTrade)
-		r.Post("/{uuid}", handlers.AddBookToTrade)
 		r.Delete("/{uuid}", handlers.DeleteTrade)
+
+		r.Get("/{uuid}/books", handlers.ListTradeBooks)
+		r.Post("/{uuid}/books", handlers.AddBookToTrade)
+		// r.Delete("/{uuid}/books", handlers.DeleteTradeBook)
 	})
 }

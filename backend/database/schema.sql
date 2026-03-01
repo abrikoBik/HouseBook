@@ -39,7 +39,8 @@ create table trades (
 );
 
 create table trade_books (
-    trade_id uuid primary key references trades(id) on delete cascade,
+    trade_id uuid references trades(id) on delete cascade,
     book_id uuid references books(id),
-    owner_id bigserial not null references users(id)
+    owner_id bigserial not null references users(id),
+    primary key (trade_id, book_id)
 );

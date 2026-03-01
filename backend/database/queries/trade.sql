@@ -1,16 +1,20 @@
 -- name: GetTrade :one
-select sqlc.embed(trades), sqlc.embed(users), sqlc.embed(books), sqlc.embed(trade_books) from trades
-join users on owner_id = users.id and buyer_id = users.id
-join trade_books on trades.id = trade_books.trade_id
-join books on book_id = books.id
+select trades.* exclude id from trades
+join users as owner on trades.owner_id = owner.id
+join users as buyer on trades.buyer_id = buyer.id
+left join trade_books on trades.id = trade_books.trade_id
+left join books on trade_books.book_id = books.id
 where trades.id = @id
 limit 1;
 
 -- name: ListTrades :many
-select sqlc.embed(trades), sqlc.embed(users), sqlc.embed(books), sqlc.embed(trade_books) from trades
-join users on owner_id = users.id and buyer_id = users.id
-join trade_books on trades.id = trade.trade_id
-join books on book_id = book.id
+select * from trades
+limit $1
+offset $2;
+
+-- name: ListTradeBooks :many
+select book_id, owner_id from trade_books
+where trade_id = @id
 limit $1
 offset $2;
 

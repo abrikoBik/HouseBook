@@ -76,7 +76,7 @@ func GetTrade(writer http.ResponseWriter, request *http.Request) {
 		r.JSON(writer, toWrite.Status, toWrite)
 		return
 	}
-	Logger.Info().Interface("id", trade.Trade.ID).Msg("book retrieved")
+	Logger.Info().Interface("id", trade.ID).Msg("book retrieved")
 
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(trade); err != nil {
@@ -117,9 +117,127 @@ func DeleteTrade(writer http.ResponseWriter, request *http.Request) {
 }
 
 func ListTrades(writer http.ResponseWriter, request *http.Request) {
-	writer.WriteHeader(http.StatusNotImplemented)
+	var (
+		err    error
+		params db.ListTradesParams
+		query  = request.URL.Query()
+		r      = render.New()
+		q      = db.New(database.Pool)
+	)
+	params.Limit, params.Offset, err = util.GetSearchPagination(query)
+	if err != nil {
+		toWrite := ErrorBadRequest(err)
+		r.JSON(writer, toWrite.Status, toWrite)
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	trades, err := q.ListTrades(database.Context, params)
+	if err != nil {
+		var toWrite *ErrorResponse
+		switch err {
+		case sql.ErrNoRows:
+			toWrite = ErrorNotFound(err)
+		default:
+			toWrite = ErrorGeneric(err)
+		}
+		r.JSON(writer, toWrite.Status, toWrite)
+		return
+	}
+	Logger.Info().Int("len(trades)", len(trades)).Msg("trades listed")
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(trades); err != nil {
+		toWrite := ErrorRender(err)
+		r.JSON(writer, toWrite.Status, toWrite)
+		return
+	}
 }
 
 func AddBookToTrade(writer http.ResponseWriter, request *http.Request) {
-	writer.WriteHeader(http.StatusNotImplemented)
+	var (
+		err  error
+		data db.AddBookToTradeParams
+		r    = render.New()
+		q    = db.New(database.Pool)
+	)
+	tradeID, err := util.PathUUID(consts.UUIDPathValue, request)
+	if err != nil {
+		toWrite := ErrorBadRequest(err)
+		r.JSON(writer, toWrite.Status, toWrite)
+		return
+	}
+	if err := json.NewDecoder(request.Body).Decode(&data); err != nil {
+		toWrite := ErrorBadRequest(err)
+		r.JSON(writer, toWrite.Status, toWrite)
+		return
+	}
+	data.Tradeid = tradeID
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	if err = q.AddBookToTrade(database.Context, data); err != nil {
+		var toWrite *ErrorResponse
+		switch err {
+		default:
+			toWrite = ErrorGeneric(err)
+		}
+		r.JSON(writer, toWrite.Status, toWrite)
+		return
+	}
+	Logger.Info().
+		Interface("tradeID", data.Tradeid).
+		Interface("bookID", data.Bookid).
+		Msg("book added to trade")
+	writer.WriteHeader(http.StatusCreated)
+}
+
+func ListTradeBooks(writer http.ResponseWriter, request *http.Request) {
+	var (
+		err    error
+		params db.ListTradeBooksParams
+		query  = request.URL.Query()
+		r      = render.New()
+		q      = db.New(database.Pool)
+	)
+	params.Limit, params.Offset, err = util.GetSearchPagination(query)
+	if err != nil {
+		toWrite := ErrorBadRequest(err)
+		r.JSON(writer, toWrite.Status, toWrite)
+		return
+	}
+	tradeID, err := util.PathUUID(consts.UUIDPathValue, request)
+	if err != nil {
+		toWrite := ErrorBadRequest(err)
+		r.JSON(writer, toWrite.Status, toWrite)
+		return
+	}
+	params.ID = tradeID
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	books, err := q.ListTradeBooks(database.Context, params)
+	if err != nil {
+		var toWrite *ErrorResponse
+		switch err {
+		case sql.ErrNoRows:
+			toWrite = ErrorNotFound(err)
+		default:
+			toWrite = ErrorGeneric(err)
+		}
+		r.JSON(writer, toWrite.Status, toWrite)
+		return
+	}
+	Logger.Info().Int("len(books)", len(books)).Msg("books listed")
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(books); err != nil {
+		toWrite := ErrorRender(err)
+		r.JSON(writer, toWrite.Status, toWrite)
+		return
+	}
 }
