@@ -4,7 +4,7 @@ RUN go install github.com/jackc/tern/v2@latest && go install github.com/sqlc-dev
 COPY go.mod go.sum .
 RUN go mod download
 COPY . .
-RUN /go/bin/sqlc -f database/sqlc.yml vet && /go/bin/sqlc -f database/sqlc.yml compile && /go/bin/sqlc -f database/sqlc.yml diff
+RUN /go/bin/sqlc -f database/sqlc.yml vet && /go/bin/sqlc -f database/sqlc.yml compile && /go/bin/sqlc -f database/sqlc.yml diff && go test ./... -v
 RUN --mount=type=cache,id=backend-cache,target="/root/.cache/go-build" go build -o housebook
 
 FROM debian:trixie-slim AS runner
