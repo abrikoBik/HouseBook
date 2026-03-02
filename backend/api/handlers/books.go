@@ -1,21 +1,20 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"housebook/consts"
 	"housebook/database"
 	"housebook/database/db"
 	"housebook/util"
-	"log"
 	"net/http"
 
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/unrolled/render"
 )
 
 func CreateBook(writer http.ResponseWriter, request *http.Request) {
-	// TODO: create a small package for all rendering-related stuff
 	var (
 		err  error
 		data db.CreateBookParams
@@ -23,8 +22,7 @@ func CreateBook(writer http.ResponseWriter, request *http.Request) {
 		q    = db.New(database.Pool)
 	)
 	if err := json.NewDecoder(request.Body).Decode(&data); err != nil {
-		toWrite := ErrorBadRequest(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorBadJSON(err))
 		return
 	}
 
@@ -33,21 +31,24 @@ func CreateBook(writer http.ResponseWriter, request *http.Request) {
 	}
 	book, err := q.CreateBook(database.Context, data)
 	if err != nil {
-		var toWrite *ErrorResponse
-		// TODO: handle more errors
-		switch err {
-		default:
+		var (
+			pgErr   *pgconn.PgError
+			toWrite ErrorResponse
+		)
+		errors.As(err, &pgErr)
+		if pgErr.Code == "23505" {
+			toWrite = ErrorDuplicate(err, pgErr)
+		} else {
 			toWrite = ErrorGeneric(err)
 		}
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, toWrite)
 		return
 	}
 	Logger.Info().Interface("id", book.ID).Msg("book created")
 
 	writer.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(writer).Encode(book); err != nil {
-		toWrite := ErrorRender(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorRender(err))
 		return
 	}
 }
@@ -58,11 +59,9 @@ func GetBook(writer http.ResponseWriter, request *http.Request) {
 		r   = render.New()
 		q   = db.New(database.Pool)
 	)
-	// TODO: commonize
 	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
 	if err != nil {
-		toWrite := ErrorBadRequest(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
 		return
 	}
 
@@ -71,22 +70,20 @@ func GetBook(writer http.ResponseWriter, request *http.Request) {
 	}
 	book, err := q.GetBook(database.Context, uuid)
 	if err != nil {
-		var toWrite *ErrorResponse
-		switch err {
-		case sql.ErrNoRows:
+		var toWrite ErrorResponse
+		if errors.Is(err, pgx.ErrNoRows) {
 			toWrite = ErrorNotFound(err)
-		default:
+		} else {
 			toWrite = ErrorGeneric(err)
 		}
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, toWrite)
 		return
 	}
 	Logger.Info().Interface("id", book.ID).Msg("book retrieved")
 
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(book); err != nil {
-		toWrite := ErrorRender(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorRender(err))
 		return
 	}
 }
@@ -100,8 +97,7 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 	)
 	data.ID, err = util.PathUUID(consts.UUIDPathValue, request)
 	if err = errors.Join(err, json.NewDecoder(request.Body).Decode(&data)); err != nil {
-		toWrite := ErrorBadRequest(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorBadJSON(err))
 		return
 	}
 
@@ -110,16 +106,24 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 	}
 	book, err := q.UpdateBook(database.Context, data)
 	if err != nil {
-		toWrite := ErrorGeneric(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		var (
+			pgErr   *pgconn.PgError
+			toWrite ErrorResponse
+		)
+		errors.As(err, &pgErr)
+		if pgErr.Code == "23505" {
+			toWrite = ErrorDuplicate(err, pgErr)
+		} else {
+			toWrite = ErrorGeneric(err)
+		}
+		RenderError(r, writer, toWrite)
 		return
 	}
 	Logger.Info().Interface("id", book.ID).Msg("book updated")
 
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(book); err != nil {
-		toWrite := ErrorRender(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorRender(err))
 		return
 	}
 }
@@ -132,8 +136,7 @@ func DeleteBook(writer http.ResponseWriter, request *http.Request) {
 	)
 	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
 	if err != nil {
-		toWrite := ErrorBadRequest(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
 		return
 	}
 
@@ -141,12 +144,7 @@ func DeleteBook(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	if err := q.DeleteBook(database.Context, uuid); err != nil {
-		var toWrite *ErrorResponse
-		switch err {
-		default:
-			toWrite = ErrorGeneric(err)
-		}
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorGeneric(err))
 		return
 	}
 	Logger.Info().Interface("id", uuid).Msg("book deleted")
@@ -162,19 +160,14 @@ func SearchBook(writer http.ResponseWriter, request *http.Request) {
 		r      = render.New()
 		q      = db.New(database.Pool)
 	)
-	// TODO: eliminate doubled code
 	params, err = util.GetSearchParams(query)
 	if err != nil {
-		log.Println(err)
-		toWrite := ErrorBadRequest(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorBadSearchParams(err, "book"))
 		return
 	}
 	params.Limit, params.Offset, err = util.GetSearchPagination(query)
 	if err != nil {
-		log.Println(err)
-		toWrite := ErrorBadRequest(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorBadPaginationParams(err))
 		return
 	}
 
@@ -183,23 +176,20 @@ func SearchBook(writer http.ResponseWriter, request *http.Request) {
 	}
 	books, err := q.SearchBooks(database.Context, params)
 	if err != nil {
-		var toWrite *ErrorResponse
-		switch err {
-		case sql.ErrNoRows:
-			// TODO: decide if 404 is applicable here
+		var toWrite ErrorResponse
+		if errors.Is(err, pgx.ErrNoRows) {
 			toWrite = ErrorNotFound(err)
-		default:
+		} else {
 			toWrite = ErrorGeneric(err)
 		}
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, toWrite)
 		return
 	}
 	Logger.Info().Int("len(books)", len(books)).Msg("books searched")
 
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(books); err != nil {
-		toWrite := ErrorRender(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorRender(err))
 		return
 	}
 }
@@ -214,8 +204,7 @@ func ListBooks(writer http.ResponseWriter, request *http.Request) {
 	)
 	params.Limit, params.Offset, err = util.GetSearchPagination(query)
 	if err != nil {
-		toWrite := ErrorBadRequest(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorBadPaginationParams(err))
 		return
 	}
 
@@ -224,23 +213,20 @@ func ListBooks(writer http.ResponseWriter, request *http.Request) {
 	}
 	books, err := q.ListBooks(database.Context, params)
 	if err != nil {
-		var toWrite *ErrorResponse
-		switch err {
-		case sql.ErrNoRows:
-			// TODO: decide if 404 is applicable here
+		var toWrite ErrorResponse
+		if errors.Is(err, pgx.ErrNoRows) {
 			toWrite = ErrorNotFound(err)
-		default:
+		} else {
 			toWrite = ErrorGeneric(err)
 		}
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, toWrite)
 		return
 	}
 	Logger.Info().Int("len(books)", len(books)).Msg("books listed")
 
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(books); err != nil {
-		toWrite := ErrorRender(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorRender(err))
 		return
 	}
 }

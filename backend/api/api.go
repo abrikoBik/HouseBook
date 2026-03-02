@@ -11,45 +11,58 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/zerolog"
 )
 
 var (
-	Context  context.Context
-	Listener net.Listener
-	Server   http.Server
-	Router   chi.Router
-	Logger   *zerolog.Logger
+	Context context.Context
+	Logger  *zerolog.Logger
+
+	addr     string
+	listener net.Listener
+	server   http.Server
+	router   chi.Router
 	err      error
 )
 
-func Start(ctx context.Context, hostname string, port uint16, callback func()) {
-	// TODO: move this from Start()?
-	Context = ctx
-	Logger = zerolog.Ctx(Context)
-	handlers.Config(ctx)
+type Conf struct {
+	Context  context.Context
+	Hostname string
+	Port     uint16
+}
 
-	Listener, err = net.Listen("tcp", fmt.Sprintf("%s:%d", hostname, port))
+func Config(config Conf, callback func()) {
+	Context = config.Context
+	Logger = zerolog.Ctx(Context)
+	handlers.Config(Context)
+	addr = fmt.Sprintf("%s:%d", config.Hostname, config.Port)
+	router = chi.NewRouter()
+	// TODO: add in production
+	// router.Use(middleware.Compress(5))
+	router.Use(middleware.Recoverer)
+	endpoints.Register(router)
+	callback()
+}
+
+func Start(callback func()) {
+	listener, err = net.Listen("tcp", addr)
 	if err != nil {
 		Logger.Panic().Err(err).Msg("panicking in API")
 	}
-	defer Listener.Close()
-	Server.Addr = Listener.Addr().String()
-
-	Router = chi.NewRouter()
-	Server.Handler = Router
-	endpoints.Register(Router)
-
-	Logger.Info().Str("hostname", hostname).Uint16("port", port).Msg("starting API server")
+	defer listener.Close()
+	server.Addr = listener.Addr().String()
+	server.Handler = router
+	Logger.Info().Str("addr", addr).Msg("starting API server")
 	callback()
-	if err := Server.Serve(Listener); !errors.Is(err, http.ErrServerClosed) {
+	if err := server.Serve(listener); !errors.Is(err, http.ErrServerClosed) {
 		Logger.Panic().Err(err).Msg("panicking in API")
 	}
-	defer Server.Shutdown(Context)
+	defer server.Shutdown(Context)
 }
 
 func Stop(callback func()) {
 	Logger.Info().Msg("stopping API server")
-	Server.Close()
+	server.Close()
 	callback()
 }

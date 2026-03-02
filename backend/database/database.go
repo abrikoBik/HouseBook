@@ -4,7 +4,6 @@ package database
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog"
@@ -14,29 +13,39 @@ var (
 	Context context.Context
 	Logger  *zerolog.Logger
 	Pool    *pgxpool.Pool
-	err     error
+
+	connString string
+	err        error
 )
 
-func Start(ctx context.Context, hostname string, port uint16, callback func()) {
-	// TODO: move this from Start()?
-	Context = ctx
-	Logger = zerolog.Ctx(Context)
+type Conf struct {
+	Context                                context.Context
+	Username, Password, Hostname, Database string
+	Port                                   uint16
+}
 
+func Config(config Conf, callback func()) {
+	Context = config.Context
+	Logger = zerolog.Ctx(Context)
 	// TODO: remove sslmode=disable
-	connString := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		os.Getenv("POSTGRES_USER"),
-		os.Getenv("POSTGRES_PASSWORD"),
-		hostname,
-		port,
-		os.Getenv("POSTGRES_DB"),
+	connString = fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
+		config.Username,
+		config.Password,
+		config.Hostname,
+		config.Port,
+		config.Database,
 	)
+	callback()
+}
+
+func Start(hostname string, port uint16, callback func()) {
+	Logger.Info().Str("hostname", hostname).Uint16("port", port).Msg("starting DB")
 	if Pool, err = pgxpool.New(Context, connString); err != nil {
 		Logger.Panic().Err(err).Msg("panicking in DB (pool)")
 	}
 	if err = Pool.Ping(Context); err != nil {
 		Logger.Panic().Err(err).Msg("panicking in DB (ping)")
 	}
-	Logger.Info().Str("hostname", hostname).Uint16("port", port).Msg("started DB")
 	callback()
 }
 
