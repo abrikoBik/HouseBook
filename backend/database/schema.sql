@@ -44,3 +44,16 @@ create table trade_books (
     owner_id bigserial not null references users(id),
     primary key (trade_id, book_id)
 );
+
+create table libraries (
+    id uuid primary key default uuid_generate_v4(),
+    user_id bigserial not null references users(id),
+    name string not null default "Библиотека"
+);
+
+create table library_books (
+    library_id uuid references libraries(id) on delete cascade,
+    book_id uuid references books(id),
+    quantity numeric not null default 1,
+    primary key (library_id, book_id)
+);
