@@ -1,23 +1,23 @@
 #bodyComment {
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 
-    &>section>h4 {
-        margin-top: 0;
-    }
+  & > section > h4 {
+    margin-top: 0;
+  }
 
-    &>section>p {
-        margin-top: 0;
-    }
+  & > section > p {
+    margin-top: 0;
+  }
 }
 
 #iconComment {
-    background-color: gray;
-    min-width: 48px;
-    min-height: 48px;
-    border-radius: 100%;
-    width: auto;
-    height: auto;
-    align-self: self-start;
-    margin-right: 2%;
+  background-color: gray;
+  min-width: 48px;
+  min-height: 48px;
+  border-radius: 100%;
+  width: auto;
+  height: auto;
+  align-self: self-start;
+  margin-right: 2%;
 }

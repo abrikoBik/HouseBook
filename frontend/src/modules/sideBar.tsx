@@ -5,12 +5,12 @@ import ExitIcon from "../assets/Exit.png";
 import "../styles/book.css";
 
 const SideBar = () => {
-    return (
-        <aside id="side_menu">
-            <nav id="side_nav">
-              <div className="logo">
-                <img src={LogoIcon} alt="logo" />
-              </div>
+  return (
+    <aside id="side_menu">
+      <nav id="side_nav">
+        <div className="logo">
+          <img src={LogoIcon} alt="logo" />
+        </div>
 
         <div className="menu_item">
           <img src={HomeIcon} alt="home" />

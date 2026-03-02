@@ -67,7 +67,7 @@ const Book = () => {
             </section>
           </div>
 
-          <Comment/>
+          <Comment />
 
           <div id="textarea">
             <textarea />
