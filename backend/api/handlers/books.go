@@ -22,7 +22,7 @@ func CreateBook(writer http.ResponseWriter, request *http.Request) {
 		q    = db.New(database.Pool)
 	)
 	if err := json.NewDecoder(request.Body).Decode(&data); err != nil {
-		RenderError(r, writer, ErrorBadRequest(err))
+		RenderError(r, writer, ErrorBadJSON(err))
 		return
 	}
 
@@ -37,7 +37,7 @@ func CreateBook(writer http.ResponseWriter, request *http.Request) {
 		)
 		errors.As(err, &pgErr)
 		if pgErr.Code == "23505" {
-			toWrite = ErrorDuplicate(err)
+			toWrite = ErrorDuplicate(err, pgErr)
 		} else {
 			toWrite = ErrorGeneric(err)
 		}
@@ -61,7 +61,7 @@ func GetBook(writer http.ResponseWriter, request *http.Request) {
 	)
 	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadRequest(err))
+		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
 		return
 	}
 
@@ -97,7 +97,7 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 	)
 	data.ID, err = util.PathUUID(consts.UUIDPathValue, request)
 	if err = errors.Join(err, json.NewDecoder(request.Body).Decode(&data)); err != nil {
-		RenderError(r, writer, ErrorBadRequest(err))
+		RenderError(r, writer, ErrorBadJSON(err))
 		return
 	}
 
@@ -112,7 +112,7 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 		)
 		errors.As(err, &pgErr)
 		if pgErr.Code == "23505" {
-			toWrite = ErrorDuplicate(err)
+			toWrite = ErrorDuplicate(err, pgErr)
 		} else {
 			toWrite = ErrorGeneric(err)
 		}
@@ -136,7 +136,7 @@ func DeleteBook(writer http.ResponseWriter, request *http.Request) {
 	)
 	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadRequest(err))
+		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
 		return
 	}
 
@@ -163,12 +163,12 @@ func SearchBook(writer http.ResponseWriter, request *http.Request) {
 	// TODO: eliminate doubled code
 	params, err = util.GetSearchParams(query)
 	if err != nil {
-		RenderError(r, writer, ErrorBadRequest(err))
+		RenderError(r, writer, ErrorBadSearchParams(err, "book"))
 		return
 	}
 	params.Limit, params.Offset, err = util.GetSearchPagination(query)
 	if err != nil {
-		RenderError(r, writer, ErrorBadRequest(err))
+		RenderError(r, writer, ErrorBadPaginationParams(err))
 		return
 	}
 
@@ -205,7 +205,7 @@ func ListBooks(writer http.ResponseWriter, request *http.Request) {
 	)
 	params.Limit, params.Offset, err = util.GetSearchPagination(query)
 	if err != nil {
-		RenderError(r, writer, ErrorBadRequest(err))
+		RenderError(r, writer, ErrorBadPaginationParams(err))
 		return
 	}
 

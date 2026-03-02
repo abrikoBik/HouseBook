@@ -28,7 +28,7 @@ func CreateUser(writer http.ResponseWriter, request *http.Request) {
 		q           = db.New(database.Pool)
 	)
 	if err := json.NewDecoder(request.Body).Decode(&requestData); err != nil {
-		RenderError(r, writer, ErrorBadRequest(err))
+		RenderError(r, writer, ErrorBadJSON(err))
 		return
 	}
 
@@ -54,7 +54,7 @@ func CreateUser(writer http.ResponseWriter, request *http.Request) {
 		)
 		errors.As(err, &pgErr)
 		if pgErr.Code == "23505" {
-			toWrite = ErrorDuplicate(err)
+			toWrite = ErrorDuplicate(err, pgErr)
 		} else {
 			toWrite = ErrorGeneric(err)
 		}
@@ -78,7 +78,7 @@ func GetUser(writer http.ResponseWriter, request *http.Request) {
 	)
 	id, err := util.PathID(consts.IDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadRequest(err))
+		RenderError(r, writer, ErrorBadID(err, consts.IDPathValue))
 		return
 	}
 
@@ -114,7 +114,7 @@ func UpdateUser(writer http.ResponseWriter, request *http.Request) {
 	)
 	data.ID, err = util.PathID(consts.IDPathValue, request)
 	if err = errors.Join(err, json.NewDecoder(request.Body).Decode(&data)); err != nil {
-		RenderError(r, writer, ErrorBadRequest(err))
+		RenderError(r, writer, ErrorBadJSON(err))
 		return
 	}
 
@@ -129,7 +129,7 @@ func UpdateUser(writer http.ResponseWriter, request *http.Request) {
 		)
 		errors.As(err, &pgErr)
 		if pgErr.Code == "23505" {
-			toWrite = ErrorDuplicate(err)
+			toWrite = ErrorDuplicate(err, pgErr)
 		} else {
 			toWrite = ErrorGeneric(err)
 		}
@@ -153,7 +153,7 @@ func DeleteUser(writer http.ResponseWriter, request *http.Request) {
 	)
 	id, err := util.PathID(consts.IDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadRequest(err))
+		RenderError(r, writer, ErrorBadID(err, consts.IDPathValue))
 		return
 	}
 
