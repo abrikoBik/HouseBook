@@ -30,13 +30,13 @@ func Start(ctx context.Context, hostname string, port uint16, callback func()) {
 		port,
 		os.Getenv("POSTGRES_DB"),
 	)
+	Logger.Info().Str("hostname", hostname).Uint16("port", port).Msg("starting DB")
 	if Pool, err = pgxpool.New(Context, connString); err != nil {
 		Logger.Panic().Err(err).Msg("panicking in DB (pool)")
 	}
 	if err = Pool.Ping(Context); err != nil {
 		Logger.Panic().Err(err).Msg("panicking in DB (ping)")
 	}
-	Logger.Info().Str("hostname", hostname).Uint16("port", port).Msg("started DB")
 	callback()
 }
 
