@@ -45,14 +45,14 @@ func Config(config Conf, callback func()) {
 	callback()
 }
 
-// @title HouseBook API
-// @version 1.0
+//	@title		HouseBook API
+//	@version	1.0
 
-// @license.name GNU General Public License
-// @license.url https://www.gnu.org/licenses/gpl-3.0.en.html
+//	@license.name	GNU General Public License
+//	@license.url	https://www.gnu.org/licenses/gpl-3.0.en.html
 
-// @host 0.0.0.0
-// @BasePath /api
+//	@host		0.0.0.0
+//	@BasePath	/api
 
 func Start(callback func()) {
 	listener, err = net.Listen("tcp", addr)

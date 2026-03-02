@@ -16,6 +16,48 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/api/books": {
+            "get": {
+                "description": "Вывести список книг, хранящихся на сервере.",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Книги"
+                ],
+                "summary": "Список книг",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Book"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Создаёт новую книгу.",
                 "consumes": [
@@ -24,9 +66,13 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Книги"
+                ],
                 "summary": "Создать книгу",
                 "parameters": [
                     {
+                        "example": "Известный автор",
                         "description": "Полное имя автора",
                         "name": "author",
                         "in": "body",
@@ -36,6 +82,7 @@ const docTemplate = `{
                         }
                     },
                     {
+                        "example": "твёрдая",
                         "description": "Тип обложки (твёрдая, мягкая)",
                         "name": "cover_type",
                         "in": "body",
@@ -44,6 +91,7 @@ const docTemplate = `{
                         }
                     },
                     {
+                        "example": "Крайне интересная книга об очень интересных вещах",
                         "description": "Описание книги",
                         "name": "description",
                         "in": "body",
@@ -52,6 +100,7 @@ const docTemplate = `{
                         }
                     },
                     {
+                        "example": "Роман",
                         "description": "Жанр книги",
                         "name": "genre",
                         "in": "body",
@@ -61,6 +110,7 @@ const docTemplate = `{
                         }
                     },
                     {
+                        "example": "978-3-16-148410-0",
                         "description": "ISBN книги",
                         "name": "isbn",
                         "in": "body",
@@ -70,24 +120,25 @@ const docTemplate = `{
                         }
                     },
                     {
+                        "example": "Русский",
                         "description": "Язык книги",
                         "name": "language",
                         "in": "body",
-                        "required": true,
                         "schema": {
                             "type": "string"
                         }
                     },
                     {
+                        "example": 100,
                         "description": "Количество страниц в книге",
                         "name": "page_count",
                         "in": "body",
-                        "required": true,
                         "schema": {
                             "type": "integer"
                         }
                     },
                     {
+                        "example": "Хороший Издатель",
                         "description": "Издательство книги",
                         "name": "publisher",
                         "in": "body",
@@ -97,6 +148,7 @@ const docTemplate = `{
                         }
                     },
                     {
+                        "example": "Интересная книга",
                         "description": "Название книги",
                         "name": "title",
                         "in": "body",
@@ -106,18 +158,341 @@ const docTemplate = `{
                         }
                     },
                     {
+                        "example": 2026,
                         "description": "Год выпуска книги",
                         "name": "year",
                         "in": "body",
-                        "required": true,
                         "schema": {
                             "type": "integer"
                         }
                     }
                 ],
                 "responses": {
-                    "401": {
-                        "description": "Unauthorized",
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/db.Book"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/books/search": {
+            "get": {
+                "description": "Найти книги, соответствующие поисковым параметрам.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Книги"
+                ],
+                "summary": "Найти книги",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Лимит количества возвращаемых элементов",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Смещение возвращаемых элементов",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "Известный автор",
+                        "description": "Полное имя автора",
+                        "name": "author",
+                        "in": "query"
+                    },
+                    {
+                        "example": "Роман",
+                        "description": "Жанр книги",
+                        "name": "genre",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "example": "Русский",
+                        "description": "Язык книги",
+                        "name": "language",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "example": "Хороший Издатель",
+                        "description": "Издательство книги",
+                        "name": "publisher",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "example": "Интересная книга",
+                        "description": "Название книги",
+                        "name": "title",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "example": 2026,
+                        "description": "Год выпуска книги",
+                        "name": "year",
+                        "in": "body",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Book"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/books/{uuid}": {
+            "get": {
+                "description": "Получить информацию о книге.",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Книги"
+                ],
+                "summary": "Получить  книгу",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Book"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Удалить книгу из базы данных.",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Книги"
+                ],
+                "summary": "Удалить книгу",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Изменить информацию о существующей книге.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Книги"
+                ],
+                "summary": "Изменить книгу",
+                "parameters": [
+                    {
+                        "example": "Известный автор",
+                        "description": "Полное имя автора",
+                        "name": "author",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "example": "твёрдая",
+                        "description": "Тип обложки (твёрдая, мягкая)",
+                        "name": "cover_type",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "example": "Крайне интересная книга об очень интересных вещах",
+                        "description": "Описание книги",
+                        "name": "description",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "example": "Роман",
+                        "description": "Жанр книги",
+                        "name": "genre",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "example": "978-3-16-148410-0",
+                        "description": "ISBN книги",
+                        "name": "isbn",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "example": "Русский",
+                        "description": "Язык книги",
+                        "name": "language",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "example": 100,
+                        "description": "Количество страниц в книге",
+                        "name": "page_count",
+                        "in": "body",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "example": "Хороший Издатель",
+                        "description": "Издательство книги",
+                        "name": "publisher",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "example": "Интересная книга",
+                        "description": "Название книги",
+                        "name": "title",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "example": 2026,
+                        "description": "Год выпуска книги",
+                        "name": "year",
+                        "in": "body",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Book"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponse"
                         }
@@ -139,6 +514,47 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "big.Int": {
+            "type": "object"
+        },
+        "db.Book": {
+            "type": "object",
+            "properties": {
+                "author": {
+                    "type": "string"
+                },
+                "cover_type": {
+                    "$ref": "#/definitions/pgtype.Text"
+                },
+                "description": {
+                    "$ref": "#/definitions/pgtype.Text"
+                },
+                "genre": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isbn": {
+                    "type": "string"
+                },
+                "language": {
+                    "$ref": "#/definitions/pgtype.Text"
+                },
+                "page_count": {
+                    "$ref": "#/definitions/pgtype.Numeric"
+                },
+                "publisher": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "year": {
+                    "$ref": "#/definitions/pgtype.Numeric"
+                }
+            }
+        },
         "handlers.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -147,6 +563,52 @@ const docTemplate = `{
                 },
                 "explanation": {
                     "type": "string"
+                }
+            }
+        },
+        "pgtype.InfinityModifier": {
+            "type": "integer",
+            "format": "int32",
+            "enum": [
+                1,
+                0,
+                -1
+            ],
+            "x-enum-varnames": [
+                "Infinity",
+                "Finite",
+                "NegativeInfinity"
+            ]
+        },
+        "pgtype.Numeric": {
+            "type": "object",
+            "properties": {
+                "exp": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "infinityModifier": {
+                    "$ref": "#/definitions/pgtype.InfinityModifier"
+                },
+                "int": {
+                    "$ref": "#/definitions/big.Int"
+                },
+                "naN": {
+                    "type": "boolean"
+                },
+                "valid": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "pgtype.Text": {
+            "type": "object",
+            "properties": {
+                "string": {
+                    "type": "string"
+                },
+                "valid": {
+                    "type": "boolean"
                 }
             }
         }
