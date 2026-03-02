@@ -22,9 +22,8 @@ func main() {
 			Logger()
 		ctx = context.Background()
 	)
-	ctx = logger.WithContext(ctx)
 	dbConf := database.Conf{
-		Context:  ctx,
+		Context:  logger.WithContext(ctx),
 		Username: os.Getenv("POSTGRES_USER"),
 		Password: os.Getenv("POSTGRES_PASSWORD"),
 		Database: os.Getenv("POSTGRES_DB"),
@@ -32,7 +31,7 @@ func main() {
 		Port:     5432,
 	}
 	apiConf := api.Conf{
-		Context:  ctx,
+		Context:  logger.WithContext(ctx),
 		Hostname: "0.0.0.0",
 		Port:     3000,
 	}
