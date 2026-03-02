@@ -11,8 +11,11 @@ import (
 func routeUsers(router chi.Router) {
 	router.Route(consts.UsersEndpoint, func(r chi.Router) {
 		r.With(middleware.JSONResponse).Post("/", handlers.CreateUser)
-		r.With(middleware.JSONResponse).Get("/{id}", handlers.GetUser)
-		r.With(middleware.JSONResponse).Patch("/{id}", handlers.UpdateUser)
-		r.Delete("/{id}", handlers.DeleteUser)
+		r.Route("/{id}", func(r chi.Router) {
+			r.With(middleware.JSONResponse).Get("/", handlers.GetUser)
+			r.With(middleware.JSONResponse).Patch("/", handlers.UpdateUser)
+			r.Delete("/", handlers.DeleteUser)
+			routeLibraries(r)
+		})
 	})
 }

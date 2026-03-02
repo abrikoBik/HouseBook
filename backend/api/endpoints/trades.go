@@ -10,6 +10,7 @@ import (
 
 func routeTrades(router chi.Router) {
 	router.Route(consts.TradesEndpoint, func(r chi.Router) {
+		// TODO: nest
 		r.With(middleware.JSONResponse).Get("/", handlers.ListTrades)
 		r.With(middleware.JSONResponse).Post("/", handlers.CreateTrade)
 		r.With(middleware.JSONResponse).Get("/{uuid}", handlers.GetTrade)

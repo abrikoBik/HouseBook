@@ -48,7 +48,7 @@ create table trade_books (
 create table libraries (
     id uuid primary key default uuid_generate_v4(),
     user_id bigserial not null references users(id),
-    name string not null default "Библиотека"
+    name text not null default 'Библиотека'
 );
 
 create table library_books (

@@ -76,23 +76,37 @@ func (q *Queries) DeleteBookFromLibrary(ctx context.Context, arg DeleteBookFromL
 
 const deleteLibrary = `-- name: DeleteLibrary :exec
 delete from libraries
-where id = $1
+where
+id = $1 and
+user_id = $2
 `
 
-func (q *Queries) DeleteLibrary(ctx context.Context, id pgtype.UUID) error {
-	_, err := q.db.Exec(ctx, deleteLibrary, id)
+type DeleteLibraryParams struct {
+	ID     pgtype.UUID `db:"id" json:"id"`
+	Userid int64       `db:"userid" json:"userid"`
+}
+
+func (q *Queries) DeleteLibrary(ctx context.Context, arg DeleteLibraryParams) error {
+	_, err := q.db.Exec(ctx, deleteLibrary, arg.ID, arg.Userid)
 	return err
 }
 
 const getLibrary = `-- name: GetLibrary :one
 select libraries.id, libraries.user_id, libraries.name from libraries
 join users on libraries.user_id = users.id
-where libraries.user_id = $1
+where
+libraries.user_id = $1 and
+libraries.id = $2
 limit 1
 `
 
-func (q *Queries) GetLibrary(ctx context.Context, id int64) (Library, error) {
-	row := q.db.QueryRow(ctx, getLibrary, id)
+type GetLibraryParams struct {
+	Userid int64       `db:"userid" json:"userid"`
+	ID     pgtype.UUID `db:"id" json:"id"`
+}
+
+func (q *Queries) GetLibrary(ctx context.Context, arg GetLibraryParams) (Library, error) {
+	row := q.db.QueryRow(ctx, getLibrary, arg.Userid, arg.ID)
 	var i Library
 	err := row.Scan(&i.ID, &i.UserID, &i.Name)
 	return i, err
@@ -100,6 +114,7 @@ func (q *Queries) GetLibrary(ctx context.Context, id int64) (Library, error) {
 
 const listLibraries = `-- name: ListLibraries :many
 select id, user_id, name from libraries
+where libraries.user_id = $3
 limit $1
 offset $2
 `
@@ -107,10 +122,11 @@ offset $2
 type ListLibrariesParams struct {
 	Limit  int32 `db:"limit" json:"limit"`
 	Offset int32 `db:"offset" json:"offset"`
+	Userid int64 `db:"userid" json:"userid"`
 }
 
 func (q *Queries) ListLibraries(ctx context.Context, arg ListLibrariesParams) ([]Library, error) {
-	rows, err := q.db.Query(ctx, listLibraries, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, listLibraries, arg.Limit, arg.Offset, arg.Userid)
 	if err != nil {
 		return nil, err
 	}
@@ -134,12 +150,27 @@ select books.id from libraries
 join users on libraries.user_id = users.id
 left join library_books on libraries.id = library_books.library_id
 left join books on library_books.book_id = books.id
-where libraries.id = $1
-limit 1
+where
+libraries.user_id = $3 and
+libraries.id = $4
+limit $1
+offset $2
 `
 
-func (q *Queries) ListLibraryBooks(ctx context.Context, id pgtype.UUID) ([]pgtype.UUID, error) {
-	rows, err := q.db.Query(ctx, listLibraryBooks, id)
+type ListLibraryBooksParams struct {
+	Limit  int32       `db:"limit" json:"limit"`
+	Offset int32       `db:"offset" json:"offset"`
+	Userid int64       `db:"userid" json:"userid"`
+	ID     pgtype.UUID `db:"id" json:"id"`
+}
+
+func (q *Queries) ListLibraryBooks(ctx context.Context, arg ListLibraryBooksParams) ([]pgtype.UUID, error) {
+	rows, err := q.db.Query(ctx, listLibraryBooks,
+		arg.Limit,
+		arg.Offset,
+		arg.Userid,
+		arg.ID,
+	)
 	if err != nil {
 		return nil, err
 	}

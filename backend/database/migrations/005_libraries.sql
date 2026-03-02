@@ -1,7 +1,7 @@
 create table libraries (
     id uuid primary key default uuid_generate_v4(),
-    user_id bigserial not null references users(id)
-    name string not null default "Библиотека"
+    user_id bigserial not null references users(id),
+    name text not null default 'Библиотекa'
 );
 
 create table library_books (
