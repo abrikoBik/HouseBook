@@ -14,6 +14,28 @@ import (
 	"github.com/unrolled/render"
 )
 
+// CreateBook godoc
+//
+// @summary Создать книгу
+// @description Создаёт новую книгу.
+// @accept json
+// @produce json
+//
+// @param author body string true "Полное имя автора"
+// @param cover_type body string false "Тип обложки (твёрдая, мягкая)"
+// @param description body string false "Описание книги"
+// @param genre body string true "Жанр книги"
+// @param isbn body string true "ISBN книги"
+// @param language body string true "Язык книги"
+// @param page_count body int true "Количество страниц в книге"
+// @param publisher body string true "Издательство книги"
+// @param title body string true "Название книги"
+// @param year body int true "Год выпуска книги"
+//
+// @failure 401 {object} ErrorResponse
+// @failure 409 {object} ErrorResponse
+// @failure 500 {object} ErrorResponse
+// @router /api/books [post]
 func CreateBook(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err  error

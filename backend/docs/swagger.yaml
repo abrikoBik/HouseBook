@@ -1,0 +1,92 @@
+definitions:
+  handlers.ErrorResponse:
+    properties:
+      error:
+        type: string
+      explanation:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/books:
+    post:
+      consumes:
+      - application/json
+      description: Создаёт новую книгу.
+      parameters:
+      - description: Полное имя автора
+        in: body
+        name: author
+        required: true
+        schema:
+          type: string
+      - description: Тип обложки (твёрдая, мягкая)
+        in: body
+        name: cover_type
+        schema:
+          type: string
+      - description: Описание книги
+        in: body
+        name: description
+        schema:
+          type: string
+      - description: Жанр книги
+        in: body
+        name: genre
+        required: true
+        schema:
+          type: string
+      - description: ISBN книги
+        in: body
+        name: isbn
+        required: true
+        schema:
+          type: string
+      - description: Язык книги
+        in: body
+        name: language
+        required: true
+        schema:
+          type: string
+      - description: Количество страниц в книге
+        in: body
+        name: page_count
+        required: true
+        schema:
+          type: integer
+      - description: Издательство книги
+        in: body
+        name: publisher
+        required: true
+        schema:
+          type: string
+      - description: Название книги
+        in: body
+        name: title
+        required: true
+        schema:
+          type: string
+      - description: Год выпуска книги
+        in: body
+        name: year
+        required: true
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Создать книгу
+swagger: "2.0"

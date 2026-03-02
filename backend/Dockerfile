@@ -10,6 +10,7 @@ RUN --mount=type=cache,id=backend-cache,target="/root/.cache/go-build" go test .
 
 FROM debian:trixie-slim AS runner
 WORKDIR /app
+COPY --from=builder /app/docs/swagger.json .
 COPY --from=builder /go/bin/tern /usr/local/bin/
 COPY --from=builder /app/housebook .
 COPY ./database/migrations ./migrations
