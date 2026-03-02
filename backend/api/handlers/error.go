@@ -60,7 +60,7 @@ func ErrorBadPaginationParams(err error) ErrorResponse {
 
 func ErrorRender(err error) ErrorResponse {
 	return ErrorResponse{
-		Status: http.StatusNotAcceptable,
+		Status: http.StatusInternalServerError,
 		Error:  "render error",
 		err:    err,
 	}

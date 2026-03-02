@@ -19,6 +19,25 @@ type UserRequest struct {
 	Password string
 }
 
+// CreateUser godoc
+//
+//	@summary		Создать пользователя
+//	@description	Создаёт нового пользователя.
+//	@accept			json
+//	@produce		json
+//
+//	@tags			Пользователи
+//
+//	@param			email		body		string	true	"Электронная почта пользователя"	Example(ivanov@example.com)
+//	@param			login		body		string	true	"Логин пользователя"				Example(ivanov)
+//	@param			name		body		string	true	"ФИО пользователя"					Example(Иванов Иван Иванович)
+//	@param			password	body		string	true	"Пароль пользователя"				Example(ivanov123qwerty)
+//
+//	@success		201			{object}	db.User
+//	@failure		400			{object}	ErrorResponse
+//	@failure		409			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/users [post]
 func CreateUser(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err         error
@@ -70,6 +89,20 @@ func CreateUser(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+// GetUser godoc
+//
+//	@summary		Получить пользователя
+//	@description	Получает информацию о пользователе.
+//	@accept			plain
+//	@produce		json
+//
+//	@tags			Пользователи
+//
+//	@success		200	{object}	db.User
+//	@failure		400	{object}	ErrorResponse
+//	@failure		404	{object}	ErrorResponse
+//	@failure		500	{object}	ErrorResponse
+//	@router			/api/users/{id} [get]
 func GetUser(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err error
@@ -105,6 +138,25 @@ func GetUser(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+// UpdateUser godoc
+//
+//	@summary		Изменить пользователя
+//	@description	Изменяет информацию о существующем пользователе.
+//	@accept			json
+//	@produce		json
+//
+//	@tags			Пользователи
+//
+//	@param			email		body		string	false	"Электронная почта пользователя"	Example(ivanov@example.com)
+//	@param			login		body		string	false	"Логин пользователя"				Example(ivanov)
+//	@param			name		body		string	false	"ФИО пользователя"					Example(Иванов Иван Иванович)
+//	@param			password	body		string	false	"Пароль пользователя"				Example(ivanov123qwerty)
+//
+//	@success		200			{object}	db.User
+//	@failure		400			{object}	ErrorResponse
+//	@failure		409			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/users/{id} [patch]
 func UpdateUser(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err  error
@@ -145,6 +197,19 @@ func UpdateUser(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+// DeleteUser godoc
+//
+//	@summary		Удалить пользователя
+//	@description	Удаляет пользователя из базы данных.
+//	@accept			plain
+//	@produce		json
+//
+//	@tags			Пользователи
+//
+//	@success		200	{string}	string	""
+//	@failure		400	{object}	ErrorResponse
+//	@failure		500	{object}	ErrorResponse
+//	@router			/api/users/{id} [delete]
 func DeleteUser(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err error

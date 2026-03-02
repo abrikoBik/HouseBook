@@ -5,7 +5,7 @@ http://localhost
 tls internal
 
 encode
-handle_path /api/* {
+handle /api/* {
 	reverse_proxy backend:3000
 }
 handle_path /cdn/* {

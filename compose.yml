@@ -65,7 +65,7 @@ services:
       - storage
     configs:
       - source: caddy
-        target: /etc/caddy/Caddyfile      
+        target: /etc/caddy/Caddyfile
     ports:
       - 80:80
       - 443:443/tcp

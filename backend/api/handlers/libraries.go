@@ -14,6 +14,22 @@ import (
 	"github.com/unrolled/render"
 )
 
+// CreateLibrary godoc
+//
+//	@summary		Создать библиотеку
+//	@description	Создаёт новую пользовательскую библиотеку.
+//	@accept			json
+//	@produce		json
+//
+//	@tags			Библиотеки
+//
+//	@param			userid	body		int		true	"ID владельца библиотеки"
+//	@param			name	body		string	true	"Название библиотеки"	Example(Избранное)
+//
+//	@success		201		{object}	db.Library
+//	@failure		400		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
+//	@router			/api/libraries [post]
 func CreateLibrary(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err  error
@@ -49,6 +65,20 @@ func CreateLibrary(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+// GetLibrary godoc
+//
+//	@summary		Получить библиотеку
+//	@description	Возвращает информацию о библиотеке.
+//	@accept			plain
+//	@produce		json
+//
+//	@tags			Библиотеки
+//
+//	@success		200	{object}	db.Library
+//	@failure		400	{object}	ErrorResponse
+//	@failure		404	{object}	ErrorResponse
+//	@failure		500	{object}	ErrorResponse
+//	@router			/api/libraries/{uuid} [get]
 func GetLibrary(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err  error
@@ -93,6 +123,19 @@ func GetLibrary(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+// DeleteLibrary godoc
+//
+//	@summary		Удалить библиотеку
+//	@description	Удаляет библиотеку из базы данных.
+//	@accept			plain
+//	@produce		json
+//
+//	@tags			Библиотеки
+//
+//	@success		200	{string}	string	""
+//	@failure		400	{object}	ErrorResponse
+//	@failure		500	{object}	ErrorResponse
+//	@router			/api/libraries/{uuid} [delete]
 func DeleteLibrary(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err  error
@@ -125,6 +168,23 @@ func DeleteLibrary(writer http.ResponseWriter, request *http.Request) {
 	writer.WriteHeader(http.StatusOK)
 }
 
+// ListLibraries godoc
+//
+//	@summary		Список библиотек
+//	@description	Возвращает список всех библиотек, принадлежащих пользователю.
+//	@accept			plain
+//	@produce		json
+//
+//	@tags			Библиотеки
+//
+//	@param			limit	query		int	false	"Лимит количества возвращаемых элементов"	Example(10)
+//	@param			offset	query		int	false	"Смещение возвращаемых элементов"			Example(5)
+//
+//	@success		200		{array}		db.Library
+//	@failure		400		{object}	ErrorResponse
+//	@failure		404		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
+//	@router			/api/users/{id}/libraries [get]
 func ListLibraries(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err    error
@@ -168,6 +228,23 @@ func ListLibraries(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+// AddBookToLibrary godoc
+//
+//	@summary		Добавить книгу
+//	@description	Добавляет книгу в существующую библиотеку.
+//	@accept			json
+//	@produce		json
+//
+//	@tags			Библиотеки
+//
+//	@param			bookid		body		pgtype.UUID	true	"ID книги"
+//	@param			quantity	body		int			false	"Количество экземпляров книги"
+//
+//	@success		201			{string}	string		""
+//	@failure		400			{object}	ErrorResponse
+//	@failure		409			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/libraries/{uuid}/books [patch]
 func AddBookToLibrary(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err  error
@@ -216,6 +293,23 @@ func AddBookToLibrary(writer http.ResponseWriter, request *http.Request) {
 	writer.WriteHeader(http.StatusCreated)
 }
 
+// ListLibraryBooks godoc
+//
+//	@summary		Список книг в библиотеке
+//	@description	Возвращает список всех книг, имеющихся в библиотеке.
+//	@accept			plain
+//	@produce		json
+//
+//	@tags			Библиотеки
+//
+//	@param			limit	query		int	false	"Лимит количества возвращаемых элементов"	Example(10)
+//	@param			offset	query		int	false	"Смещение возвращаемых элементов"			Example(5)
+//
+//	@success		200		{array}		db.LibraryBook
+//	@failure		400		{object}	ErrorResponse
+//	@failure		404		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
+//	@router			/api/libraries/{uuid}/books [get]
 func ListLibraryBooks(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err    error
@@ -265,6 +359,19 @@ func ListLibraryBooks(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+// DeleteBookFromLibrary godoc
+//
+//	@summary		Удалить книгу
+//	@description	Удаляет книгу из существующей библиотеки.
+//	@accept			json
+//	@produce		json
+//
+//	@tags			Библиотеки
+//
+//	@success		201	{string}	string	""
+//	@failure		400	{object}	ErrorResponse
+//	@failure		500	{object}	ErrorResponse
+//	@router			/api/libraries/{library-uuid}/books/{book-uuid} [delete]
 func DeleteBookFromLibrary(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err    error
