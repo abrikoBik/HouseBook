@@ -26,8 +26,7 @@ func Health(w http.ResponseWriter, r *http.Request) {
 
 func PingDB(renderer *render.Render, writer http.ResponseWriter) error {
 	if err := database.Pool.Ping(database.Context); err != nil {
-		toWrite := ErrorDatabase(err)
-		renderer.JSON(writer, toWrite.Status, toWrite)
+		RenderError(renderer, writer, ErrorDatabase(err))
 		return err
 	}
 	return nil

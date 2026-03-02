@@ -20,8 +20,7 @@ func CreateTrade(writer http.ResponseWriter, request *http.Request) {
 		q    = db.New(database.Pool)
 	)
 	if err := json.NewDecoder(request.Body).Decode(&data); err != nil {
-		toWrite := ErrorBadRequest(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorBadRequest(err))
 		return
 	}
 
@@ -30,20 +29,19 @@ func CreateTrade(writer http.ResponseWriter, request *http.Request) {
 	}
 	trade, err := q.CreateTrade(database.Context, data)
 	if err != nil {
-		var toWrite *ErrorResponse
+		var toWrite ErrorResponse
 		switch err {
 		default:
 			toWrite = ErrorGeneric(err)
 		}
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, toWrite)
 		return
 	}
 	Logger.Info().Interface("id", trade.ID).Msg("trade created")
 
 	writer.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(writer).Encode(trade); err != nil {
-		toWrite := ErrorRender(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorRender(err))
 		return
 	}
 }
@@ -56,8 +54,7 @@ func GetTrade(writer http.ResponseWriter, request *http.Request) {
 	)
 	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
 	if err != nil {
-		toWrite := ErrorBadRequest(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorBadRequest(err))
 		return
 	}
 
@@ -66,22 +63,21 @@ func GetTrade(writer http.ResponseWriter, request *http.Request) {
 	}
 	trade, err := q.GetTrade(database.Context, uuid)
 	if err != nil {
-		var toWrite *ErrorResponse
+		var toWrite ErrorResponse
 		switch err {
 		case sql.ErrNoRows:
 			toWrite = ErrorNotFound(err)
 		default:
 			toWrite = ErrorGeneric(err)
 		}
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, toWrite)
 		return
 	}
 	Logger.Info().Interface("id", trade.ID).Msg("book retrieved")
 
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(trade); err != nil {
-		toWrite := ErrorRender(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorRender(err))
 		return
 	}
 }
@@ -94,8 +90,7 @@ func DeleteTrade(writer http.ResponseWriter, request *http.Request) {
 	)
 	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
 	if err != nil {
-		toWrite := ErrorBadRequest(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorBadRequest(err))
 		return
 	}
 
@@ -103,12 +98,12 @@ func DeleteTrade(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	if err := q.DeleteTrade(database.Context, uuid); err != nil {
-		var toWrite *ErrorResponse
+		var toWrite ErrorResponse
 		switch err {
 		default:
 			toWrite = ErrorGeneric(err)
 		}
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, toWrite)
 		return
 	}
 	Logger.Info().Interface("id", uuid).Msg("trade deleted")
@@ -126,8 +121,7 @@ func ListTrades(writer http.ResponseWriter, request *http.Request) {
 	)
 	params.Limit, params.Offset, err = util.GetSearchPagination(query)
 	if err != nil {
-		toWrite := ErrorBadRequest(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorBadRequest(err))
 		return
 	}
 
@@ -136,22 +130,21 @@ func ListTrades(writer http.ResponseWriter, request *http.Request) {
 	}
 	trades, err := q.ListTrades(database.Context, params)
 	if err != nil {
-		var toWrite *ErrorResponse
+		var toWrite ErrorResponse
 		switch err {
 		case sql.ErrNoRows:
 			toWrite = ErrorNotFound(err)
 		default:
 			toWrite = ErrorGeneric(err)
 		}
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, toWrite)
 		return
 	}
 	Logger.Info().Int("len(trades)", len(trades)).Msg("trades listed")
 
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(trades); err != nil {
-		toWrite := ErrorRender(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorRender(err))
 		return
 	}
 }
@@ -165,13 +158,11 @@ func AddBookToTrade(writer http.ResponseWriter, request *http.Request) {
 	)
 	tradeID, err := util.PathUUID(consts.UUIDPathValue, request)
 	if err != nil {
-		toWrite := ErrorBadRequest(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorBadRequest(err))
 		return
 	}
 	if err := json.NewDecoder(request.Body).Decode(&data); err != nil {
-		toWrite := ErrorBadRequest(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorBadRequest(err))
 		return
 	}
 	data.Tradeid = tradeID
@@ -180,12 +171,12 @@ func AddBookToTrade(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	if err = q.AddBookToTrade(database.Context, data); err != nil {
-		var toWrite *ErrorResponse
+		var toWrite ErrorResponse
 		switch err {
 		default:
 			toWrite = ErrorGeneric(err)
 		}
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, toWrite)
 		return
 	}
 	Logger.Info().
@@ -205,14 +196,12 @@ func ListTradeBooks(writer http.ResponseWriter, request *http.Request) {
 	)
 	params.Limit, params.Offset, err = util.GetSearchPagination(query)
 	if err != nil {
-		toWrite := ErrorBadRequest(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorBadRequest(err))
 		return
 	}
 	tradeID, err := util.PathUUID(consts.UUIDPathValue, request)
 	if err != nil {
-		toWrite := ErrorBadRequest(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorBadRequest(err))
 		return
 	}
 	params.ID = tradeID
@@ -222,22 +211,22 @@ func ListTradeBooks(writer http.ResponseWriter, request *http.Request) {
 	}
 	books, err := q.ListTradeBooks(database.Context, params)
 	if err != nil {
-		var toWrite *ErrorResponse
+		var toWrite ErrorResponse
 		switch err {
+		// TODO: this path is never taken; find the correct error type
 		case sql.ErrNoRows:
 			toWrite = ErrorNotFound(err)
 		default:
 			toWrite = ErrorGeneric(err)
 		}
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, toWrite)
 		return
 	}
 	Logger.Info().Int("len(books)", len(books)).Msg("books listed")
 
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(books); err != nil {
-		toWrite := ErrorRender(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorRender(err))
 		return
 	}
 }
@@ -251,15 +240,13 @@ func DeleteTradeBook(writer http.ResponseWriter, request *http.Request) {
 	)
 	tradeID, err := util.PathUUID("trade-uuid", request)
 	if err != nil {
-		toWrite := ErrorBadRequest(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorBadRequest(err))
 		return
 	}
 	params.TradeID = tradeID
 	bookID, err := util.PathUUID("book-uuid", request)
 	if err != nil {
-		toWrite := ErrorBadRequest(err)
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, ErrorBadRequest(err))
 		return
 	}
 	params.BookID = bookID
@@ -268,12 +255,12 @@ func DeleteTradeBook(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	if err := q.DeleteTradeBook(database.Context, params); err != nil {
-		var toWrite *ErrorResponse
+		var toWrite ErrorResponse
 		switch err {
 		default:
 			toWrite = ErrorGeneric(err)
 		}
-		r.JSON(writer, toWrite.Status, toWrite)
+		RenderError(r, writer, toWrite)
 		return
 	}
 	Logger.Info().

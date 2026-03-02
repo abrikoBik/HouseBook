@@ -2,57 +2,62 @@ package handlers
 
 import (
 	"net/http"
+
+	"github.com/unrolled/render"
 )
 
 // ErrorResponse is a helper struct for rendering errors.
 type ErrorResponse struct {
 	Status int    `json:"-"`
 	Error  string `json:"error"`
-	// TODO: remove in production
-	Debug string `json:"debug"`
+
+	err error `json:"-"`
 }
 
-func ErrorBadRequest(err error) *ErrorResponse {
-	Logger.Err(err).Msg("bad request")
-	return &ErrorResponse{
+func RenderError(renderer *render.Render, writer http.ResponseWriter, err ErrorResponse) {
+	Logger.Err(err.err).Msg(err.Error)
+	writer.Header().Set("Content-Type", "application/json")
+	renderer.JSON(writer, err.Status, err)
+}
+
+// TODO: add more errors
+
+func ErrorBadRequest(err error) ErrorResponse {
+	return ErrorResponse{
 		Status: http.StatusBadRequest,
 		Error:  "bad request",
-		Debug:  err.Error(),
+		err:    err,
 	}
 }
 
-func ErrorRender(err error) *ErrorResponse {
-	Logger.Err(err).Msg("render error")
-	return &ErrorResponse{
+func ErrorRender(err error) ErrorResponse {
+	return ErrorResponse{
 		Status: http.StatusInternalServerError,
 		Error:  "render error",
-		Debug:  err.Error(),
+		err:    err,
 	}
 }
 
-func ErrorNotFound(err error) *ErrorResponse {
-	Logger.Err(err).Msg("not found")
-	return &ErrorResponse{
+func ErrorNotFound(err error) ErrorResponse {
+	return ErrorResponse{
 		Status: http.StatusNotFound,
 		Error:  "not found",
-		Debug:  err.Error(),
+		err:    err,
 	}
 }
 
-func ErrorDatabase(err error) *ErrorResponse {
-	Logger.Err(err).Msg("database error")
-	return &ErrorResponse{
+func ErrorDatabase(err error) ErrorResponse {
+	return ErrorResponse{
 		Status: http.StatusInternalServerError,
 		Error:  "database error",
-		Debug:  err.Error(),
+		err:    err,
 	}
 }
 
-func ErrorGeneric(err error) *ErrorResponse {
-	Logger.Err(err).Msg("unknown error")
-	return &ErrorResponse{
+func ErrorGeneric(err error) ErrorResponse {
+	return ErrorResponse{
 		Status: http.StatusInternalServerError,
 		Error:  "unknown error",
-		Debug:  err.Error(),
+		err:    err,
 	}
 }
