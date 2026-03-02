@@ -22,6 +22,18 @@ type Book struct {
 	Description pgtype.Text    `db:"description" json:"description"`
 }
 
+type Library struct {
+	ID     pgtype.UUID `db:"id" json:"id"`
+	UserID int64       `db:"user_id" json:"user_id"`
+	Name   string      `db:"name" json:"name"`
+}
+
+type LibraryBook struct {
+	LibraryID pgtype.UUID    `db:"library_id" json:"library_id"`
+	BookID    pgtype.UUID    `db:"book_id" json:"book_id"`
+	Quantity  pgtype.Numeric `db:"quantity" json:"quantity"`
+}
+
 type Trade struct {
 	ID          pgtype.UUID      `db:"id" json:"id"`
 	OwnerID     int64            `db:"owner_id" json:"owner_id"`

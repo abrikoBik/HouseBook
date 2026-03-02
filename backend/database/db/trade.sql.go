@@ -85,6 +85,23 @@ func (q *Queries) CreateTrade(ctx context.Context, arg CreateTradeParams) (Trade
 	return i, err
 }
 
+const deleteBookFromTrade = `-- name: DeleteBookFromTrade :exec
+delete from trade_books
+where
+trade_id = $1 and
+book_id = $2
+`
+
+type DeleteBookFromTradeParams struct {
+	TradeID pgtype.UUID `db:"trade_id" json:"trade_id"`
+	BookID  pgtype.UUID `db:"book_id" json:"book_id"`
+}
+
+func (q *Queries) DeleteBookFromTrade(ctx context.Context, arg DeleteBookFromTradeParams) error {
+	_, err := q.db.Exec(ctx, deleteBookFromTrade, arg.TradeID, arg.BookID)
+	return err
+}
+
 const deleteTrade = `-- name: DeleteTrade :exec
 delete from trades
 where id = $1
@@ -92,23 +109,6 @@ where id = $1
 
 func (q *Queries) DeleteTrade(ctx context.Context, id pgtype.UUID) error {
 	_, err := q.db.Exec(ctx, deleteTrade, id)
-	return err
-}
-
-const deleteTradeBook = `-- name: DeleteTradeBook :exec
-delete from trade_books
-where
-trade_id = $1 and
-book_id = $2
-`
-
-type DeleteTradeBookParams struct {
-	TradeID pgtype.UUID `db:"trade_id" json:"trade_id"`
-	BookID  pgtype.UUID `db:"book_id" json:"book_id"`
-}
-
-func (q *Queries) DeleteTradeBook(ctx context.Context, arg DeleteTradeBookParams) error {
-	_, err := q.db.Exec(ctx, deleteTradeBook, arg.TradeID, arg.BookID)
 	return err
 }
 

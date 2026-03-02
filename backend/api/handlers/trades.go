@@ -228,7 +228,7 @@ func ListTradeBooks(writer http.ResponseWriter, request *http.Request) {
 func DeleteTradeBook(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err    error
-		params db.DeleteTradeBookParams
+		params db.DeleteBookFromTradeParams
 		r      = render.New()
 		q      = db.New(database.Pool)
 	)
@@ -248,7 +248,7 @@ func DeleteTradeBook(writer http.ResponseWriter, request *http.Request) {
 	if PingDB(r, writer) != nil {
 		return
 	}
-	if err := q.DeleteTradeBook(database.Context, params); err != nil {
+	if err := q.DeleteBookFromTrade(database.Context, params); err != nil {
 		RenderError(r, writer, ErrorGeneric(err))
 		return
 	}
