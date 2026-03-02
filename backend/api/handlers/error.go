@@ -23,8 +23,6 @@ func RenderError(renderer *render.Render, writer http.ResponseWriter, err ErrorR
 	renderer.JSON(writer, err.Status, err)
 }
 
-// TODO: add more errors
-
 func ErrorBadJSON(err error) ErrorResponse {
 	return ErrorResponse{
 		Status: http.StatusBadRequest,

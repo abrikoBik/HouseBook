@@ -160,7 +160,6 @@ func SearchBook(writer http.ResponseWriter, request *http.Request) {
 		r      = render.New()
 		q      = db.New(database.Pool)
 	)
-	// TODO: eliminate doubled code
 	params, err = util.GetSearchParams(query)
 	if err != nil {
 		RenderError(r, writer, ErrorBadSearchParams(err, "book"))
