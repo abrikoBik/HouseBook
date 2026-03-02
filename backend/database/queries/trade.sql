@@ -30,6 +30,16 @@ insert into trades (
 )
 returning *;
 
+-- name: CompleteTrade :one
+update trades
+set completed_at = now()
+where id = @id
+returning *;
+
+-- name: DeleteTrade :exec
+delete from trades
+where id = @id;
+
 -- name: AddBookToTrade :exec
 insert into trade_books (
     trade_id,
@@ -41,17 +51,7 @@ insert into trade_books (
     @ownerID
 );
 
--- name: CompleteTrade :one
-update trades
-set completed_at = now()
-where id = @id
-returning *;
-
--- name: DeleteTrade :exec
-delete from trades
-where id = @id;
-
--- name: DeleteTradeBook :exec
+-- name: DeleteBookFromTrade :exec
 delete from trade_books
 where
 trade_id = @trade_id and

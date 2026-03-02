@@ -27,6 +27,10 @@ insert into libraries (
 )
 returning *;
 
+-- name: DeleteLibrary :exec
+delete from libraries
+where id = @id;
+
 -- name: AddBookToLibrary :exec
 insert into library_books (
     library_id,
@@ -37,10 +41,6 @@ insert into library_books (
     @bookID,
     @quantity
 );
-
--- name: DeleteLibrary :exec
-delete from libraries
-where id = @id;
 
 -- name: DeleteBookFromLibrary :exec
 delete from library_books
