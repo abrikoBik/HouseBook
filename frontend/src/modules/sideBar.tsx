@@ -2,12 +2,13 @@ import HomeIcon from "../assets/Home.png";
 import LogoIcon from "../assets/Logo.png";
 import FavoritesIcon from "../assets/Favorites.png";
 import ExitIcon from "../assets/Exit.png";
+import "../styles/book.css";
 
-const sideBar = () => {
+const SideBar = () => {
   return (
     <aside id="side_menu">
-      <nav>
-        <div className="menu_item">
+      <nav id="side_nav">
+        <div className="logo">
           <img src={LogoIcon} alt="logo" />
         </div>
 
@@ -27,4 +28,4 @@ const sideBar = () => {
   );
 };
 
-export default sideBar;
+export default SideBar;
