@@ -11,6 +11,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/zerolog"
 )
 
@@ -36,6 +37,11 @@ func Config(config Conf, callback func()) {
 	Logger = zerolog.Ctx(Context)
 	handlers.Config(Context)
 	addr = fmt.Sprintf("%s:%d", config.Hostname, config.Port)
+	router = chi.NewRouter()
+	// TODO: add in production
+	// router.Use(middleware.Compress(5))
+	router.Use(middleware.Recoverer)
+	endpoints.Register(router)
 	callback()
 }
 
@@ -46,11 +52,7 @@ func Start(callback func()) {
 	}
 	defer listener.Close()
 	server.Addr = listener.Addr().String()
-
-	router = chi.NewRouter()
 	server.Handler = router
-	endpoints.Register(router)
-
 	Logger.Info().Str("addr", addr).Msg("starting API server")
 	callback()
 	if err := server.Serve(listener); !errors.Is(err, http.ErrServerClosed) {
