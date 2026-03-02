@@ -17,11 +17,13 @@ var (
 	err     error
 )
 
-func Start(ctx context.Context, hostname string, port uint16, callback func()) {
-	// TODO: move this from Start()?
+func Config(ctx context.Context, callback func()) {
 	Context = ctx
 	Logger = zerolog.Ctx(Context)
+	callback()
+}
 
+func Start(hostname string, port uint16, callback func()) {
 	// TODO: remove sslmode=disable
 	connString := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
 		os.Getenv("POSTGRES_USER"),

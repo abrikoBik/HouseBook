@@ -23,12 +23,14 @@ var (
 	err      error
 )
 
-func Start(ctx context.Context, hostname string, port uint16, callback func()) {
-	// TODO: move this from Start()?
+func Config(ctx context.Context, callback func()) {
 	Context = ctx
 	Logger = zerolog.Ctx(Context)
-	handlers.Config(ctx)
+	handlers.Config(Context)
+	callback()
+}
 
+func Start(hostname string, port uint16, callback func()) {
 	Listener, err = net.Listen("tcp", fmt.Sprintf("%s:%d", hostname, port))
 	if err != nil {
 		Logger.Panic().Err(err).Msg("panicking in API")
