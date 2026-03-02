@@ -183,6 +183,7 @@ func AddBookToTrade(writer http.ResponseWriter, request *http.Request) {
 		Interface("tradeID", data.Tradeid).
 		Interface("bookID", data.Bookid).
 		Msg("book added to trade")
+
 	writer.WriteHeader(http.StatusCreated)
 }
 
