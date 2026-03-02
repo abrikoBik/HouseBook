@@ -80,8 +80,8 @@ func CreateBook(writer http.ResponseWriter, request *http.Request) {
 
 // GetBook godoc
 //
-//	@summary		Получить  книгу
-//	@description	Получить информацию о книге.
+//	@summary		Получить книгу
+//	@description	Возвращает информацию о книге.
 //	@accept			plain
 //	@produce		json
 //
@@ -130,7 +130,7 @@ func GetBook(writer http.ResponseWriter, request *http.Request) {
 // UpdateBook godoc
 //
 //	@summary		Изменить книгу
-//	@description	Изменить информацию о существующей книге.
+//	@description	Изменяет информацию о существующей книге.
 //	@accept			json
 //	@produce		json
 //
@@ -195,7 +195,7 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 // DeleteBook godoc
 //
 //	@summary		Удалить книгу
-//	@description	Удалить книгу из базы данных.
+//	@description	Удаляет книгу из базы данных.
 //	@accept			plain
 //	@produce		json
 //
@@ -232,7 +232,7 @@ func DeleteBook(writer http.ResponseWriter, request *http.Request) {
 // SearchBook godoc
 //
 //	@summary		Найти книги
-//	@description	Найти книги, соответствующие поисковым параметрам.
+//	@description	Возвращает список книг, соответствующих поисковым параметрам.
 //	@accept			json
 //	@produce		json
 //
@@ -242,11 +242,11 @@ func DeleteBook(writer http.ResponseWriter, request *http.Request) {
 //	@param			offset		query		int		false	"Смещение возвращаемых элементов"			Example(5)
 //
 //	@param			author		query		string	false	"Полное имя автора"							Example(Известный автор)
-//	@param			genre		body		string	false	"Жанр книги"								Example(Роман)
-//	@param			language	body		string	false	"Язык книги"								Example(Русский)
-//	@param			publisher	body		string	false	"Издательство книги"						Example(Хороший Издатель)
-//	@param			title		body		string	false	"Название книги"							Example(Интересная книга)
-//	@param			year		body		int		false	"Год выпуска книги"							Example(2026)
+//	@param			genre		query		string	false	"Жанр книги"								Example(Роман)
+//	@param			language	query		string	false	"Язык книги"								Example(Русский)
+//	@param			publisher	query		string	false	"Издательство книги"						Example(Хороший Издатель)
+//	@param			title		query		string	false	"Название книги"							Example(Интересная книга)
+//	@param			year		query		int		false	"Год выпуска книги"							Example(2026)
 //
 //	@success		200			{array}		db.Book
 //	@failure		400			{object}	ErrorResponse
@@ -298,16 +298,19 @@ func SearchBook(writer http.ResponseWriter, request *http.Request) {
 // ListBooks godoc
 //
 //	@summary		Список книг
-//	@description	Вывести список книг, хранящихся на сервере.
+//	@description	Возвращает список всех книг, хранящихся на сервере.
 //	@accept			plain
 //	@produce		json
 //
 //	@tags			Книги
 //
-//	@success		200	{array}		db.Book
-//	@failure		400	{object}	ErrorResponse
-//	@failure		404	{object}	ErrorResponse
-//	@failure		500	{object}	ErrorResponse
+//	@param			limit	query		int	false	"Лимит количества возвращаемых элементов"	Example(10)
+//	@param			offset	query		int	false	"Смещение возвращаемых элементов"			Example(5)
+//
+//	@success		200		{array}		db.Book
+//	@failure		400		{object}	ErrorResponse
+//	@failure		404		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
 //	@router			/api/books [get]
 func ListBooks(writer http.ResponseWriter, request *http.Request) {
 	var (
