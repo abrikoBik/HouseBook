@@ -15,43 +15,52 @@ import (
 )
 
 var (
-	Context  context.Context
-	Listener net.Listener
-	Server   http.Server
-	Router   chi.Router
-	Logger   *zerolog.Logger
+	Context context.Context
+	Logger  *zerolog.Logger
+
+	addr     string
+	listener net.Listener
+	server   http.Server
+	router   chi.Router
 	err      error
 )
 
-func Config(ctx context.Context, callback func()) {
-	Context = ctx
+type Conf struct {
+	Context  context.Context
+	Hostname string
+	Port     uint16
+}
+
+func Config(config Conf, callback func()) {
+	Context = config.Context
 	Logger = zerolog.Ctx(Context)
 	handlers.Config(Context)
+	addr = fmt.Sprintf("%s:%d", config.Hostname, config.Port)
 	callback()
 }
 
-func Start(hostname string, port uint16, callback func()) {
-	Listener, err = net.Listen("tcp", fmt.Sprintf("%s:%d", hostname, port))
+func Start(callback func()) {
+	listener, err = net.Listen("tcp", addr)
 	if err != nil {
 		Logger.Panic().Err(err).Msg("panicking in API")
 	}
-	defer Listener.Close()
-	Server.Addr = Listener.Addr().String()
+	defer listener.Close()
+	server.Addr = listener.Addr().String()
 
-	Router = chi.NewRouter()
-	Server.Handler = Router
-	endpoints.Register(Router)
+	router = chi.NewRouter()
+	server.Handler = router
+	endpoints.Register(router)
 
-	Logger.Info().Str("hostname", hostname).Uint16("port", port).Msg("starting API server")
+	Logger.Info().Str("addr", addr).Msg("starting API server")
 	callback()
-	if err := Server.Serve(Listener); !errors.Is(err, http.ErrServerClosed) {
+	if err := server.Serve(listener); !errors.Is(err, http.ErrServerClosed) {
 		Logger.Panic().Err(err).Msg("panicking in API")
 	}
-	defer Server.Shutdown(Context)
+	defer server.Shutdown(Context)
 }
 
 func Stop(callback func()) {
 	Logger.Info().Msg("stopping API server")
-	Server.Close()
+	server.Close()
 	callback()
 }
