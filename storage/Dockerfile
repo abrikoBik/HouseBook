@@ -1,13 +1,12 @@
 FROM golang:1.25 AS builder
-WORKDIR /usr/src/housebook-storage
+WORKDIR /app
+COPY go.mod go.sum .
+RUN go mod download
 COPY . .
-ENV GOCACHE=/root/.cache/go-build
-ENV GOMODCACHE=/root/.cache/go-mod
-RUN --mount=type=cache,target="/root/.cache/go-build" --mount=type=cache,target="/root/.cache/go-mod" go build -o /usr/bin/housebook-storage
+RUN --mount=type=cache,id=backend-cache,target="/root/.cache/go-build" go build -o housebook-storage
 
 FROM golang:1.25 AS runner
-WORKDIR /usr/bin
-COPY --from=builder /usr/src/housebook-storage /usr/src/housebook-storage
-COPY --from=builder /usr/bin/housebook-storage /usr/bin/housebook-storage
-EXPOSE 3000
-CMD ["/usr/bin/housebook-storage"]
+WORKDIR /app
+COPY --from=builder /app/housebook-storage .
+EXPOSE 3001
+CMD ["./housebook-storage"]

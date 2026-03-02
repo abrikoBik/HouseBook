@@ -23,6 +23,7 @@ services:
     build: storage
     volumes:
       - storage:/var/lib/storage
+    hostname: storage
     networks:
       - back
       - front
@@ -35,6 +36,7 @@ services:
       - db
       - storage
     build: backend
+    hostname: backend
     networks:
       - back
       - front
@@ -63,7 +65,7 @@ services:
       - storage
     configs:
       - source: caddy
-        target: /etc/caddy/Caddyfile      
+        target: /etc/caddy/Caddyfile
     ports:
       - 80:80
       - 443:443/tcp

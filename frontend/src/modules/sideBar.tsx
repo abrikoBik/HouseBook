@@ -12,20 +12,20 @@ const SideBar = () => {
                 <img src={LogoIcon} alt="logo" />
               </div>
 
-              <div className="menu_item">
-                <img src={HomeIcon} alt="home" />
-              </div>
+        <div className="menu_item">
+          <img src={HomeIcon} alt="home" />
+        </div>
 
-              <div className="menu_item">
-                <img src={FavoritesIcon} alt="favorites" />
-              </div>
+        <div className="menu_item">
+          <img src={FavoritesIcon} alt="favorites" />
+        </div>
 
-              <div className="menu_item">
-                <img src={ExitIcon} alt="exit" />
-              </div>
-            </nav>
-        </aside>
-    );    
-}
+        <div className="menu_item">
+          <img src={ExitIcon} alt="exit" />
+        </div>
+      </nav>
+    </aside>
+  );
+};
 
 export default SideBar;

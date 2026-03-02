@@ -3,18 +3,25 @@ package endpoints
 
 import (
 	"housebook/api/handlers"
+	_ "housebook/docs"
+	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
 func Register(router chi.Router) {
-	router.Use(middleware.RequestID)
-	router.Use(middleware.Logger)
-	router.Use(middleware.Recoverer)
-
+	router.Mount("/api", router)
 	router.Get("/health", handlers.Health)
 	routeUsers(router)
 	routeBooks(router)
 	routeTrades(router)
+	router.Route("/docs", func(r chi.Router) {
+		r.Get("/swagger.json", func(w http.ResponseWriter, r *http.Request) {
+			http.ServeFile(w, r, "/app/swagger.json")
+		})
+		r.Get("/*", httpSwagger.Handler(
+			httpSwagger.URL("/api/docs/swagger.json"),
+		))
+	})
 }

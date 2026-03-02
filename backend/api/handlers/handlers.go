@@ -1,8 +1,33 @@
 // Package handlers contains all HTTP handlers.
 package handlers
 
-import "net/http"
+import (
+	"context"
+	"housebook/database"
+	"net/http"
+
+	"github.com/rs/zerolog"
+	"github.com/unrolled/render"
+)
+
+var (
+	Context context.Context
+	Logger  *zerolog.Logger
+)
+
+func Config(ctx context.Context) {
+	Context = ctx
+	Logger = zerolog.Ctx(Context)
+}
 
 func Health(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
+}
+
+func PingDB(renderer *render.Render, writer http.ResponseWriter) error {
+	if err := database.Pool.Ping(database.Context); err != nil {
+		RenderError(renderer, writer, ErrorDatabase(err))
+		return err
+	}
+	return nil
 }

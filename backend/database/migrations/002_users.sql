@@ -1,5 +1,5 @@
 create table users (
-    id serial primary key,
+    id bigserial primary key,
 
     email text unique not null,
     login text unique not null,

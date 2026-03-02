@@ -3,7 +3,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding-left: 10vw; 
+  padding-left: 10vw;
   padding-right: 5vw;
   padding-top: 5vw;
 }
@@ -13,29 +13,28 @@
   z-index: 200;
   flex-direction: row;
   margin-bottom: -15%;
-  &>div>div>h1 {
+  & > div > div > h1 {
     font-weight: bold;
     font-size: 64px;
   }
 
-  &>div>:nth-child(2) {
+  & > div > :nth-child(2) {
     display: flex;
     margin-top: auto;
     width: 100%;
     padding-bottom: 8%;
-    box-shadow: 0px 2px #ECEAE6;
+    box-shadow: 0px 2px #eceae6;
   }
-
 }
 
-#cover>div {
+#cover > div {
   display: flex;
   flex-direction: column;
   margin-left: 8rem;
-}  
+}
 
 #bronya {
-  background-color: #272A34;
+  background-color: #272a34;
   color: white;
   border: 0;
   border-radius: 20px;
@@ -58,9 +57,9 @@
   padding-left: 2.2%;
   padding-right: 2.2%;
   border-radius: 100%;
-  background-color: #F3F1EB;
+  background-color: #f3f1eb;
 
-  &>img {
+  & > img {
     width: auto;
     height: auto;
     max-width: 1.3rem;
@@ -74,7 +73,7 @@
 }
 
 .bookDescription {
-  background-color: #FDFBF7;
+  background-color: #fdfbf7;
   padding: 5%;
   padding-top: 20%;
   border-radius: 25px;
