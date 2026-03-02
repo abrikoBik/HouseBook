@@ -1,22 +1,15 @@
 import BookCover from "../assets/Book.png";
 import FavoritesIcon from "../assets/Favorites.png";
-//import NotificationsIcon from "../assets/Notifications.png"
 import "../styles/book.css";
+import SideBar from "../modules/sideBar";
+import Header from "../modules/header";
+import Comment from "../modules/comment";
 
 const Book = () => {
   return (
     <section id="layout">
-      {/*<header id="top_menu">
-        <div id="top_actions">
-          <div id="notifications">
-            <img src={NotificationsIcon} alt="notifications" />
-          </div>
-          <div id="profile">
-            <span>Шиловский Максим</span>
-          </div>
-        </div>
-        </header>*/}
-
+      <Header />
+      <SideBar />
       <section id="bookBody">
         <div id="cover">
           <img src={BookCover} alt="book" />
@@ -53,7 +46,7 @@ const Book = () => {
               </p>
             </div>
 
-            <section>
+            <section className="kniga">
               <div id="about">
                 <h4>Производитель</h4>
                 <div>Издательство Азбука</div>
@@ -74,32 +67,7 @@ const Book = () => {
             </section>
           </div>
 
-          <div id="comments">
-            <h4>Шиловский Максим</h4>
-            <p>
-              Очень сильная книга с интересным сюжетом и непривычными событиями для
-              европейского, русского менталитета. <br />
-              Читая эту книгу, я пересказывал почти каждую главу родственникам.
-              Книга содержит в себе много философский мыслей и индийской мудрости,
-              но при этом не перегружает читателя. <br />
-              Чтение «Тень горы» показалось более захватывающим, чем «Шантарам»
-              из-за меньшего содержания военных действий. Буду рекомендовать книгу
-              знакомым.
-            </p>
-          </div>
-
-          <div>
-            <h4>Попов Даниил</h4>
-            <p>
-              Хуй пизда гавно какашечки Хуй пизда гавно какашечки Хуй пизда гавно
-              какашечки Хуй пизда гавно какашечки Хуй пизда гавно какашечки Хуй
-              пизда гавно какашечки Хуй пизда гавно хуй =) какашечки Хуй пизда
-              гавно какашечки Хуй пизда гавно какашечки Хуй пизда гавно какашечки
-              Хуй пизда гавно какашечки Хуй пизда гавно какашечки! Гавно, гавно,
-              гавно, гавно, гавно, гавно, гавно, гавно, гавно, гавно, гавно,
-              гавно, гавно, гавно.
-            </p>
-          </div>
+          <Comment/>
 
           <div id="textarea">
             <textarea />
