@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"housebook/consts"
@@ -10,6 +9,8 @@ import (
 	"housebook/util"
 	"net/http"
 
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/unrolled/render"
 )
 
@@ -30,7 +31,17 @@ func CreateBook(writer http.ResponseWriter, request *http.Request) {
 	}
 	book, err := q.CreateBook(database.Context, data)
 	if err != nil {
-		RenderError(r, writer, ErrorGeneric(err))
+		var (
+			pgErr   *pgconn.PgError
+			toWrite ErrorResponse
+		)
+		errors.As(err, &pgErr)
+		if pgErr.Code == "23505" {
+			toWrite = ErrorDuplicate(err)
+		} else {
+			toWrite = ErrorGeneric(err)
+		}
+		RenderError(r, writer, toWrite)
 		return
 	}
 	Logger.Info().Interface("id", book.ID).Msg("book created")
@@ -60,7 +71,7 @@ func GetBook(writer http.ResponseWriter, request *http.Request) {
 	book, err := q.GetBook(database.Context, uuid)
 	if err != nil {
 		var toWrite ErrorResponse
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			toWrite = ErrorNotFound(err)
 		} else {
 			toWrite = ErrorGeneric(err)
@@ -95,7 +106,17 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 	}
 	book, err := q.UpdateBook(database.Context, data)
 	if err != nil {
-		RenderError(r, writer, ErrorGeneric(err))
+		var (
+			pgErr   *pgconn.PgError
+			toWrite ErrorResponse
+		)
+		errors.As(err, &pgErr)
+		if pgErr.Code == "23505" {
+			toWrite = ErrorDuplicate(err)
+		} else {
+			toWrite = ErrorGeneric(err)
+		}
+		RenderError(r, writer, toWrite)
 		return
 	}
 	Logger.Info().Interface("id", book.ID).Msg("book updated")
@@ -157,7 +178,7 @@ func SearchBook(writer http.ResponseWriter, request *http.Request) {
 	books, err := q.SearchBooks(database.Context, params)
 	if err != nil {
 		var toWrite ErrorResponse
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			toWrite = ErrorNotFound(err)
 		} else {
 			toWrite = ErrorGeneric(err)
@@ -194,7 +215,7 @@ func ListBooks(writer http.ResponseWriter, request *http.Request) {
 	books, err := q.ListBooks(database.Context, params)
 	if err != nil {
 		var toWrite ErrorResponse
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			toWrite = ErrorNotFound(err)
 		} else {
 			toWrite = ErrorGeneric(err)

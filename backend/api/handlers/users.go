@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"housebook/consts"
@@ -10,6 +9,8 @@ import (
 	"housebook/util"
 	"net/http"
 
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/unrolled/render"
 )
 
@@ -47,7 +48,17 @@ func CreateUser(writer http.ResponseWriter, request *http.Request) {
 	data = requestData.CreateUserParams
 	user, err := q.CreateUser(database.Context, data)
 	if err != nil {
-		RenderError(r, writer, ErrorGeneric(err))
+		var (
+			pgErr   *pgconn.PgError
+			toWrite ErrorResponse
+		)
+		errors.As(err, &pgErr)
+		if pgErr.Code == "23505" {
+			toWrite = ErrorDuplicate(err)
+		} else {
+			toWrite = ErrorGeneric(err)
+		}
+		RenderError(r, writer, toWrite)
 		return
 	}
 	Logger.Info().Int64("id", user.ID).Msg("user created")
@@ -77,7 +88,7 @@ func GetUser(writer http.ResponseWriter, request *http.Request) {
 	user, err := q.GetUser(database.Context, id)
 	if err != nil {
 		var toWrite ErrorResponse
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			toWrite = ErrorNotFound(err)
 		} else {
 			toWrite = ErrorGeneric(err)
@@ -112,7 +123,17 @@ func UpdateUser(writer http.ResponseWriter, request *http.Request) {
 	}
 	user, err := q.UpdateUser(database.Context, data)
 	if err != nil {
-		RenderError(r, writer, ErrorGeneric(err))
+		var (
+			pgErr   *pgconn.PgError
+			toWrite ErrorResponse
+		)
+		errors.As(err, &pgErr)
+		if pgErr.Code == "23505" {
+			toWrite = ErrorDuplicate(err)
+		} else {
+			toWrite = ErrorGeneric(err)
+		}
+		RenderError(r, writer, toWrite)
 		return
 	}
 	Logger.Info().Int64("id", user.ID).Msg("user updated")

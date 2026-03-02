@@ -32,7 +32,7 @@ func ErrorBadRequest(err error) ErrorResponse {
 
 func ErrorRender(err error) ErrorResponse {
 	return ErrorResponse{
-		Status: http.StatusInternalServerError,
+		Status: http.StatusNotAcceptable,
 		Error:  "render error",
 		err:    err,
 	}
@@ -50,6 +50,14 @@ func ErrorDatabase(err error) ErrorResponse {
 	return ErrorResponse{
 		Status: http.StatusInternalServerError,
 		Error:  "database error",
+		err:    err,
+	}
+}
+
+func ErrorDuplicate(err error) ErrorResponse {
+	return ErrorResponse{
+		Status: http.StatusConflict,
+		Error:  "duplicate key provided",
 		err:    err,
 	}
 }

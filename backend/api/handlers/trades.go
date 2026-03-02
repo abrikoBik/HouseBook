@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"housebook/consts"
@@ -10,6 +9,8 @@ import (
 	"housebook/util"
 	"net/http"
 
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/unrolled/render"
 )
 
@@ -60,7 +61,7 @@ func GetTrade(writer http.ResponseWriter, request *http.Request) {
 	trade, err := q.GetTrade(database.Context, uuid)
 	if err != nil {
 		var toWrite ErrorResponse
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			toWrite = ErrorNotFound(err)
 		} else {
 			toWrite = ErrorGeneric(err)
@@ -121,7 +122,7 @@ func ListTrades(writer http.ResponseWriter, request *http.Request) {
 	trades, err := q.ListTrades(database.Context, params)
 	if err != nil {
 		var toWrite ErrorResponse
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			toWrite = ErrorNotFound(err)
 		} else {
 			toWrite = ErrorGeneric(err)
@@ -160,7 +161,17 @@ func AddBookToTrade(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	if err = q.AddBookToTrade(database.Context, data); err != nil {
-		RenderError(r, writer, ErrorGeneric(err))
+		var (
+			pgErr   *pgconn.PgError
+			toWrite ErrorResponse
+		)
+		errors.As(err, &pgErr)
+		if pgErr.Code == "23505" {
+			toWrite = ErrorDuplicate(err)
+		} else {
+			toWrite = ErrorGeneric(err)
+		}
+		RenderError(r, writer, toWrite)
 		return
 	}
 	Logger.Info().
@@ -197,7 +208,7 @@ func ListTradeBooks(writer http.ResponseWriter, request *http.Request) {
 	books, err := q.ListTradeBooks(database.Context, params)
 	if err != nil {
 		var toWrite ErrorResponse
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			toWrite = ErrorNotFound(err)
 		} else {
 			toWrite = ErrorGeneric(err)
