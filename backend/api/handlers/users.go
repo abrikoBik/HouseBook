@@ -47,12 +47,7 @@ func CreateUser(writer http.ResponseWriter, request *http.Request) {
 	data = requestData.CreateUserParams
 	user, err := q.CreateUser(database.Context, data)
 	if err != nil {
-		var toWrite ErrorResponse
-		switch err {
-		default:
-			toWrite = ErrorGeneric(err)
-		}
-		RenderError(r, writer, toWrite)
+		RenderError(r, writer, ErrorGeneric(err))
 		return
 	}
 	Logger.Info().Int64("id", user.ID).Msg("user created")
@@ -82,10 +77,9 @@ func GetUser(writer http.ResponseWriter, request *http.Request) {
 	user, err := q.GetUser(database.Context, id)
 	if err != nil {
 		var toWrite ErrorResponse
-		switch err {
-		case sql.ErrNoRows:
+		if errors.Is(err, sql.ErrNoRows) {
 			toWrite = ErrorNotFound(err)
-		default:
+		} else {
 			toWrite = ErrorGeneric(err)
 		}
 		RenderError(r, writer, toWrite)
@@ -146,12 +140,7 @@ func DeleteUser(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	if err := q.DeleteUser(database.Context, id); err != nil {
-		var toWrite ErrorResponse
-		switch err {
-		default:
-			toWrite = ErrorGeneric(err)
-		}
-		RenderError(r, writer, toWrite)
+		RenderError(r, writer, ErrorGeneric(err))
 		return
 	}
 	Logger.Info().Int64("id", id).Msg("user deleted")

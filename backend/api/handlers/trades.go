@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"housebook/consts"
 	"housebook/database"
 	"housebook/database/db"
@@ -29,12 +30,7 @@ func CreateTrade(writer http.ResponseWriter, request *http.Request) {
 	}
 	trade, err := q.CreateTrade(database.Context, data)
 	if err != nil {
-		var toWrite ErrorResponse
-		switch err {
-		default:
-			toWrite = ErrorGeneric(err)
-		}
-		RenderError(r, writer, toWrite)
+		RenderError(r, writer, ErrorGeneric(err))
 		return
 	}
 	Logger.Info().Interface("id", trade.ID).Msg("trade created")
@@ -64,10 +60,9 @@ func GetTrade(writer http.ResponseWriter, request *http.Request) {
 	trade, err := q.GetTrade(database.Context, uuid)
 	if err != nil {
 		var toWrite ErrorResponse
-		switch err {
-		case sql.ErrNoRows:
+		if errors.Is(err, sql.ErrNoRows) {
 			toWrite = ErrorNotFound(err)
-		default:
+		} else {
 			toWrite = ErrorGeneric(err)
 		}
 		RenderError(r, writer, toWrite)
@@ -98,12 +93,7 @@ func DeleteTrade(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	if err := q.DeleteTrade(database.Context, uuid); err != nil {
-		var toWrite ErrorResponse
-		switch err {
-		default:
-			toWrite = ErrorGeneric(err)
-		}
-		RenderError(r, writer, toWrite)
+		RenderError(r, writer, ErrorGeneric(err))
 		return
 	}
 	Logger.Info().Interface("id", uuid).Msg("trade deleted")
@@ -131,10 +121,9 @@ func ListTrades(writer http.ResponseWriter, request *http.Request) {
 	trades, err := q.ListTrades(database.Context, params)
 	if err != nil {
 		var toWrite ErrorResponse
-		switch err {
-		case sql.ErrNoRows:
+		if errors.Is(err, sql.ErrNoRows) {
 			toWrite = ErrorNotFound(err)
-		default:
+		} else {
 			toWrite = ErrorGeneric(err)
 		}
 		RenderError(r, writer, toWrite)
@@ -171,12 +160,7 @@ func AddBookToTrade(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	if err = q.AddBookToTrade(database.Context, data); err != nil {
-		var toWrite ErrorResponse
-		switch err {
-		default:
-			toWrite = ErrorGeneric(err)
-		}
-		RenderError(r, writer, toWrite)
+		RenderError(r, writer, ErrorGeneric(err))
 		return
 	}
 	Logger.Info().
@@ -213,11 +197,9 @@ func ListTradeBooks(writer http.ResponseWriter, request *http.Request) {
 	books, err := q.ListTradeBooks(database.Context, params)
 	if err != nil {
 		var toWrite ErrorResponse
-		switch err {
-		// TODO: this path is never taken; find the correct error type
-		case sql.ErrNoRows:
+		if errors.Is(err, sql.ErrNoRows) {
 			toWrite = ErrorNotFound(err)
-		default:
+		} else {
 			toWrite = ErrorGeneric(err)
 		}
 		RenderError(r, writer, toWrite)
@@ -256,12 +238,7 @@ func DeleteTradeBook(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	if err := q.DeleteTradeBook(database.Context, params); err != nil {
-		var toWrite ErrorResponse
-		switch err {
-		default:
-			toWrite = ErrorGeneric(err)
-		}
-		RenderError(r, writer, toWrite)
+		RenderError(r, writer, ErrorGeneric(err))
 		return
 	}
 	Logger.Info().

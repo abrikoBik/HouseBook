@@ -14,7 +14,6 @@ import (
 )
 
 func CreateBook(writer http.ResponseWriter, request *http.Request) {
-	// TODO: create a small package for all rendering-related stuff
 	var (
 		err  error
 		data db.CreateBookParams
@@ -31,13 +30,7 @@ func CreateBook(writer http.ResponseWriter, request *http.Request) {
 	}
 	book, err := q.CreateBook(database.Context, data)
 	if err != nil {
-		var toWrite ErrorResponse
-		// TODO: handle more errors
-		switch err {
-		default:
-			toWrite = ErrorGeneric(err)
-		}
-		RenderError(r, writer, toWrite)
+		RenderError(r, writer, ErrorGeneric(err))
 		return
 	}
 	Logger.Info().Interface("id", book.ID).Msg("book created")
@@ -55,7 +48,6 @@ func GetBook(writer http.ResponseWriter, request *http.Request) {
 		r   = render.New()
 		q   = db.New(database.Pool)
 	)
-	// TODO: commonize
 	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
 	if err != nil {
 		RenderError(r, writer, ErrorBadRequest(err))
@@ -68,10 +60,9 @@ func GetBook(writer http.ResponseWriter, request *http.Request) {
 	book, err := q.GetBook(database.Context, uuid)
 	if err != nil {
 		var toWrite ErrorResponse
-		switch err {
-		case sql.ErrNoRows:
+		if errors.Is(err, sql.ErrNoRows) {
 			toWrite = ErrorNotFound(err)
-		default:
+		} else {
 			toWrite = ErrorGeneric(err)
 		}
 		RenderError(r, writer, toWrite)
@@ -132,12 +123,7 @@ func DeleteBook(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	if err := q.DeleteBook(database.Context, uuid); err != nil {
-		var toWrite ErrorResponse
-		switch err {
-		default:
-			toWrite = ErrorGeneric(err)
-		}
-		RenderError(r, writer, toWrite)
+		RenderError(r, writer, ErrorGeneric(err))
 		return
 	}
 	Logger.Info().Interface("id", uuid).Msg("book deleted")
@@ -171,11 +157,9 @@ func SearchBook(writer http.ResponseWriter, request *http.Request) {
 	books, err := q.SearchBooks(database.Context, params)
 	if err != nil {
 		var toWrite ErrorResponse
-		switch err {
-		case sql.ErrNoRows:
-			// TODO: decide if 404 is applicable here
+		if errors.Is(err, sql.ErrNoRows) {
 			toWrite = ErrorNotFound(err)
-		default:
+		} else {
 			toWrite = ErrorGeneric(err)
 		}
 		RenderError(r, writer, toWrite)
@@ -210,11 +194,9 @@ func ListBooks(writer http.ResponseWriter, request *http.Request) {
 	books, err := q.ListBooks(database.Context, params)
 	if err != nil {
 		var toWrite ErrorResponse
-		switch err {
-		case sql.ErrNoRows:
-			// TODO: decide if 404 is applicable here
+		if errors.Is(err, sql.ErrNoRows) {
 			toWrite = ErrorNotFound(err)
-		default:
+		} else {
 			toWrite = ErrorGeneric(err)
 		}
 		RenderError(r, writer, toWrite)
