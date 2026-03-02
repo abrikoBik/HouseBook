@@ -22,7 +22,7 @@ $ docker compose exec backend tern migrate -m /app/migrations -c /app/migrations
 
 Для бэкенда в папке `backend`:
 ```shell
-$ go fmt
+$ go fmt ./...
 ```
 
 Для фронтенда в папке `frontend`:
