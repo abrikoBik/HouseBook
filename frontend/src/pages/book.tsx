@@ -9,19 +9,19 @@ import type BookT from "../types/book";
 import { useEffect, useState } from "react";
 
 const Book = () => {
-  var id = "beb2c6cd-1674-4616-8b8a-b6a281e15089";
+  const id = "beb2c6cd-1674-4616-8b8a-b6a281e15089";
 
   const [book, setBook] = useState<BookT>();
 
   async function getBook(uuid: string) {
-    try {
-      const response = await fetch(`/api/books/${uuid}`);
-      const result = await response.json();
-      console.log(response);
-      setBook(result);
-    } catch (error: any) {
-      console.error(error as Error);
+    const response = await fetch(`/api/books/${uuid}`);
+    const result = await response.json();
+    if (!response.ok) {
+      const error = result as Error;
+      console.error(error);
+      alert(error.error);
     }
+    setBook(result);
   }
 
   useEffect(() => {
