@@ -9,9 +9,10 @@ import type Error from "../types/error";
 import { type default as BookT } from "../types/book";
 
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 
 const Book = () => {
+  const navigate = useNavigate();
   const { uuid } = useParams();
   const [book, setBook] = useState<BookT>();
 
@@ -19,7 +20,15 @@ const Book = () => {
     const response = await fetch(`/api/books/${id}`);
     const result = await response.json();
     if (!response.ok) {
-      throw new Error((result as Error).error);
+      switch (response.status) {
+        case 400:
+        case 404:
+          navigate("/404", { replace: true });
+          break;
+        default:
+          throw new Error((result as Error).error);
+          break;
+      }
     }
     setBook(result as BookT);
   };
