@@ -7,7 +7,7 @@ const NotFound = () => {
     <section id="layout">
       <Header />
       <SideBar />
-      <section id="status">
+      <section id="status404">
         <h1>404</h1>
         <p>Страница не была найдена =(</p>
         <a href="/">На главную</a>
