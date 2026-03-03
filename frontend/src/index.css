@@ -24,6 +24,10 @@ h1 {
   font-size: 5rem;
 }
 
+a {
+  color: #e0616a;
+}
+
 .material-symbols-outlined {
   font-variation-settings:
     "FILL" 0,
