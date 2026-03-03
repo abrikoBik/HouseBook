@@ -5,9 +5,8 @@ import SideBar from "../modules/sideBar";
 const NotFound = () => {
   return (
     <section id="layout">
-
       <Header />
-      <SideBar />      
+      <SideBar />
       <section id="status">
         <h1>404</h1>
         <p>Страница не была найдена =(</p>

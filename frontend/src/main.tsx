@@ -16,7 +16,7 @@ createRoot(document.getElementById("root")!).render(
         <Routes>
           <Route path="/auth" element={<Auth />} />
           <Route path="/book/:uuid" element={<Book />} />
-          <Route path="/*" element={<NotFound />} />
+          <Route path="/*" element={<NotFound replace />} />
         </Routes>
       </Router>
     </CookiesProvider>
