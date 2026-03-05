@@ -22,6 +22,8 @@ func main() {
 			Logger()
 		ctx = context.Background()
 	)
+
+	wg.Add(consts.ServiceCount)
 	dbConf := database.Conf{
 		Context:  logger.WithContext(ctx),
 		Username: os.Getenv("POSTGRES_USER"),
@@ -35,10 +37,9 @@ func main() {
 		Hostname: "0.0.0.0",
 		Port:     3000,
 	}
-
-	wg.Add(consts.ServiceCount)
 	go database.Config(dbConf, wg.Done)
 	go api.Config(apiConf, wg.Done)
+	wg.Wait()
 	logger.Info().Int("serviceCount", consts.ServiceCount).Msg("configured")
 
 	wg.Add(consts.ServiceCount)
@@ -49,9 +50,9 @@ func main() {
 
 	signal.Notify(exit, syscall.SIGTERM)
 	<-exit
-	logger.Info().Int("serviceCount", consts.ServiceCount).Msg("stopping")
 	wg.Add(consts.ServiceCount)
 	go database.Stop(wg.Done)
 	go api.Stop(wg.Done)
 	wg.Wait()
+	logger.Info().Int("serviceCount", consts.ServiceCount).Msg("stopped")
 }
