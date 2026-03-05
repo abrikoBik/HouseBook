@@ -5,13 +5,13 @@ limit 1;
 
 -- name: ListBookComments :many
 select * from comments
-where book_id = @id
+where book_id = @bookID
 limit $1
 offset $2;
 
 -- name: ListUserComments :many
 select * from comments
-where user_id = @id
+where user_id = @userID
 limit $1
 offset $2;
 

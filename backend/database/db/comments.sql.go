@@ -80,11 +80,11 @@ offset $2
 type ListBookCommentsParams struct {
 	Limit  int32       `db:"limit" json:"limit"`
 	Offset int32       `db:"offset" json:"offset"`
-	ID     pgtype.UUID `db:"id" json:"id"`
+	Bookid pgtype.UUID `db:"bookid" json:"bookid"`
 }
 
 func (q *Queries) ListBookComments(ctx context.Context, arg ListBookCommentsParams) ([]Comment, error) {
-	rows, err := q.db.Query(ctx, listBookComments, arg.Limit, arg.Offset, arg.ID)
+	rows, err := q.db.Query(ctx, listBookComments, arg.Limit, arg.Offset, arg.Bookid)
 	if err != nil {
 		return nil, err
 	}
@@ -118,11 +118,11 @@ offset $2
 type ListUserCommentsParams struct {
 	Limit  int32 `db:"limit" json:"limit"`
 	Offset int32 `db:"offset" json:"offset"`
-	ID     int64 `db:"id" json:"id"`
+	Userid int64 `db:"userid" json:"userid"`
 }
 
 func (q *Queries) ListUserComments(ctx context.Context, arg ListUserCommentsParams) ([]Comment, error) {
-	rows, err := q.db.Query(ctx, listUserComments, arg.Limit, arg.Offset, arg.ID)
+	rows, err := q.db.Query(ctx, listUserComments, arg.Limit, arg.Offset, arg.Userid)
 	if err != nil {
 		return nil, err
 	}

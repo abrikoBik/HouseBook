@@ -16,6 +16,7 @@ func Register(router chi.Router) {
 	routeUsers(router)
 	routeBooks(router)
 	routeTrades(router)
+	routeComments(router)
 	router.Route("/docs", func(r chi.Router) {
 		r.Get("/swagger.json", func(w http.ResponseWriter, r *http.Request) {
 			http.ServeFile(w, r, "/app/swagger.json")

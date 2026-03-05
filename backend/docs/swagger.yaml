@@ -26,6 +26,17 @@ definitions:
       year:
         $ref: '#/definitions/pgtype.Numeric'
     type: object
+  db.Comment:
+    properties:
+      body:
+        type: string
+      book_id:
+        type: string
+      id:
+        type: string
+      user_id:
+        type: integer
+    type: object
   db.Library:
     properties:
       id:
@@ -397,6 +408,46 @@ paths:
       summary: Изменить книгу
       tags:
       - Книги
+  /api/books/{uuid}/comments:
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает список всех отзывов о книге, хранящихся на сервере.
+      parameters:
+      - description: Лимит количества возвращаемых элементов
+        example: 10
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение возвращаемых элементов
+        example: 5
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Comment'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Список отзывов книги
+      tags:
+      - Отзывы
   /api/books/search:
     get:
       consumes:
@@ -467,6 +518,101 @@ paths:
       summary: Найти книги
       tags:
       - Книги
+  /api/comments:
+    post:
+      consumes:
+      - application/json
+      description: Создаёт новый отзыв о книге.
+      parameters:
+      - description: ID автора отзыва
+        in: body
+        name: userid
+        required: true
+        schema:
+          type: integer
+      - description: ID книги
+        in: body
+        name: bookid
+        required: true
+        schema:
+          type: integer
+      - description: Текст отзыва
+        in: body
+        name: body
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.Comment'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Создать отзыв
+      tags:
+      - Отзывы
+  /api/comments/{uuid}:
+    delete:
+      consumes:
+      - text/plain
+      description: Удаляет отзыв из базы данных.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Удалить отзыв
+      tags:
+      - Отзывы
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает информацию об отзыве.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Comment'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Получить отзыв
+      tags:
+      - Отзывы
   /api/libraries:
     post:
       consumes:
@@ -1036,6 +1182,46 @@ paths:
       summary: Изменить пользователя
       tags:
       - Пользователи
+  /api/users/{id}/comments:
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает список всех отзывов, написанных пользователем.
+      parameters:
+      - description: Лимит количества возвращаемых элементов
+        example: 10
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение возвращаемых элементов
+        example: 5
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Comment'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Список отзывов пользователя
+      tags:
+      - Отзывы
   /api/users/{id}/libraries:
     get:
       consumes:
