@@ -25,7 +25,7 @@ returning id, user_id, book_id, body
 `
 
 type CreateCommentParams struct {
-	Userid pgtype.Int8 `db:"userid" json:"userid"`
+	Userid int64       `db:"userid" json:"userid"`
 	Bookid pgtype.UUID `db:"bookid" json:"bookid"`
 	Body   string      `db:"body" json:"body"`
 }
@@ -116,9 +116,9 @@ offset $2
 `
 
 type ListUserCommentsParams struct {
-	Limit  int32       `db:"limit" json:"limit"`
-	Offset int32       `db:"offset" json:"offset"`
-	ID     pgtype.Int8 `db:"id" json:"id"`
+	Limit  int32 `db:"limit" json:"limit"`
+	Offset int32 `db:"offset" json:"offset"`
+	ID     int64 `db:"id" json:"id"`
 }
 
 func (q *Queries) ListUserComments(ctx context.Context, arg ListUserCommentsParams) ([]Comment, error) {
