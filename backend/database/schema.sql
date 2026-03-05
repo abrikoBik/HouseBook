@@ -57,3 +57,10 @@ create table library_books (
     quantity numeric not null default 1,
     primary key (library_id, book_id)
 );
+
+create table comments (
+    id uuid primary key default uuid_generate_v4(),
+    user_id bigserial references users(id) on delete cascade,
+    book_id uuid references books(id) on delete cascade,
+    body text not null
+);

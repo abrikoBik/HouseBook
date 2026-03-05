@@ -22,6 +22,13 @@ type Book struct {
 	Description pgtype.Text    `db:"description" json:"description"`
 }
 
+type Comment struct {
+	ID     pgtype.UUID `db:"id" json:"id"`
+	UserID pgtype.Int8 `db:"user_id" json:"user_id"`
+	BookID pgtype.UUID `db:"book_id" json:"book_id"`
+	Body   string      `db:"body" json:"body"`
+}
+
 type Library struct {
 	ID     pgtype.UUID `db:"id" json:"id"`
 	UserID int64       `db:"user_id" json:"user_id"`
