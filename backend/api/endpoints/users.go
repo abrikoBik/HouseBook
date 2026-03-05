@@ -15,6 +15,7 @@ func routeUsers(router chi.Router) {
 			r.With(middleware.JSONResponse).Get("/", handlers.GetUser)
 			r.With(middleware.JSONResponse).Patch("/", handlers.UpdateUser)
 			r.Delete("/", handlers.DeleteUser)
+			r.With(middleware.JSONResponse).Get("/comments", handlers.ListUserComments)
 			routeLibraries(r)
 		})
 	})
