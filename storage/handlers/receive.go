@@ -2,11 +2,11 @@ package handlers
 
 import (
 	"errors"
+	"housebook_storage/consts"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
-	"storage/consts"
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
