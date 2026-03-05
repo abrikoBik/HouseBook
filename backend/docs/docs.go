@@ -530,7 +530,7 @@ const docTemplate = `{
                 "tags": [
                     "Отзывы"
                 ],
-                "summary": "Список отзывов книги",
+                "summary": "Список отзывов о книге",
                 "parameters": [
                     {
                         "type": "integer",

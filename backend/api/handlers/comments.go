@@ -159,7 +159,7 @@ func DeleteComment(writer http.ResponseWriter, request *http.Request) {
 
 // ListBookComments godoc
 //
-//	@summary		Список отзывов книги
+//	@summary		Список отзывов о книге
 //	@description	Возвращает список всех отзывов о книге, хранящихся на сервере.
 //	@accept			plain
 //	@produce		json
