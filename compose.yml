@@ -44,7 +44,6 @@ services:
     depends_on:
       - db
       - storage
-      - proxy
     build: backend
     hostname: backend
     networks:
@@ -57,7 +56,6 @@ services:
     depends_on:
       - backend
       - storage
-      - proxy
     build: frontend
     develop:
       watch:
