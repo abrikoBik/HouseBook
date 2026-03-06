@@ -1,6 +1,7 @@
 package sites
 
 import (
+	"housebook_scraper/consts"
 	"housebook_scraper/types"
 	"net/url"
 	"strconv"
@@ -14,7 +15,12 @@ func ScrapeMyBook(collector *colly.Collector, requestURL *url.URL) (result types
 	collector.OnHTML(".iDfqxd", func(element *colly.HTMLElement) {
 		// language, publisher, cover type and color are not found on mybook.ru
 		pageCountString := element.ChildText(".eSjGMZ p:nth-child(1)")
-		if result.PageCount, err = strconv.Atoi(pageCountString[0:strings.Index(pageCountString, " ")]); err != nil {
+		pageCountSlice := strings.Split(pageCountString, " ")
+		if len(pageCountSlice) == 0 {
+			err = consts.ErrPageCountEmpty
+			return
+		}
+		if result.PageCount, err = strconv.Atoi(pageCountSlice[0]); err != nil {
 			return
 		}
 		result.Title = element.ChildText("h1")
