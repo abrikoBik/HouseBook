@@ -27,9 +27,9 @@ func Config(c context.Context) *http.ServeMux {
 	collector = sites.Config(ctx, consts.AllowedDomains)
 	router := http.NewServeMux()
 	router.HandleFunc("GET /health", Health)
-	router.HandleFunc("POST /mybook", BuildScraper(collector, sites.MyBook))
-	router.HandleFunc("POST /labirint", BuildScraper(collector, sites.Labirint))
-	router.HandleFunc("POST /litres", BuildScraper(collector, sites.Litres))
+	router.HandleFunc("POST /mybook", BuildHandler(collector, &sites.MyBook))
+	router.HandleFunc("POST /labirint", BuildHandler(collector, &sites.Labirint))
+	router.HandleFunc("POST /litres", BuildHandler(collector, &sites.Litres))
 	return router
 }
 

@@ -1,6 +1,9 @@
 package sites
 
+import "housebook_scraper/consts"
+
 var Labirint = Site{
+	Domain:      consts.LabirintDomain,
 	Root:        "body",
 	Title:       "h1",
 	Author:      "._features_ctofl_78>div:nth-child(1)>div:nth-child(2)>a",

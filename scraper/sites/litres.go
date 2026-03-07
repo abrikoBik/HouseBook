@@ -1,6 +1,9 @@
 package sites
 
+import "housebook_scraper/consts"
+
 var Litres = Site{
+	Domain:      consts.LitresDomain,
 	Root:        "body",
 	Title:       "h1",
 	Author:      "._86af713b>div>span",

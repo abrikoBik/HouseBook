@@ -1,6 +1,9 @@
 package sites
 
+import "housebook_scraper/consts"
+
 var MyBook = Site{
+	Domain:      consts.MyBookDomain,
 	Root:        ".iDfqxd",
 	Title:       "h1",
 	Author:      ".eFHndH>.bkolKJ>a>.fZFkVd>.jVKkXg",

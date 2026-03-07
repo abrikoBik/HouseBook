@@ -14,21 +14,6 @@ type Scraper interface {
 	Scrape(collector *colly.Collector, requestURL *url.URL) (result types.Book, err error)
 }
 
-// Site contains all Colly scraper strings for a specific site.
-type Site struct {
-	Root,
-	Title,
-	Author,
-	ISBN,
-	Genre,
-	Language,
-	Publisher,
-	CoverType,
-	PageCount,
-	Description,
-	Color string
-}
-
 // Scrape implements a common scraper for all sites to use.
 func (site *Site) Scrape(collector *colly.Collector, requestURL *url.URL) (result types.Book, err error) {
 	collector.OnHTML(site.Root, func(element *colly.HTMLElement) {

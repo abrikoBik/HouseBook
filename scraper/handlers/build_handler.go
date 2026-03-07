@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
-func BuildScraper(collector *colly.Collector, scraper sites.Site) func(http.ResponseWriter, *http.Request) {
+func BuildHandler(collector *colly.Collector, scraper sites.Scraper) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var (
 			requestData Request

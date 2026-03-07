@@ -8,6 +8,21 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// Site contains the domain and all Colly scraper strings for a specific site.
+type Site struct {
+	Domain, Root,
+	Title,
+	Author,
+	ISBN,
+	Genre,
+	Language,
+	Publisher,
+	CoverType,
+	PageCount,
+	Description,
+	Color string
+}
+
 func Config(ctx context.Context, domains []string) *colly.Collector {
 	logger := zerolog.Ctx(ctx)
 	collector := colly.NewCollector(
