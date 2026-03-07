@@ -20,7 +20,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/book" element={<Book />} />
-          <Route path="/test" element={<Notification />}/>
+          <Route path="/test" element={<Notification />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/book/:uuid" element={<Book />} />
           <Route path="/*" element={<NotFound />} />
