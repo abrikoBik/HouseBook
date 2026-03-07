@@ -7,6 +7,8 @@ import "./index.css";
 
 import Auth from "./pages/auth.tsx";
 import Book from "./pages/book.tsx";
+import Notification from "./modules/notification.tsx";
+import Profile from "./pages/profile.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -15,6 +17,8 @@ createRoot(document.getElementById("root")!).render(
         <Routes>
           <Route path="/auth" element={<Auth />} />
           <Route path="/book" element={<Book />} />
+          <Route path="/test" element={<Notification />}/>
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </Router>
     </CookiesProvider>
