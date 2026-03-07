@@ -4,9 +4,8 @@ package sites
 import (
 	"housebook_scraper/consts"
 	"housebook_scraper/types"
+	"housebook_scraper/util"
 	"net/url"
-	"strconv"
-	"strings"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/gsiems/go-isbn/pkg/isbn"
@@ -44,14 +43,14 @@ func (site *Site) Scrape(collector *colly.Collector, requestURL *url.URL) (resul
 		result.Publisher = publisher
 
 		if year := element.ChildText(site.Year); year != "" {
-			if result.Year, err = strconv.Atoi(strings.Split(year, " ")[0]); err != nil {
+			if result.Year, err = util.ExtractNumber(year); err != nil {
 				return
 			}
 		}
 		result.Language = element.ChildText(site.Language)
 		result.CoverType = element.ChildText(site.CoverType)
 		if pc := element.ChildText(site.PageCount); pc != "" {
-			if result.PageCount, err = strconv.Atoi(strings.Split(pc, " ")[0]); err != nil {
+			if result.PageCount, err = util.ExtractNumber(pc); err != nil {
 				return
 			}
 		}
