@@ -6,6 +6,7 @@ import (
 	"housebook_scraper/types"
 	"housebook_scraper/util"
 	"net/url"
+	"strconv"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/gsiems/go-isbn/pkg/isbn"
@@ -24,7 +25,13 @@ func (site *Site) Scrape(collector *colly.Collector, requestURL *url.URL) (resul
 	collector.OnHTML(site.Root, func(element *colly.HTMLElement) {
 		result.Title = element.ChildText(site.Title)
 		result.Author = element.ChildText(site.Author)
-		result.ISBN = element.ChildText(site.ISBN)
+		// remove all foreign characters from an ISBN
+		i, nerr := util.ExtractNumber(element.ChildText(site.ISBN))
+		if nerr != nil {
+			err = consts.ErrInvalidISBN
+			return
+		}
+		result.ISBN = strconv.Itoa(i)
 		if !isbn.ValidateCheckDigit(result.ISBN) {
 			err = consts.ErrInvalidISBN
 			return
