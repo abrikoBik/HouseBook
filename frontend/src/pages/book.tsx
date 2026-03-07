@@ -4,11 +4,6 @@ import "../styles/book.css";
 import SideBar from "../modules/sideBar";
 import Header from "../modules/header";
 import Comment from "../modules/comment";
-<<<<<<< HEAD
- 
-=======
-
->>>>>>> origin/main
 import type Error from "../types/error";
 import { type default as BookT } from "../types/book";
 
