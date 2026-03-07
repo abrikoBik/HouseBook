@@ -3,14 +3,10 @@ package sites
 
 import (
 	"context"
-	"housebook_scraper/types"
-	"net/url"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog"
 )
-
-type Scraper func(collector *colly.Collector, requestURL *url.URL) (result types.Book, err error)
 
 func Config(ctx context.Context, domains []string) *colly.Collector {
 	logger := zerolog.Ctx(ctx)

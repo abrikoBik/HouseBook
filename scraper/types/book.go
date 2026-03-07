@@ -1,3 +1,4 @@
+// Package types contains all types used by the scraper service.
 package types
 
 type Book struct {

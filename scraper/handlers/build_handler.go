@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
-func BuildScraper(collector *colly.Collector, scraperFunc sites.Scraper) func(http.ResponseWriter, *http.Request) {
+func BuildScraper(collector *colly.Collector, scraper sites.Site) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var (
 			requestData Request
@@ -28,7 +28,7 @@ func BuildScraper(collector *colly.Collector, scraperFunc sites.Scraper) func(ht
 			response.Error().Err(err).Send()
 			return
 		}
-		book, err := scraperFunc(collector, requestURL)
+		book, err := scraper.Scrape(collector, requestURL)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			response.Error().Err(err).Send()
