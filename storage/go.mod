@@ -1,4 +1,4 @@
-module storage
+module housebook_storage
 
 go 1.24.4
 
