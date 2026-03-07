@@ -49,6 +49,10 @@ func BuildHandler(scraper sites.Site) func(http.ResponseWriter, *http.Request) {
 			response.Error().Err(err).Send()
 			return
 		}
-		response.Log().Interface("book", book).Send()
+		if err := json.NewEncoder(w).Encode(book); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			response.Error().Err(err).Send()
+			return
+		}
 	}
 }

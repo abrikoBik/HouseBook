@@ -2,14 +2,15 @@
 package types
 
 type Book struct {
-	Title       string
-	Author      string
-	ISBN        string
-	Genre       string
-	Language    string
-	Publisher   string
-	CoverType   string
-	PageCount   int
-	Description string
-	Color       bool
+	Title     string `json:"title"`
+	Author    string `json:"author"`
+	ISBN      string `json:"isbn"`
+	Genre     string `json:"genre"`
+	Publisher string `json:"publisher"`
+
+	Year        int    `json:"year,omitempty"`
+	Language    string `json:"language,omitempty"`
+	CoverType   string `json:"cover_type,omitempty"`
+	PageCount   int    `json:"page_count,omitempty"`
+	Description string `json:"description,omitempty"`
 }
