@@ -14,6 +14,4 @@ const (
 
 var (
 	ErrPageCountEmpty = errors.New("page count is empty")
-
-	AllowedDomains = []string{MyBookDomain, LitresDomain, LabirintDomain}
 )

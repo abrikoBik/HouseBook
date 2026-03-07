@@ -3,18 +3,15 @@ package handlers
 
 import (
 	"context"
-	"housebook_scraper/consts"
 	"housebook_scraper/sites"
 	"net/http"
 
-	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog"
 )
 
 var (
-	ctx       context.Context
-	logger    *zerolog.Logger
-	collector *colly.Collector
+	ctx    context.Context
+	logger *zerolog.Logger
 )
 
 type Request struct {
@@ -24,12 +21,11 @@ type Request struct {
 func Config(c context.Context) *http.ServeMux {
 	ctx = c
 	logger = zerolog.Ctx(ctx)
-	collector = sites.Config(ctx, consts.AllowedDomains)
 	router := http.NewServeMux()
 	router.HandleFunc("GET /health", Health)
-	router.HandleFunc("POST /mybook", BuildHandler(collector, &sites.MyBook))
-	router.HandleFunc("POST /labirint", BuildHandler(collector, &sites.Labirint))
-	router.HandleFunc("POST /litres", BuildHandler(collector, &sites.Litres))
+	router.HandleFunc("POST /mybook", BuildHandler(sites.MyBook))
+	router.HandleFunc("POST /labirint", BuildHandler(sites.Labirint))
+	router.HandleFunc("POST /litres", BuildHandler(sites.Litres))
 	return router
 }
 

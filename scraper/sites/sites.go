@@ -2,10 +2,13 @@
 package sites
 
 import (
-	"context"
+	"housebook_scraper/consts"
+	"housebook_scraper/types"
+	"net/url"
+	"strconv"
+	"strings"
 
 	"github.com/gocolly/colly/v2"
-	"github.com/rs/zerolog"
 )
 
 // Site contains the domain and all Colly scraper strings for a specific site.
@@ -23,21 +26,33 @@ type Site struct {
 	Color string
 }
 
-func Config(ctx context.Context, domains []string) *colly.Collector {
-	logger := zerolog.Ctx(ctx)
-	collector := colly.NewCollector(
-		colly.StdlibContext(ctx),
-		colly.AllowedDomains(domains...),
-		colly.AllowURLRevisit(),
-	)
-	collector.OnError(func(r *colly.Response, err error) {
-		logger.Info().Err(err).Send()
+type Scraper interface {
+	Scrape(collector *colly.Collector, requestURL *url.URL) (result types.Book, err error)
+}
+
+// Scrape implements a common scraper for all sites to use.
+func (site *Site) Scrape(collector *colly.Collector, requestURL *url.URL) (result types.Book, err error) {
+	collector.OnHTML(site.Root, func(element *colly.HTMLElement) {
+		result.Title = element.ChildText(site.Title)
+		result.Author = element.ChildText(site.Author)
+		result.ISBN = element.ChildText(site.ISBN)
+		result.Genre = element.ChildText(site.Genre)
+		result.Language = element.ChildText(site.Language)
+		result.Publisher = element.ChildText(site.Publisher)
+		result.CoverType = element.ChildText(site.CoverType)
+		pageCountString := element.ChildText(site.PageCount)
+		pageCountSlice := strings.Split(pageCountString, " ")
+		if len(pageCountSlice) == 0 {
+			err = consts.ErrPageCountEmpty
+			return
+		}
+		if result.PageCount, err = strconv.Atoi(pageCountSlice[0]); err != nil {
+			return
+		}
+		_ = element.ChildText(site.Color)
+		result.Description = element.ChildText(site.Description)
 	})
-	collector.OnRequest(func(r *colly.Request) {
-		logger.Info().Str("url", r.URL.String()).Msg("scraping")
-	})
-	collector.OnScraped(func(r *colly.Response) {
-		logger.Info().Str("url", r.Request.URL.String()).Msg("scraped")
-	})
-	return collector
+	err = collector.Visit(requestURL.String())
+	collector.Wait()
+	return
 }

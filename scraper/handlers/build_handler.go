@@ -10,7 +10,22 @@ import (
 	"github.com/rs/zerolog"
 )
 
-func BuildHandler(collector *colly.Collector, scraper sites.Scraper) func(http.ResponseWriter, *http.Request) {
+func BuildHandler(scraper sites.Site) func(http.ResponseWriter, *http.Request) {
+	collector := colly.NewCollector(
+		colly.StdlibContext(ctx),
+		colly.AllowedDomains(scraper.Domain),
+		colly.AllowURLRevisit(),
+		colly.Async(true),
+	)
+	collector.OnError(func(r *colly.Response, err error) {
+		logger.Info().Err(err).Send()
+	})
+	collector.OnRequest(func(r *colly.Request) {
+		logger.Info().Str("url", r.URL.String()).Msg("scraping")
+	})
+	collector.OnScraped(func(r *colly.Response) {
+		logger.Info().Str("url", r.Request.URL.String()).Msg("scraped")
+	})
 	return func(w http.ResponseWriter, r *http.Request) {
 		var (
 			requestData Request
