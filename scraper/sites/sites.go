@@ -4,6 +4,7 @@ package sites
 import (
 	"housebook_scraper/consts"
 	"housebook_scraper/types"
+	"log"
 	"net/url"
 	"strconv"
 	"strings"
@@ -21,6 +22,7 @@ type Site struct {
 
 // Scrape implements a common scraper for all sites to use.
 func (site *Site) Scrape(collector *colly.Collector, requestURL *url.URL) (result types.Book, err error) {
+	// TODO: eliminate doubled code
 	collector.OnHTML(site.Root, func(element *colly.HTMLElement) {
 		result.Title = element.ChildText(site.Title)
 		result.Author = element.ChildText(site.Author)
@@ -29,8 +31,18 @@ func (site *Site) Scrape(collector *colly.Collector, requestURL *url.URL) (resul
 			err = consts.ErrInvalidISBN
 			return
 		}
-		result.Genre = element.ChildText(site.Genre)
-		result.Publisher = element.ChildText(site.Publisher)
+		// this is a very dirty hack, some sites do not provide a genre and a publisher
+		// TODO: check on the backend if those fields really should be non null
+		genre := element.ChildText(site.Genre)
+		if genre == "" {
+			genre = "Неизвестен"
+		}
+		result.Genre = genre
+		publisher := element.ChildText(site.Publisher)
+		if publisher == "" {
+			publisher = "Неизвестен"
+		}
+		result.Publisher = publisher
 
 		if year := element.ChildText(site.Year); year != "" {
 			if result.Year, err = strconv.Atoi(strings.Split(year, " ")[0]); err != nil {
