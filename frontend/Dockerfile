@@ -1,7 +1,8 @@
 FROM node:25 AS builder
 WORKDIR /usr/src/housebook
-COPY . .
+COPY package.json package-lock.json .
 RUN npm install
+COPY . .
 RUN npm run format:check && npm run lint && npm run build
 
 # TODO: switch to Caddy in production

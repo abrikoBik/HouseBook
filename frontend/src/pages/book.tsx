@@ -5,7 +5,38 @@ import SideBar from "../modules/sideBar";
 import Header from "../modules/header";
 import Comment from "../modules/comment";
 
+import type Error from "../types/error";
+import { type default as BookT } from "../types/book";
+
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router";
+
 const Book = () => {
+  const navigate = useNavigate();
+  const { uuid } = useParams();
+  const [book, setBook] = useState<BookT>();
+
+  const getBook = async (id: string) => {
+    const response = await fetch(`/api/books/${id}`);
+    const result = await response.json();
+    if (!response.ok) {
+      switch (response.status) {
+        case 400:
+        case 404:
+          navigate("/404", { replace: true });
+          break;
+        default:
+          throw new Error((result as Error).error);
+          break;
+      }
+    }
+    setBook(result as BookT);
+  };
+
+  useEffect(() => {
+    getBook(uuid!);
+  }, [uuid]);
+
   return (
     <section id="layout">
       <Header />
@@ -15,8 +46,8 @@ const Book = () => {
           <img src={BookCover} alt="book" />
           <div>
             <div>
-              <h1 className={"desc"}>Шантарам: Том 2</h1>
-              <h4 className={"desc"}>Григори Дэвид Робертс</h4>
+              <h1 className={"desc"}>{book?.title}</h1>
+              <h4 className={"desc"}>{book?.author}</h4>
             </div>
             <div>
               <button id="bronya">Забронировать</button>
@@ -31,37 +62,26 @@ const Book = () => {
           <div id="description">
             <div>
               <h4>Описание</h4>
-              <p>
-                Долгожданное продолжение «Шантарама» — одного из самых
-                поразительных романов XXI века. <br />
-                Эта исповедь человека, выбравшегося из бездны, разошлась
-                многомиллионными тиражами и заслужила сравнения с произведениями
-                Мелвилла и Хемингуэя. <br />
-                Спустя два года после гибели мафиозного босса Кадербхая и ухода
-                возлюбленной Карлы Лин по прозвищу Шантарам должен выполнить
-                последнее поручение своего покойного покровителя. <br />
-                Ему предстоит завоевать доверие горного мудреца, уцелеть в
-                разгорающейся войне мафиозных кланов и, главное, вновь обрести
-                любовь и веру.
-              </p>
+              <p>{book?.description}</p>
             </div>
 
             <section className="kniga">
               <div id="about">
-                <h4>Производитель</h4>
-                <div>Издательство Азбука</div>
+                <h4>Издатель</h4>
+                <div>{book?.publisher}</div>
               </div>
 
               <div id="language">
                 <h4>Язык</h4>
-                <div>Русский</div>
+                <div>{book?.language}</div>
               </div>
 
               <div id="type">
                 <h4>Тип обложки</h4>
                 <div>
-                  твердая, цветная, 832 страниц <br />
-                  ISBN: 978 5 389 10812 7
+                  {/*TODO: склонение страниц, убрать пустые поля*/}
+                  {book?.cover_type}, {book?.page_count} страниц <br />
+                  ISBN: {book?.isbn}
                 </div>
               </div>
             </section>
