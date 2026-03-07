@@ -1,4 +1,10 @@
 # HouseBook
+
+[![Backend CI](https://github.com/e829dce/HouseBook/actions/workflows/backend.yml/badge.svg)](https://github.com/e829dce/HouseBook/actions/workflows/backend.yml)
+[![Frontend CI](https://github.com/e829dce/HouseBook/actions/workflows/frontend.yml/badge.svg)](https://github.com/e829dce/HouseBook/actions/workflows/frontend.yml)
+[![Storage CI](https://github.com/e829dce/HouseBook/actions/workflows/storage.yml/badge.svg)](https://github.com/e829dce/HouseBook/actions/workflows/storage.yml)
+[![Scraper CI](https://github.com/e829dce/HouseBook/actions/workflows/scraper.yml/badge.svg)](https://github.com/e829dce/HouseBook/actions/workflows/scraper.yml)
+
 Перед началом работы необходимо создать файл `.env` в корне проекта. Примерно выглядит так:
 ```python
 POSTGRES_DB=database
