@@ -13,5 +13,5 @@ const (
 )
 
 var (
-	ErrPageCountEmpty = errors.New("page count is empty")
+	ErrInvalidISBN = errors.New("scraped ISBN is invalid")
 )
