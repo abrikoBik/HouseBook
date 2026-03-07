@@ -13,6 +13,7 @@ import (
 )
 
 func SendFile(writer http.ResponseWriter, request *http.Request) {
+	writer.Header().Set("Content-Type", "application/json")
 	response := zerolog.New(writer)
 	id := request.PathValue("id")
 	if err := uuid.Validate(id); err != nil {

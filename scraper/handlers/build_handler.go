@@ -27,6 +27,7 @@ func BuildHandler(scraper sites.Site) func(http.ResponseWriter, *http.Request) {
 		logger.Info().Str("url", r.Request.URL.String()).Msg("scraped")
 	})
 	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
 		var (
 			requestData Request
 			requestURL  *url.URL

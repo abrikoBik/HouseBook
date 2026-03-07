@@ -13,6 +13,7 @@ import (
 )
 
 func ReceiveFile(writer http.ResponseWriter, request *http.Request) {
+	writer.Header().Set("Content-Type", "application/json")
 	response := zerolog.New(writer)
 	if err := request.ParseMultipartForm(consts.MaxSize); err != nil {
 		logger.Error().Err(err).Msg("exiting at request.ParseMultipartForm")
