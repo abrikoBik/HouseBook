@@ -4,7 +4,6 @@ package sites
 import (
 	"housebook_scraper/consts"
 	"housebook_scraper/types"
-	"log"
 	"net/url"
 	"strconv"
 	"strings"
