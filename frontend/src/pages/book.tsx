@@ -4,30 +4,42 @@ import "../styles/book.css";
 import SideBar from "../modules/sideBar";
 import Header from "../modules/header";
 import Comment from "../modules/comment";
+<<<<<<< HEAD
  
+=======
+
+>>>>>>> origin/main
 import type Error from "../types/error";
-import type BookT from "../types/book";
+import { type default as BookT } from "../types/book";
+
 import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router";
 
 const Book = () => {
-  const id = "beb2c6cd-1674-4616-8b8a-b6a281e15089";
-
+  const navigate = useNavigate();
+  const { uuid } = useParams();
   const [book, setBook] = useState<BookT>();
 
-  async function getBook(uuid: string) {
-    const response = await fetch(`/api/books/${uuid}`);
+  const getBook = async (id: string) => {
+    const response = await fetch(`/api/books/${id}`);
     const result = await response.json();
     if (!response.ok) {
-      const error = result as Error;
-      console.error(error);
-      alert(error.error);
+      switch (response.status) {
+        case 400:
+        case 404:
+          navigate("/404", { replace: true });
+          break;
+        default:
+          throw new Error((result as Error).error);
+          break;
+      }
     }
-    setBook(result);
-  }
+    setBook(result as BookT);
+  };
 
   useEffect(() => {
-    getBook(id);
-  }, []);
+    getBook(uuid!);
+  }, [uuid]);
 
   return (
     <section id="layout">
@@ -71,7 +83,7 @@ const Book = () => {
               <div id="type">
                 <h4>Тип обложки</h4>
                 <div>
-                  {/*TODO: склонение страниц*/}
+                  {/*TODO: склонение страниц, убрать пустые поля*/}
                   {book?.cover_type}, {book?.page_count} страниц <br />
                   ISBN: {book?.isbn}
                 </div>

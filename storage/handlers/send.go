@@ -2,17 +2,18 @@ package handlers
 
 import (
 	"encoding/base64"
+	"housebook_storage/consts"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
-	"storage/consts"
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 )
 
 func SendFile(writer http.ResponseWriter, request *http.Request) {
+	writer.Header().Set("Content-Type", "application/json")
 	response := zerolog.New(writer)
 	id := request.PathValue("id")
 	if err := uuid.Validate(id); err != nil {

@@ -1,4 +1,4 @@
-export default interface BookT {
+export default interface Book {
   author: string;
   cover_type?: string;
   description?: string;
