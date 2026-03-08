@@ -25,7 +25,7 @@ insert into users (
     $4,
     $5
 )
-returning id, email, login, name, salt, hash, image_uuid, rating
+returning id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id
 `
 
 type CreateUserParams struct {
@@ -54,6 +54,9 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Hash,
 		&i.ImageUuid,
 		&i.Rating,
+		&i.NowReadingID,
+		&i.FinishedReadingID,
+		&i.TradeReadyID,
 	)
 	return i, err
 }
@@ -69,7 +72,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 }
 
 const getUser = `-- name: GetUser :one
-select id, email, login, name, salt, hash, image_uuid, rating from users
+select id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id from users
 where id = $1
 limit 1
 `
@@ -86,6 +89,9 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 		&i.Hash,
 		&i.ImageUuid,
 		&i.Rating,
+		&i.NowReadingID,
+		&i.FinishedReadingID,
+		&i.TradeReadyID,
 	)
 	return i, err
 }
@@ -94,7 +100,7 @@ const setProfilePicture = `-- name: SetProfilePicture :one
 update users
 set image_uuid = $1
 where id = $2
-returning id, email, login, name, salt, hash, image_uuid, rating
+returning id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id
 `
 
 type SetProfilePictureParams struct {
@@ -114,6 +120,9 @@ func (q *Queries) SetProfilePicture(ctx context.Context, arg SetProfilePicturePa
 		&i.Hash,
 		&i.ImageUuid,
 		&i.Rating,
+		&i.NowReadingID,
+		&i.FinishedReadingID,
+		&i.TradeReadyID,
 	)
 	return i, err
 }
@@ -125,7 +134,7 @@ set
     login = coalesce($2, login),
     name = coalesce($3, name)
 where id = $4
-returning id, email, login, name, salt, hash, image_uuid, rating
+returning id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id
 `
 
 type UpdateUserParams struct {
@@ -152,6 +161,9 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.Hash,
 		&i.ImageUuid,
 		&i.Rating,
+		&i.NowReadingID,
+		&i.FinishedReadingID,
+		&i.TradeReadyID,
 	)
 	return i, err
 }

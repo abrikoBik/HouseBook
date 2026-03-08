@@ -44,11 +44,13 @@ type LibraryBook struct {
 }
 
 type Trade struct {
-	ID          pgtype.UUID      `db:"id" json:"id"`
-	OwnerID     int64            `db:"owner_id" json:"owner_id"`
-	BuyerID     int64            `db:"buyer_id" json:"buyer_id"`
-	CreatedAt   pgtype.Timestamp `db:"created_at" json:"created_at"`
-	CompletedAt pgtype.Timestamp `db:"completed_at" json:"completed_at"`
+	ID             pgtype.UUID      `db:"id" json:"id"`
+	OwnerID        int64            `db:"owner_id" json:"owner_id"`
+	BuyerID        int64            `db:"buyer_id" json:"buyer_id"`
+	OwnerConfirmed bool             `db:"owner_confirmed" json:"owner_confirmed"`
+	BuyerConfirmed bool             `db:"buyer_confirmed" json:"buyer_confirmed"`
+	CreatedAt      pgtype.Timestamp `db:"created_at" json:"created_at"`
+	CompletedAt    pgtype.Timestamp `db:"completed_at" json:"completed_at"`
 }
 
 type TradeBook struct {
@@ -58,12 +60,15 @@ type TradeBook struct {
 }
 
 type User struct {
-	ID        int64       `db:"id" json:"id"`
-	Email     string      `db:"email" json:"email"`
-	Login     string      `db:"login" json:"login"`
-	Name      string      `db:"name" json:"name"`
-	Salt      []byte      `db:"salt" json:"-"`
-	Hash      []byte      `db:"hash" json:"-"`
-	ImageUuid pgtype.UUID `db:"image_uuid" json:"image_uuid"`
-	Rating    float32     `db:"rating" json:"rating"`
+	ID                int64       `db:"id" json:"id"`
+	Email             string      `db:"email" json:"email"`
+	Login             string      `db:"login" json:"login"`
+	Name              string      `db:"name" json:"name"`
+	Salt              []byte      `db:"salt" json:"-"`
+	Hash              []byte      `db:"hash" json:"-"`
+	ImageUuid         pgtype.UUID `db:"image_uuid" json:"image_uuid"`
+	Rating            float32     `db:"rating" json:"rating"`
+	NowReadingID      pgtype.UUID `db:"now_reading_id" json:"now_reading_id"`
+	FinishedReadingID pgtype.UUID `db:"finished_reading_id" json:"finished_reading_id"`
+	TradeReadyID      pgtype.UUID `db:"trade_ready_id" json:"trade_ready_id"`
 }

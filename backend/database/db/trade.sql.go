@@ -38,7 +38,7 @@ const completeTrade = `-- name: CompleteTrade :one
 update trades
 set completed_at = now()
 where id = $1
-returning id, owner_id, buyer_id, created_at, completed_at
+returning id, owner_id, buyer_id, owner_confirmed, buyer_confirmed, created_at, completed_at
 `
 
 func (q *Queries) CompleteTrade(ctx context.Context, id pgtype.UUID) (Trade, error) {
@@ -48,6 +48,8 @@ func (q *Queries) CompleteTrade(ctx context.Context, id pgtype.UUID) (Trade, err
 		&i.ID,
 		&i.OwnerID,
 		&i.BuyerID,
+		&i.OwnerConfirmed,
+		&i.BuyerConfirmed,
 		&i.CreatedAt,
 		&i.CompletedAt,
 	)
@@ -64,7 +66,7 @@ insert into trades (
     $2,
     now()
 )
-returning id, owner_id, buyer_id, created_at, completed_at
+returning id, owner_id, buyer_id, owner_confirmed, buyer_confirmed, created_at, completed_at
 `
 
 type CreateTradeParams struct {
@@ -79,6 +81,8 @@ func (q *Queries) CreateTrade(ctx context.Context, arg CreateTradeParams) (Trade
 		&i.ID,
 		&i.OwnerID,
 		&i.BuyerID,
+		&i.OwnerConfirmed,
+		&i.BuyerConfirmed,
 		&i.CreatedAt,
 		&i.CompletedAt,
 	)
@@ -113,7 +117,7 @@ func (q *Queries) DeleteTrade(ctx context.Context, id pgtype.UUID) error {
 }
 
 const getTrade = `-- name: GetTrade :one
-select trades.id, trades.owner_id, trades.buyer_id, trades.created_at, trades.completed_at from trades
+select trades.id, trades.owner_id, trades.buyer_id, trades.owner_confirmed, trades.buyer_confirmed, trades.created_at, trades.completed_at from trades
 join users as owner on trades.owner_id = owner.id
 join users as buyer on trades.buyer_id = buyer.id
 left join trade_books on trades.id = trade_books.trade_id
@@ -129,6 +133,8 @@ func (q *Queries) GetTrade(ctx context.Context, id pgtype.UUID) (Trade, error) {
 		&i.ID,
 		&i.OwnerID,
 		&i.BuyerID,
+		&i.OwnerConfirmed,
+		&i.BuyerConfirmed,
 		&i.CreatedAt,
 		&i.CompletedAt,
 	)
@@ -174,7 +180,7 @@ func (q *Queries) ListTradeBooks(ctx context.Context, arg ListTradeBooksParams) 
 }
 
 const listTrades = `-- name: ListTrades :many
-select id, owner_id, buyer_id, created_at, completed_at from trades
+select id, owner_id, buyer_id, owner_confirmed, buyer_confirmed, created_at, completed_at from trades
 limit $1
 offset $2
 `
@@ -197,6 +203,8 @@ func (q *Queries) ListTrades(ctx context.Context, arg ListTradesParams) ([]Trade
 			&i.ID,
 			&i.OwnerID,
 			&i.BuyerID,
+			&i.OwnerConfirmed,
+			&i.BuyerConfirmed,
 			&i.CreatedAt,
 			&i.CompletedAt,
 		); err != nil {

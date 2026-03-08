@@ -31,7 +31,11 @@ create table users (
     hash bytea not null,
 
     image_uuid uuid,
-    rating real not null default 5 check (rating >= 1 and rating <= 5)
+    rating real not null default 5 check (rating >= 1 and rating <= 5),
+
+    now_reading_id uuid references libraries(id),
+    finished_reading_id uuid references libraries(id),
+    trade_ready_id uuid references libraries(id)
 );
 
 create table trades (
@@ -39,6 +43,8 @@ create table trades (
 
     owner_id bigserial not null references users(id),
     buyer_id bigserial not null references users(id),
+    owner_confirmed boolean not null default false,
+    buyer_confirmed boolean not null default false,
 
     created_at timestamp not null default current_timestamp,
     completed_at timestamp
