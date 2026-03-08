@@ -34,45 +34,36 @@ func (q *Queries) AddBookToTrade(ctx context.Context, arg AddBookToTradeParams) 
 	return err
 }
 
-const confirmBuyerTrade = `-- name: ConfirmBuyerTrade :one
+const confirmTrade = `-- name: ConfirmTrade :one
 update trades
-set buyer_confirmed = true,
+set
+owner_confirmed = case
+    when owner_id = $1 then true
+    else owner_confirmed
+end,
+buyer_confirmed = case
+    when buyer_id = $1 then true
+    else buyer_confirmed
+end,
 completed_at = case
-    when owner_confirmed = true and completed_at is null then now()
+    when
+        owner_confirmed = true and
+        buyer_confirmed = true and
+        completed_at is null
+    then now()
     else completed_at
 end
-where id = $1
+where id = $2
 returning id, owner_id, buyer_id, owner_confirmed, buyer_confirmed, created_at, completed_at
 `
 
-func (q *Queries) ConfirmBuyerTrade(ctx context.Context, id pgtype.UUID) (Trade, error) {
-	row := q.db.QueryRow(ctx, confirmBuyerTrade, id)
-	var i Trade
-	err := row.Scan(
-		&i.ID,
-		&i.OwnerID,
-		&i.BuyerID,
-		&i.OwnerConfirmed,
-		&i.BuyerConfirmed,
-		&i.CreatedAt,
-		&i.CompletedAt,
-	)
-	return i, err
+type ConfirmTradeParams struct {
+	Userid int64       `db:"userid" json:"userid"`
+	ID     pgtype.UUID `db:"id" json:"id"`
 }
 
-const confirmOwnerTrade = `-- name: ConfirmOwnerTrade :one
-update trades
-set owner_confirmed = true,
-completed_at = case
-    when buyer_confirmed = true and completed_at is null then now()
-    else completed_at
-end
-where id = $1
-returning id, owner_id, buyer_id, owner_confirmed, buyer_confirmed, created_at, completed_at
-`
-
-func (q *Queries) ConfirmOwnerTrade(ctx context.Context, id pgtype.UUID) (Trade, error) {
-	row := q.db.QueryRow(ctx, confirmOwnerTrade, id)
+func (q *Queries) ConfirmTrade(ctx context.Context, arg ConfirmTradeParams) (Trade, error) {
+	row := q.db.QueryRow(ctx, confirmTrade, arg.Userid, arg.ID)
 	var i Trade
 	err := row.Scan(
 		&i.ID,
