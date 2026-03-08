@@ -14,6 +14,7 @@ func routeTrades(router chi.Router) {
 		r.With(middleware.JSONResponse).Get("/", handlers.ListTrades)
 		r.With(middleware.JSONResponse).Post("/", handlers.CreateTrade)
 		r.With(middleware.JSONResponse).Get("/{uuid}", handlers.GetTrade)
+		r.With(middleware.JSONResponse).Patch("/{uuid}", handlers.ConfirmTrade)
 		r.Delete("/{uuid}", handlers.DeleteTrade)
 
 		r.With(middleware.JSONResponse).Get("/{uuid}/books", handlers.ListTradeBooks)

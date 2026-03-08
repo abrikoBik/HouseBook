@@ -376,3 +376,58 @@ func DeleteTradeBook(writer http.ResponseWriter, request *http.Request) {
 
 	writer.WriteHeader(http.StatusOK)
 }
+
+// ConfirmTrade godoc
+//
+//	@summary		Завершить сделку
+//	@description	Помечает сделку завершённой со стороны пользователя.
+//	@accept			json
+//	@produce		json
+//
+//	@tags			Сделки
+//
+//	@param			uuid		path		pgtype.UUID	true	"UUID сделки"
+//	@param			userid		body		int	true	"ID пользователя"
+//
+//	@success		200			{object}	db.Trade
+//	@failure		400			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/trades/{uuid} [patch]
+func ConfirmTrade(writer http.ResponseWriter, request *http.Request) {
+	var (
+		err  error
+		data db.ConfirmTradeParams
+		r    = render.New()
+		q    = db.New(database.Pool)
+	)
+	if err := json.NewDecoder(request.Body).Decode(&data); err != nil {
+		RenderError(r, writer, ErrorBadJSON(err))
+		return
+	}
+	data.ID, err = util.PathUUID(consts.UUIDPathValue, request)
+	if err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	trade, err := q.ConfirmTrade(database.Context, data)
+	if err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+	Logger.Info().
+		Str("id", trade.ID.String()).
+		Bool("ownerConfirmed", trade.OwnerConfirmed).
+		Bool("buyerConfirmed", trade.BuyerConfirmed).
+		Time("completedAt", trade.CompletedAt.Time).
+		Msg("trade confirmed")
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(trade); err != nil {
+		RenderError(r, writer, ErrorRender(err))
+		return
+	}
+}
