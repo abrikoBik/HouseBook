@@ -81,9 +81,9 @@ func GetTrade(writer http.ResponseWriter, request *http.Request) {
 		r   = render.New()
 		q   = db.New(database.Pool)
 	)
-	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
+	uuid, err := util.PathUUID(consts.TradeIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.TradeIDPathValue))
 		return
 	}
 
@@ -131,9 +131,9 @@ func DeleteTrade(writer http.ResponseWriter, request *http.Request) {
 		r   = render.New()
 		q   = db.New(database.Pool)
 	)
-	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
+	uuid, err := util.PathUUID(consts.TradeIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.TradeIDPathValue))
 		return
 	}
 
@@ -222,6 +222,7 @@ func ListTrades(writer http.ResponseWriter, request *http.Request) {
 //	@failure		500		{object}	ErrorResponse
 //	@router			/api/user/{id}/trades [get]
 func ListUserTrades(writer http.ResponseWriter, request *http.Request) {
+	// TODO: move function to users
 	var (
 		err    error
 		params db.ListUserTradesParams
@@ -229,9 +230,9 @@ func ListUserTrades(writer http.ResponseWriter, request *http.Request) {
 		r      = render.New()
 		q      = db.New(database.Pool)
 	)
-	params.Userid, err = util.PathID(consts.IDPathValue, request)
+	params.Userid, err = util.PathID(consts.UserIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.IDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.UserIDPathValue))
 		return
 	}
 	if params.Limit, params.Offset, err = util.GetSearchPagination(query); err != nil {
@@ -290,9 +291,9 @@ func AddBookToTrade(writer http.ResponseWriter, request *http.Request) {
 		r    = render.New()
 		q    = db.New(database.Pool)
 	)
-	tradeID, err := util.PathUUID(consts.UUIDPathValue, request)
+	tradeID, err := util.PathUUID(consts.TradeIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.TradeIDPathValue))
 		return
 	}
 	if err := json.NewDecoder(request.Body).Decode(&data); err != nil {
@@ -357,9 +358,9 @@ func ListTradeBooks(writer http.ResponseWriter, request *http.Request) {
 		RenderError(r, writer, ErrorBadPaginationParams(err))
 		return
 	}
-	tradeID, err := util.PathUUID(consts.UUIDPathValue, request)
+	tradeID, err := util.PathUUID(consts.TradeIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.TradeIDPathValue))
 		return
 	}
 	params.ID = tradeID
@@ -410,15 +411,15 @@ func DeleteTradeBook(writer http.ResponseWriter, request *http.Request) {
 		r      = render.New()
 		q      = db.New(database.Pool)
 	)
-	tradeID, err := util.PathUUID("trade-uuid", request)
+	tradeID, err := util.PathUUID(consts.TradeIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, "trade-uuid"))
+		RenderError(r, writer, ErrorBadID(err, consts.TradeIDPathValue))
 		return
 	}
 	params.TradeID = tradeID
-	bookID, err := util.PathUUID("book-uuid", request)
+	bookID, err := util.PathUUID(consts.BookIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, "book-uuid"))
+		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
 		return
 	}
 	params.BookID = bookID
@@ -465,9 +466,9 @@ func ConfirmTrade(writer http.ResponseWriter, request *http.Request) {
 		RenderError(r, writer, ErrorBadJSON(err))
 		return
 	}
-	data.ID, err = util.PathUUID(consts.UUIDPathValue, request)
+	data.ID, err = util.PathUUID(consts.TradeIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.TradeIDPathValue))
 		return
 	}
 

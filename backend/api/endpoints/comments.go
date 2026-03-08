@@ -11,7 +11,7 @@ import (
 func routeComments(router chi.Router) {
 	router.Route(consts.CommentsEndpoint, func(r chi.Router) {
 		r.With(middleware.JSONResponse).Post("/", handlers.CreateComment)
-		r.Route("/{uuid}", func(r chi.Router) {
+		r.Route(consts.CommentIDPath, func(r chi.Router) {
 			r.With(middleware.JSONResponse).Get("/", handlers.GetComment)
 			r.Delete("/", handlers.DeleteComment)
 		})

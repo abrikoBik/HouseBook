@@ -111,9 +111,9 @@ func GetUser(writer http.ResponseWriter, request *http.Request) {
 		r   = render.New()
 		q   = db.New(database.Pool)
 	)
-	id, err := util.PathID(consts.IDPathValue, request)
+	id, err := util.PathID(consts.UserIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.IDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.UserIDPathValue))
 		return
 	}
 
@@ -167,9 +167,9 @@ func UpdateUser(writer http.ResponseWriter, request *http.Request) {
 		r    = render.New()
 		q    = db.New(database.Pool)
 	)
-	data.ID, err = util.PathID(consts.IDPathValue, request)
+	data.ID, err = util.PathID(consts.UserIDPathValue, request)
 	if err = errors.Join(err, json.NewDecoder(request.Body).Decode(&data)); err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.IDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.UserIDPathValue))
 		return
 	}
 
@@ -225,8 +225,8 @@ func SetProfileImage(writer http.ResponseWriter, request *http.Request) {
 		q    = db.New(database.Pool)
 	)
 
-	if data.ID, err = util.PathID(consts.IDPathValue, request); err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.IDPathValue))
+	if data.ID, err = util.PathID(consts.UserIDPathValue, request); err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.UserIDPathValue))
 		return
 	}
 
@@ -313,9 +313,9 @@ func DeleteUser(writer http.ResponseWriter, request *http.Request) {
 		r   = render.New()
 		q   = db.New(database.Pool)
 	)
-	id, err := util.PathID(consts.IDPathValue, request)
+	id, err := util.PathID(consts.UserIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.IDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.UserIDPathValue))
 		return
 	}
 

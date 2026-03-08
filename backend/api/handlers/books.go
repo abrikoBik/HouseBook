@@ -100,9 +100,9 @@ func GetBook(writer http.ResponseWriter, request *http.Request) {
 		r   = render.New()
 		q   = db.New(database.Pool)
 	)
-	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
+	uuid, err := util.PathUUID(consts.BookIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
 		return
 	}
 
@@ -162,9 +162,9 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 		r    = render.New()
 		q    = db.New(database.Pool)
 	)
-	data.ID, err = util.PathUUID(consts.UUIDPathValue, request)
+	data.ID, err = util.PathUUID(consts.BookIDPathValue, request)
 	if err = errors.Join(err, json.NewDecoder(request.Body).Decode(&data)); err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
 		return
 	}
 
@@ -219,8 +219,8 @@ func SetBookCover(writer http.ResponseWriter, request *http.Request) {
 		q    = db.New(database.Pool)
 	)
 
-	if data.ID, err = util.PathUUID(consts.UUIDPathValue, request); err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+	if data.ID, err = util.PathUUID(consts.BookIDPathValue, request); err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
 		return
 	}
 
@@ -307,9 +307,9 @@ func DeleteBook(writer http.ResponseWriter, request *http.Request) {
 		r   = render.New()
 		q   = db.New(database.Pool)
 	)
-	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
+	uuid, err := util.PathUUID(consts.BookIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
 		return
 	}
 
