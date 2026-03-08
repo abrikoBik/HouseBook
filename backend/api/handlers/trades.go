@@ -167,7 +167,6 @@ func DeleteTrade(writer http.ResponseWriter, request *http.Request) {
 //	@failure		500		{object}	ErrorResponse
 //	@router			/api/trades [get]
 func ListTrades(writer http.ResponseWriter, request *http.Request) {
-	// TODO: allow listing a specific user's trades
 	var (
 		err    error
 		params db.ListTradesParams
@@ -196,6 +195,68 @@ func ListTrades(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	Logger.Info().Int("len(trades)", len(trades)).Msg("trades listed")
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(trades); err != nil {
+		RenderError(r, writer, ErrorRender(err))
+		return
+	}
+}
+
+// ListUserTrades godoc
+//
+//	@summary		Список сделок пользователя
+//	@description	Возвращает список сделок пользователя.
+//	@accept			plain
+//	@produce		json
+//
+//	@tags			Сделки
+//
+//	@param			id path		int	true	"ID пользователя"
+//	@param			limit	query		int	false	"Лимит количества возвращаемых элементов"	Example(10)
+//	@param			offset	query		int	false	"Смещение возвращаемых элементов"			Example(5)
+//
+//	@success		200		{array}		db.Trade
+//	@failure		400		{object}	ErrorResponse
+//	@failure		404		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
+//	@router			/api/user/{id}/trades [get]
+func ListUserTrades(writer http.ResponseWriter, request *http.Request) {
+	var (
+		err    error
+		params db.ListUserTradesParams
+		query  = request.URL.Query()
+		r      = render.New()
+		q      = db.New(database.Pool)
+	)
+	params.Userid, err = util.PathID(consts.IDPathValue, request)
+	if err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.IDPathValue))
+		return
+	}
+	if params.Limit, params.Offset, err = util.GetSearchPagination(query); err != nil {
+		RenderError(r, writer, ErrorBadPaginationParams(err))
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	trades, err := q.ListUserTrades(database.Context, params)
+	if err != nil {
+		var toWrite ErrorResponse
+		if errors.Is(err, pgx.ErrNoRows) {
+			toWrite = ErrorNotFound(err)
+		} else {
+			toWrite = ErrorGeneric(err)
+		}
+		RenderError(r, writer, toWrite)
+		return
+	}
+	Logger.Info().
+		Int64("id", params.Userid).
+		Int("len(trades)", len(trades)).
+		Msg("user trades listed")
 
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(trades); err != nil {

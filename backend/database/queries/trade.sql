@@ -12,6 +12,14 @@ select * from trades
 limit $1
 offset $2;
 
+-- name: ListUserTrades :many
+select * from trades
+where
+owner_id = @userID or
+buyer_id = @userID
+limit $1
+offset $2;
+
 -- name: ListTradeBooks :many
 select book_id, owner_id from trade_books
 where trade_id = @id

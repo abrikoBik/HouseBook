@@ -240,3 +240,46 @@ func (q *Queries) ListTrades(ctx context.Context, arg ListTradesParams) ([]Trade
 	}
 	return items, nil
 }
+
+const listUserTrades = `-- name: ListUserTrades :many
+select id, owner_id, buyer_id, owner_confirmed, buyer_confirmed, created_at, completed_at from trades
+where
+owner_id = $3 or
+buyer_id = $3
+limit $1
+offset $2
+`
+
+type ListUserTradesParams struct {
+	Limit  int32 `db:"limit" json:"limit"`
+	Offset int32 `db:"offset" json:"offset"`
+	Userid int64 `db:"userid" json:"userid"`
+}
+
+func (q *Queries) ListUserTrades(ctx context.Context, arg ListUserTradesParams) ([]Trade, error) {
+	rows, err := q.db.Query(ctx, listUserTrades, arg.Limit, arg.Offset, arg.Userid)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Trade
+	for rows.Next() {
+		var i Trade
+		if err := rows.Scan(
+			&i.ID,
+			&i.OwnerID,
+			&i.BuyerID,
+			&i.OwnerConfirmed,
+			&i.BuyerConfirmed,
+			&i.CreatedAt,
+			&i.CompletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
