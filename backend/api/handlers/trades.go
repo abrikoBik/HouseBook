@@ -210,7 +210,7 @@ func ListTrades(writer http.ResponseWriter, request *http.Request) {
 //	@accept			plain
 //	@produce		json
 //
-//	@tags			Сделки
+//	@tags			Сделки,Пользователи
 //
 //	@param			user-id	path		int	true	"ID пользователя"
 //	@param			limit	query		int	false	"Лимит количества возвращаемых элементов"	Example(10)
@@ -273,7 +273,7 @@ func ListUserTrades(writer http.ResponseWriter, request *http.Request) {
 //	@accept			json
 //	@produce		json
 //
-//	@tags			Сделки
+//	@tags			Сделки,Книги
 //
 //	@param			trade-id	path		pgtype.UUID	true	"UUID сделки"
 //	@param			ownerid		body		int			true	"ID владельца книги"
@@ -334,7 +334,7 @@ func AddBookToTrade(writer http.ResponseWriter, request *http.Request) {
 //	@accept			plain
 //	@produce		json
 //
-//	@tags			Сделки
+//	@tags			Сделки,Книги
 //
 //	@param			trade-id	path		pgtype.UUID	true	"UUID сделки"
 //	@param			limit		query		int			false	"Лимит количества возвращаемых элементов"	Example(10)
@@ -395,7 +395,7 @@ func ListTradeBooks(writer http.ResponseWriter, request *http.Request) {
 //	@accept			json
 //	@produce		json
 //
-//	@tags			Сделки
+//	@tags			Сделки,Книги
 //
 //	@param			library-id	path		pgtype.UUID	true	"UUID библиотеки"
 //	@param			book-id		path		pgtype.UUID	true	"UUID книги"

@@ -466,6 +466,7 @@ paths:
       summary: Список отзывов о книге
       tags:
       - Отзывы
+      - Книги
   /api/books/{book-id}/cover:
     put:
       consumes:
@@ -825,6 +826,7 @@ paths:
       summary: Список книг в библиотеке
       tags:
       - Библиотеки
+      - Книги
     patch:
       consumes:
       - application/json
@@ -868,6 +870,7 @@ paths:
       summary: Добавить книгу
       tags:
       - Библиотеки
+      - Книги
   /api/libraries/{library-id}/books/{book-id}:
     delete:
       consumes:
@@ -891,6 +894,7 @@ paths:
       summary: Удалить книгу
       tags:
       - Библиотеки
+      - Книги
   /api/trades:
     get:
       consumes:
@@ -1084,6 +1088,7 @@ paths:
       summary: Список книг в сделке
       tags:
       - Сделки
+      - Книги
     patch:
       consumes:
       - application/json
@@ -1123,6 +1128,7 @@ paths:
       summary: Добавить книгу
       tags:
       - Сделки
+      - Книги
   /api/trades/{trade-id}/books/{book-id}:
     delete:
       consumes:
@@ -1146,6 +1152,7 @@ paths:
       summary: Удалить книгу
       tags:
       - Сделки
+      - Книги
   /api/user/{user-id}/trades:
     get:
       consumes:
@@ -1191,6 +1198,7 @@ paths:
       summary: Список сделок пользователя
       tags:
       - Сделки
+      - Пользователи
   /api/users:
     post:
       consumes:
@@ -1409,6 +1417,7 @@ paths:
       summary: Список отзывов пользователя
       tags:
       - Отзывы
+      - Пользователи
   /api/users/{user-id}/image:
     put:
       consumes:
@@ -1488,4 +1497,5 @@ paths:
       summary: Список библиотек пользователя
       tags:
       - Библиотеки
+      - Пользователи
 swagger: "2.0"

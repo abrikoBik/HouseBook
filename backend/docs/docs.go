@@ -528,7 +528,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Отзывы"
+                    "Отзывы",
+                    "Книги"
                 ],
                 "summary": "Список отзывов о книге",
                 "parameters": [
@@ -964,7 +965,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Библиотеки"
+                    "Библиотеки",
+                    "Книги"
                 ],
                 "summary": "Список книг в библиотеке",
                 "parameters": [
@@ -1022,7 +1024,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Библиотеки"
+                    "Библиотеки",
+                    "Книги"
                 ],
                 "summary": "Добавить книгу",
                 "parameters": [
@@ -1089,7 +1092,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Библиотеки"
+                    "Библиотеки",
+                    "Книги"
                 ],
                 "summary": "Удалить книгу",
                 "responses": {
@@ -1355,7 +1359,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Сделки"
+                    "Сделки",
+                    "Книги"
                 ],
                 "summary": "Список книг в сделке",
                 "parameters": [
@@ -1413,7 +1418,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Сделки"
+                    "Сделки",
+                    "Книги"
                 ],
                 "summary": "Добавить книгу",
                 "parameters": [
@@ -1474,7 +1480,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Сделки"
+                    "Сделки",
+                    "Книги"
                 ],
                 "summary": "Удалить книгу",
                 "responses": {
@@ -1509,7 +1516,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Сделки"
+                    "Сделки",
+                    "Пользователи"
                 ],
                 "summary": "Список сделок пользователя",
                 "parameters": [
@@ -1835,7 +1843,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Отзывы"
+                    "Отзывы",
+                    "Пользователи"
                 ],
                 "summary": "Список отзывов пользователя",
                 "parameters": [
@@ -1953,7 +1962,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Библиотеки"
+                    "Библиотеки",
+                    "Пользователи"
                 ],
                 "summary": "Список библиотек пользователя",
                 "parameters": [

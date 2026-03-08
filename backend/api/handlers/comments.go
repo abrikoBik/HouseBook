@@ -168,7 +168,7 @@ func DeleteComment(writer http.ResponseWriter, request *http.Request) {
 //	@accept			plain
 //	@produce		json
 //
-//	@tags			Отзывы
+//	@tags			Отзывы,Книги
 //
 //	@param			book-id	path		pgtype.UUID	true	"UUID книги"
 //	@param			limit	query		int			false	"Лимит количества возвращаемых элементов"	Example(10)
@@ -226,7 +226,7 @@ func ListBookComments(writer http.ResponseWriter, request *http.Request) {
 //	@accept			plain
 //	@produce		json
 //
-//	@tags			Отзывы
+//	@tags			Отзывы,Пользователи
 //
 //	@param			user-id	path		int	true	"ID пользователя"
 //	@param			limit	query		int	false	"Лимит количества возвращаемых элементов"	Example(10)

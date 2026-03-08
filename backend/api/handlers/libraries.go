@@ -209,7 +209,7 @@ func ListLibraries(writer http.ResponseWriter, request *http.Request) {
 //	@accept			plain
 //	@produce		json
 //
-//	@tags			Библиотеки
+//	@tags			Библиотеки,Пользователи
 //
 //	@param			user-id	path		int	true	"ID пользователя"
 //	@param			limit	query		int	false	"Лимит количества возвращаемых элементов"	Example(10)
@@ -270,7 +270,7 @@ func ListUserLibraries(writer http.ResponseWriter, request *http.Request) {
 //	@accept			json
 //	@produce		json
 //
-//	@tags			Библиотеки
+//	@tags			Библиотеки,Книги
 //
 //	@param			library-id	path		string		true	"UUID библиотеки"
 //	@param			bookid		body		pgtype.UUID	true	"ID книги"
@@ -329,7 +329,7 @@ func AddBookToLibrary(writer http.ResponseWriter, request *http.Request) {
 //	@accept			plain
 //	@produce		json
 //
-//	@tags			Библиотеки
+//	@tags			Библиотеки,Книги
 //
 //	@param			library-id	path		pgtype.UUID	true	"UUID библиотеки"
 //	@param			limit		query		int			false	"Лимит количества возвращаемых элементов"	Example(10)
@@ -387,7 +387,7 @@ func ListLibraryBooks(writer http.ResponseWriter, request *http.Request) {
 //	@accept			json
 //	@produce		json
 //
-//	@tags			Библиотеки
+//	@tags			Библиотеки,Книги
 //
 //	@param			library-id	path		pgtype.UUID	true	"UUID библиотеки"
 //	@param			book-id		path		pgtype.UUID	true	"UUID книги"
