@@ -197,6 +197,25 @@ func UpdateUser(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+// SetProfileImage godoc
+//
+//	@summary		Задать аватар
+//	@description	Задаёт аватар пользователя.
+//	@accept			mpfd
+//	@produce		json
+//
+//	@tags			Пользователи
+//
+//	@param			image	formData	file	true	"Файл аватара (PNG или JPEG)"
+//
+//	@success		200		{string}	string	""
+//	@failure		400		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
+//	@router			/api/users/{id}/image [put]
+func SetProfileImage(writer http.ResponseWriter, request *http.Request) {
+	writer.WriteHeader(http.StatusNotImplemented)
+}
+
 // DeleteUser godoc
 //
 //	@summary		Удалить пользователя

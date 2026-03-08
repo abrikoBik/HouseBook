@@ -578,6 +578,50 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/books/{uuid}/cover": {
+            "put": {
+                "description": "Задаёт обложку для книги.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Книги"
+                ],
+                "summary": "Задать обложку",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Файл обложки (PNG или JPEG)",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/comments": {
             "post": {
                 "description": "Создаёт новый отзыв о книге.",
@@ -1640,6 +1684,50 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/users/{id}/image": {
+            "put": {
+                "description": "Задаёт аватар пользователя.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Пользователи"
+                ],
+                "summary": "Задать аватар",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Файл аватара (PNG или JPEG)",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/users/{id}/libraries": {
             "get": {
                 "description": "Возвращает список всех библиотек, принадлежащих пользователю.",
@@ -1721,6 +1809,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
+                    "type": "string"
+                },
+                "image_uuid": {
                     "type": "string"
                 },
                 "isbn": {
@@ -1830,6 +1921,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "image_uuid": {
+                    "type": "string"
                 },
                 "login": {
                     "type": "string"

@@ -192,6 +192,25 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+// SetBookCover godoc
+//
+//	@summary		Задать обложку
+//	@description	Задаёт обложку для книги.
+//	@accept			mpfd
+//	@produce		json
+//
+//	@tags			Книги
+//
+//	@param			image	formData	file	true	"Файл обложки (PNG или JPEG)"
+//
+//	@success		200		{string}	string	""
+//	@failure		400		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
+//	@router			/api/books/{uuid}/cover [put]
+func SetBookCover(writer http.ResponseWriter, request *http.Request) {
+	writer.WriteHeader(http.StatusNotImplemented)
+}
+
 // DeleteBook godoc
 //
 //	@summary		Удалить книгу
