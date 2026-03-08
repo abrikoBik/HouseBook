@@ -3,7 +3,9 @@ package handlers
 import (
 	"errors"
 	"housebook_storage/consts"
-	"io"
+	"image"
+	"image/jpeg"
+	"image/png"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -18,7 +20,6 @@ func ReceiveFile(writer http.ResponseWriter, request *http.Request) {
 	if err := request.ParseMultipartForm(consts.MaxSize); err != nil {
 		logger.Error().Err(err).Msg("exiting at request.ParseMultipartForm")
 		writer.WriteHeader(http.StatusInternalServerError)
-		// TODO: delete in production?
 		response.Error().Err(err).Send()
 		return
 	}
@@ -50,14 +51,26 @@ func ReceiveFile(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	defer file.Close()
-	written, err := io.Copy(file, stream)
+	img, format, err := image.Decode(stream)
 	if err != nil {
-		logger.Error().Err(err).Msg("exiting at io.Copy")
+		logger.Error().Err(err).Msg("exiting at image.Decode")
+		writer.WriteHeader(http.StatusBadRequest)
+		response.Error().Err(err).Send()
+		return
+	}
+	switch format {
+	case "png":
+		err = png.Encode(file, img)
+	case "jpeg":
+		err = jpeg.Encode(file, img, nil)
+	}
+	if err != nil {
+		logger.Error().Err(err).Str("format", format).Msg("exiting at image.Encode")
 		writer.WriteHeader(http.StatusInternalServerError)
 		response.Error().Err(err).Send()
 		return
 	}
-	logger.Info().Int64("written", written).Str("id", id.String()).Send()
+	logger.Info().Str("format", format).Str("id", id.String()).Send()
 	writer.WriteHeader(http.StatusCreated)
 	response.Log().Str("id", id.String()).Send()
 }

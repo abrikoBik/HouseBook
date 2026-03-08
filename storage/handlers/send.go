@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"housebook_storage/consts"
 	"image"
+	"image/jpeg"
+	"image/png"
 	"io"
 	"net/http"
 	"os"
@@ -14,9 +16,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 	"golang.org/x/image/draw"
-
-	"image/jpeg"
-	"image/png"
 )
 
 func SendFile(writer http.ResponseWriter, request *http.Request) {
