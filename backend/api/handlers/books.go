@@ -164,7 +164,7 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 	)
 	data.ID, err = util.PathUUID(consts.UUIDPathValue, request)
 	if err = errors.Join(err, json.NewDecoder(request.Body).Decode(&data)); err != nil {
-		RenderError(r, writer, ErrorBadJSON(err))
+		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
 		return
 	}
 
@@ -220,7 +220,7 @@ func SetBookCover(writer http.ResponseWriter, request *http.Request) {
 	)
 
 	if data.ID, err = util.PathUUID(consts.UUIDPathValue, request); err != nil {
-		RenderError(r, writer, ErrorBadJSON(err))
+		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
 		return
 	}
 

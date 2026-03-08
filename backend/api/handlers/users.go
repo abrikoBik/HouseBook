@@ -169,7 +169,7 @@ func UpdateUser(writer http.ResponseWriter, request *http.Request) {
 	)
 	data.ID, err = util.PathID(consts.IDPathValue, request)
 	if err = errors.Join(err, json.NewDecoder(request.Body).Decode(&data)); err != nil {
-		RenderError(r, writer, ErrorBadJSON(err))
+		RenderError(r, writer, ErrorBadID(err, consts.IDPathValue))
 		return
 	}
 
@@ -226,7 +226,7 @@ func SetProfileImage(writer http.ResponseWriter, request *http.Request) {
 	)
 
 	if data.ID, err = util.PathID(consts.IDPathValue, request); err != nil {
-		RenderError(r, writer, ErrorBadJSON(err))
+		RenderError(r, writer, ErrorBadID(err, consts.IDPathValue))
 		return
 	}
 
