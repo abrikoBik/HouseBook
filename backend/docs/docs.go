@@ -604,7 +604,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/db.Book"
                         }
                     },
                     "400": {
@@ -1710,7 +1710,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/db.User"
                         }
                     },
                     "400": {

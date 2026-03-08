@@ -228,10 +228,11 @@ func (q *Queries) SearchBooks(ctx context.Context, arg SearchBooksParams) ([]Boo
 	return items, nil
 }
 
-const setCoverImage = `-- name: SetCoverImage :exec
+const setCoverImage = `-- name: SetCoverImage :one
 update books
 set image_uuid = $1
 where id = $2
+returning id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid
 `
 
 type SetCoverImageParams struct {
@@ -239,9 +240,24 @@ type SetCoverImageParams struct {
 	ID        pgtype.UUID `db:"id" json:"id"`
 }
 
-func (q *Queries) SetCoverImage(ctx context.Context, arg SetCoverImageParams) error {
-	_, err := q.db.Exec(ctx, setCoverImage, arg.Imageuuid, arg.ID)
-	return err
+func (q *Queries) SetCoverImage(ctx context.Context, arg SetCoverImageParams) (Book, error) {
+	row := q.db.QueryRow(ctx, setCoverImage, arg.Imageuuid, arg.ID)
+	var i Book
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Author,
+		&i.Isbn,
+		&i.Genre,
+		&i.Publisher,
+		&i.Year,
+		&i.Language,
+		&i.CoverType,
+		&i.PageCount,
+		&i.Description,
+		&i.ImageUuid,
+	)
+	return i, err
 }
 
 const updateBook = `-- name: UpdateBook :one

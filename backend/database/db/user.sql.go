@@ -88,10 +88,11 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 	return i, err
 }
 
-const setProfilePicture = `-- name: SetProfilePicture :exec
+const setProfilePicture = `-- name: SetProfilePicture :one
 update users
 set image_uuid = $1
 where id = $2
+returning id, email, login, name, salt, hash, image_uuid
 `
 
 type SetProfilePictureParams struct {
@@ -99,9 +100,19 @@ type SetProfilePictureParams struct {
 	ID        int64       `db:"id" json:"id"`
 }
 
-func (q *Queries) SetProfilePicture(ctx context.Context, arg SetProfilePictureParams) error {
-	_, err := q.db.Exec(ctx, setProfilePicture, arg.Imageuuid, arg.ID)
-	return err
+func (q *Queries) SetProfilePicture(ctx context.Context, arg SetProfilePictureParams) (User, error) {
+	row := q.db.QueryRow(ctx, setProfilePicture, arg.Imageuuid, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Login,
+		&i.Name,
+		&i.Salt,
+		&i.Hash,
+		&i.ImageUuid,
+	)
+	return i, err
 }
 
 const updateUser = `-- name: UpdateUser :one

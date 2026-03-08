@@ -32,7 +32,8 @@ returning *;
 delete from users
 where id = @id;
 
--- name: SetProfilePicture :exec
+-- name: SetProfilePicture :one
 update users
 set image_uuid = @imageUUID
-where id = @id;
+where id = @id
+returning *;

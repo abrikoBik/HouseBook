@@ -66,7 +66,8 @@ where
 limit $1
 offset $2;
 
--- name: SetCoverImage :exec
+-- name: SetCoverImage :one
 update books
 set image_uuid = @imageUUID
-where id = @id;
+where id = @id
+returning *;

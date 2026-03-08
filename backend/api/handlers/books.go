@@ -203,7 +203,7 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 //
 //	@param			image	formData	file	true	"Файл обложки (PNG или JPEG)"
 //
-//	@success		200		{string}	string	""
+//	@success		200		{object}	db.Book
 //	@failure		400		{object}	ErrorResponse
 //	@failure		500		{object}	ErrorResponse
 //	@router			/api/books/{uuid}/cover [put]
@@ -265,16 +265,21 @@ func SetBookCover(writer http.ResponseWriter, request *http.Request) {
 	if PingDB(r, writer) != nil {
 		return
 	}
-	if err := q.SetCoverImage(database.Context, data); err != nil {
+	book, err := q.SetCoverImage(database.Context, data)
+	if err != nil {
 		RenderError(r, writer, ErrorGeneric(err))
 		return
 	}
 	Logger.Info().
-		Str("id", data.ID.String()).
-		Str("imageUUID", data.Imageuuid.String()).
+		Str("id", book.ID.String()).
+		Str("imageUUID", book.ImageUuid.String()).
 		Msg("book cover set")
 
 	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(book); err != nil {
+		RenderError(r, writer, ErrorRender(err))
+		return
+	}
 }
 
 // DeleteBook godoc

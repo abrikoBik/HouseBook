@@ -208,7 +208,7 @@ func UpdateUser(writer http.ResponseWriter, request *http.Request) {
 //
 //	@param			image	formData	file	true	"Файл аватара (PNG или JPEG)"
 //
-//	@success		200		{string}	string	""
+//	@success		200		{object}	db.User
 //	@failure		400		{object}	ErrorResponse
 //	@failure		500		{object}	ErrorResponse
 //	@router			/api/users/{id}/image [put]
@@ -271,16 +271,21 @@ func SetProfileImage(writer http.ResponseWriter, request *http.Request) {
 	if PingDB(r, writer) != nil {
 		return
 	}
-	if err := q.SetProfilePicture(database.Context, data); err != nil {
+	user, err := q.SetProfilePicture(database.Context, data)
+	if err != nil {
 		RenderError(r, writer, ErrorGeneric(err))
 		return
 	}
 	Logger.Info().
-		Int64("id", data.ID).
-		Str("imageUUID", data.Imageuuid.String()).
+		Int64("id", user.ID).
+		Str("imageUUID", user.ImageUuid.String()).
 		Msg("profile picture set")
 
 	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(user); err != nil {
+		RenderError(r, writer, ErrorRender(err))
+		return
+	}
 }
 
 // DeleteUser godoc
