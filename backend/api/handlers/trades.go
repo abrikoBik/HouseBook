@@ -386,12 +386,12 @@ func DeleteTradeBook(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Сделки
 //
-//	@param			uuid		path		pgtype.UUID	true	"UUID сделки"
-//	@param			userid		body		int	true	"ID пользователя"
+//	@param			uuid	path		pgtype.UUID	true	"UUID сделки"
+//	@param			userid	body		int			true	"ID пользователя"
 //
-//	@success		200			{object}	db.Trade
-//	@failure		400			{object}	ErrorResponse
-//	@failure		500			{object}	ErrorResponse
+//	@success		200		{object}	db.Trade
+//	@failure		400		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
 //	@router			/api/trades/{uuid} [patch]
 func ConfirmTrade(writer http.ResponseWriter, request *http.Request) {
 	var (

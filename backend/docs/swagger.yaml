@@ -19,6 +19,8 @@ definitions:
         type: string
       language:
         $ref: '#/definitions/pgtype.Text'
+      link:
+        $ref: '#/definitions/pgtype.Text'
       page_count:
         $ref: '#/definitions/pgtype.Numeric'
       publisher:
@@ -59,6 +61,8 @@ definitions:
     type: object
   db.Trade:
     properties:
+      buyer_confirmed:
+        type: boolean
       buyer_id:
         type: integer
       completed_at:
@@ -67,6 +71,8 @@ definitions:
         $ref: '#/definitions/pgtype.Timestamp'
       id:
         type: string
+      owner_confirmed:
+        type: boolean
       owner_id:
         type: integer
     type: object
@@ -83,6 +89,8 @@ definitions:
     properties:
       email:
         type: string
+      finished_reading_id:
+        type: string
       id:
         type: integer
       image_uuid:
@@ -90,6 +98,12 @@ definitions:
       login:
         type: string
       name:
+        type: string
+      now_reading_id:
+        type: string
+      rating:
+        type: number
+      trade_ready_id:
         type: string
     type: object
   handlers.ErrorResponse:
@@ -983,6 +997,35 @@ paths:
           schema:
             $ref: '#/definitions/handlers.ErrorResponse'
       summary: Получить сделку
+      tags:
+      - Сделки
+    patch:
+      consumes:
+      - application/json
+      description: Помечает сделку завершённой со стороны пользователя.
+      parameters:
+      - description: ID пользователя
+        in: body
+        name: userid
+        required: true
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Trade'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Завершить сделку
       tags:
       - Сделки
   /api/trades/{uuid}/books:

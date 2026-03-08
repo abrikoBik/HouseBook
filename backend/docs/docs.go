@@ -1276,6 +1276,50 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "patch": {
+                "description": "Помечает сделку завершённой со стороны пользователя.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Сделки"
+                ],
+                "summary": "Завершить сделку",
+                "parameters": [
+                    {
+                        "description": "ID пользователя",
+                        "name": "userid",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Trade"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
             }
         },
         "/api/trades/{uuid}/books": {
@@ -1873,6 +1917,9 @@ const docTemplate = `{
                 "language": {
                     "$ref": "#/definitions/pgtype.Text"
                 },
+                "link": {
+                    "$ref": "#/definitions/pgtype.Text"
+                },
                 "page_count": {
                     "$ref": "#/definitions/pgtype.Numeric"
                 },
@@ -1935,6 +1982,9 @@ const docTemplate = `{
         "db.Trade": {
             "type": "object",
             "properties": {
+                "buyer_confirmed": {
+                    "type": "boolean"
+                },
                 "buyer_id": {
                     "type": "integer"
                 },
@@ -1946,6 +1996,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "string"
+                },
+                "owner_confirmed": {
+                    "type": "boolean"
                 },
                 "owner_id": {
                     "type": "integer"
@@ -1972,6 +2025,9 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
+                "finished_reading_id": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -1982,6 +2038,15 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "now_reading_id": {
+                    "type": "string"
+                },
+                "rating": {
+                    "type": "number"
+                },
+                "trade_ready_id": {
                     "type": "string"
                 }
             }
