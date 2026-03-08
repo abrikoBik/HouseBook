@@ -25,7 +25,7 @@ insert into users (
     $4,
     $5
 )
-returning id, email, login, name, salt, hash
+returning id, email, login, name, salt, hash, image_uuid
 `
 
 type CreateUserParams struct {
@@ -52,6 +52,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Name,
 		&i.Salt,
 		&i.Hash,
+		&i.ImageUuid,
 	)
 	return i, err
 }
@@ -67,7 +68,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 }
 
 const getUser = `-- name: GetUser :one
-select id, email, login, name, salt, hash from users
+select id, email, login, name, salt, hash, image_uuid from users
 where id = $1
 limit 1
 `
@@ -82,8 +83,25 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 		&i.Name,
 		&i.Salt,
 		&i.Hash,
+		&i.ImageUuid,
 	)
 	return i, err
+}
+
+const setProfilePicture = `-- name: SetProfilePicture :exec
+update users
+set image_uuid = $1
+where id = $2
+`
+
+type SetProfilePictureParams struct {
+	Imageuuid pgtype.UUID `db:"imageuuid" json:"imageuuid"`
+	ID        int64       `db:"id" json:"id"`
+}
+
+func (q *Queries) SetProfilePicture(ctx context.Context, arg SetProfilePictureParams) error {
+	_, err := q.db.Exec(ctx, setProfilePicture, arg.Imageuuid, arg.ID)
+	return err
 }
 
 const updateUser = `-- name: UpdateUser :one
@@ -93,7 +111,7 @@ set
     login = coalesce($2, login),
     name = coalesce($3, name)
 where id = $4
-returning id, email, login, name, salt, hash
+returning id, email, login, name, salt, hash, image_uuid
 `
 
 type UpdateUserParams struct {
@@ -118,6 +136,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.Name,
 		&i.Salt,
 		&i.Hash,
+		&i.ImageUuid,
 	)
 	return i, err
 }

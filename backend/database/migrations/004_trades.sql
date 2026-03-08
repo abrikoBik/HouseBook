@@ -10,8 +10,7 @@ create table trade_books (
 
 ---- create above / drop below ----
 
-alter table trades
-drop column owner_id,
-drop column buyer_id;
+alter table trades drop column owner_id;
+alter table trades drop column buyer_id;
 
 drop table trade_books;
