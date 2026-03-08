@@ -31,12 +31,24 @@ $ docker compose exec backend tern migrate -m /app/migrations -c /app/migrations
 $ go fmt ./...
 ```
 
+Для документации в папке `backend`:
+```shell
+$ go tool swag fmt
+```
+
 Для фронтенда в папке `frontend`:
 ```shell
 $ npm run format
 ```
 
 ## Сборка проекта
+> [!NOTE]
+> Перед сборкой бэкенда желательно сгенерировать документацию:
+> ```shell
+> $ go tool swag init --parseDependency --parseInternal
+> ```
+> Далее документация будет доступна на `http://localhost/api/docs/`.
+
 ```shell
 $ docker compose build
 ```
