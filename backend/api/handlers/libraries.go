@@ -37,16 +37,10 @@ func CreateLibrary(writer http.ResponseWriter, request *http.Request) {
 		r    = render.New()
 		q    = db.New(database.Pool)
 	)
-	userID, err := util.PathID(consts.IDPathValue, request)
-	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.IDPathValue))
-		return
-	}
 	if err := json.NewDecoder(request.Body).Decode(&data); err != nil {
 		RenderError(r, writer, ErrorBadJSON(err))
 		return
 	}
-	data.Userid = userID
 
 	if PingDB(r, writer) != nil {
 		return
@@ -74,38 +68,29 @@ func CreateLibrary(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Библиотеки
 //
-//	@param			uuid	path		pgtype.UUID	true	"UUID библиотеки"
+//	@param			library-id	path		pgtype.UUID	true	"UUID библиотеки"
 //
-//	@success		200		{object}	db.Library
-//	@failure		400		{object}	ErrorResponse
-//	@failure		404		{object}	ErrorResponse
-//	@failure		500		{object}	ErrorResponse
-//	@router			/api/libraries/{uuid} [get]
+//	@success		200			{object}	db.Library
+//	@failure		400			{object}	ErrorResponse
+//	@failure		404			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/libraries/{library-id} [get]
 func GetLibrary(writer http.ResponseWriter, request *http.Request) {
 	var (
-		err  error
-		data db.GetLibraryParams
-		r    = render.New()
-		q    = db.New(database.Pool)
+		err error
+		r   = render.New()
+		q   = db.New(database.Pool)
 	)
-	// TODO: clean up, match the docs
-	userID, err := util.PathID(consts.IDPathValue, request)
+	libraryUUID, err := util.PathUUID(consts.LibraryIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.IDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.LibraryIDPathValue))
 		return
 	}
-	data.Userid = userID
-	libraryUUID, err := util.PathUUID("library-uuid", request)
-	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, "library-uuid"))
-		return
-	}
-	data.ID = libraryUUID
 
 	if PingDB(r, writer) != nil {
 		return
 	}
-	library, err := q.GetLibrary(database.Context, data)
+	library, err := q.GetLibrary(database.Context, libraryUUID)
 	if err != nil {
 		var toWrite ErrorResponse
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -134,36 +119,28 @@ func GetLibrary(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Библиотеки
 //
-//	@param			uuid	path		pgtype.UUID	true	"UUID библиотеки"
+//	@param			library-id	path		pgtype.UUID	true	"UUID библиотеки"
 //
-//	@success		200		{string}	string		""
-//	@failure		400		{object}	ErrorResponse
-//	@failure		500		{object}	ErrorResponse
-//	@router			/api/libraries/{uuid} [delete]
+//	@success		200			{string}	string		""
+//	@failure		400			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/libraries/{library-id} [delete]
 func DeleteLibrary(writer http.ResponseWriter, request *http.Request) {
 	var (
-		err  error
-		data db.DeleteLibraryParams
-		r    = render.New()
-		q    = db.New(database.Pool)
+		err error
+		r   = render.New()
+		q   = db.New(database.Pool)
 	)
-	userID, err := util.PathID(consts.IDPathValue, request)
+	libraryUUID, err := util.PathUUID(consts.LibraryIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.IDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.LibraryIDPathValue))
 		return
 	}
-	data.Userid = userID
-	libraryUUID, err := util.PathUUID("library-uuid", request)
-	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, "library-uuid"))
-		return
-	}
-	data.ID = libraryUUID
 
 	if PingDB(r, writer) != nil {
 		return
 	}
-	if err := q.DeleteLibrary(database.Context, data); err != nil {
+	if err := q.DeleteLibrary(database.Context, libraryUUID); err != nil {
 		RenderError(r, writer, ErrorGeneric(err))
 		return
 	}
@@ -175,13 +152,12 @@ func DeleteLibrary(writer http.ResponseWriter, request *http.Request) {
 // ListLibraries godoc
 //
 //	@summary		Список библиотек
-//	@description	Возвращает список всех библиотек, принадлежащих пользователю.
+//	@description	Возвращает список всех библиотек, хранящихся на сервере.
 //	@accept			plain
 //	@produce		json
 //
 //	@tags			Библиотеки
 //
-//	@param			id		path		int	true	"ID пользователя"
 //	@param			limit	query		int	false	"Лимит количества возвращаемых элементов"	Example(10)
 //	@param			offset	query		int	false	"Смещение возвращаемых элементов"			Example(5)
 //
@@ -189,7 +165,7 @@ func DeleteLibrary(writer http.ResponseWriter, request *http.Request) {
 //	@failure		400		{object}	ErrorResponse
 //	@failure		404		{object}	ErrorResponse
 //	@failure		500		{object}	ErrorResponse
-//	@router			/api/users/{id}/libraries [get]
+//	@router			/api/libraries [get]
 func ListLibraries(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err    error
@@ -198,14 +174,7 @@ func ListLibraries(writer http.ResponseWriter, request *http.Request) {
 		r      = render.New()
 		q      = db.New(database.Pool)
 	)
-	userID, err := util.PathID(consts.IDPathValue, request)
-	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.IDPathValue))
-		return
-	}
-	params.Userid = userID
-	params.Limit, params.Offset, err = util.GetSearchPagination(query)
-	if err != nil {
+	if params.Limit, params.Offset, err = util.GetSearchPagination(query); err != nil {
 		RenderError(r, writer, ErrorBadPaginationParams(err))
 		return
 	}
@@ -233,6 +202,67 @@ func ListLibraries(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+// ListUserLibraries godoc
+//
+//	@summary		Список библиотек пользователя
+//	@description	Возвращает список всех библиотек, принадлежащих пользователю.
+//	@accept			plain
+//	@produce		json
+//
+//	@tags			Библиотеки,Пользователи
+//
+//	@param			user-id	path		int	true	"ID пользователя"
+//	@param			limit	query		int	false	"Лимит количества возвращаемых элементов"	Example(10)
+//	@param			offset	query		int	false	"Смещение возвращаемых элементов"			Example(5)
+//
+//	@success		200		{array}		db.Library
+//	@failure		400		{object}	ErrorResponse
+//	@failure		404		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
+//	@router			/api/users/{user-id}/libraries [get]
+func ListUserLibraries(writer http.ResponseWriter, request *http.Request) {
+	var (
+		err    error
+		params db.ListUserLibrariesParams
+		query  = request.URL.Query()
+		r      = render.New()
+		q      = db.New(database.Pool)
+	)
+	if params.Userid, err = util.PathID(consts.UserIDPathValue, request); err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.UserIDPathValue))
+		return
+	}
+	if params.Limit, params.Offset, err = util.GetSearchPagination(query); err != nil {
+		RenderError(r, writer, ErrorBadPaginationParams(err))
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	libraries, err := q.ListUserLibraries(database.Context, params)
+	if err != nil {
+		var toWrite ErrorResponse
+		if errors.Is(err, pgx.ErrNoRows) {
+			toWrite = ErrorNotFound(err)
+		} else {
+			toWrite = ErrorGeneric(err)
+		}
+		RenderError(r, writer, toWrite)
+		return
+	}
+	Logger.Info().
+		Int64("userID", params.Userid).
+		Int("len(libraries)", len(libraries)).
+		Msg("libraries listed")
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(libraries); err != nil {
+		RenderError(r, writer, ErrorRender(err))
+		return
+	}
+}
+
 // AddBookToLibrary godoc
 //
 //	@summary		Добавить книгу
@@ -240,9 +270,9 @@ func ListLibraries(writer http.ResponseWriter, request *http.Request) {
 //	@accept			json
 //	@produce		json
 //
-//	@tags			Библиотеки
+//	@tags			Библиотеки,Книги
 //
-//	@param			uuid		path		string		true	"UUID библиотеки"
+//	@param			library-id	path		string		true	"UUID библиотеки"
 //	@param			bookid		body		pgtype.UUID	true	"ID книги"
 //	@param			quantity	body		int			false	"Количество экземпляров книги"
 //
@@ -250,7 +280,7 @@ func ListLibraries(writer http.ResponseWriter, request *http.Request) {
 //	@failure		400			{object}	ErrorResponse
 //	@failure		409			{object}	ErrorResponse
 //	@failure		500			{object}	ErrorResponse
-//	@router			/api/libraries/{uuid}/books [patch]
+//	@router			/api/libraries/{library-id}/books [patch]
 func AddBookToLibrary(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err  error
@@ -262,17 +292,10 @@ func AddBookToLibrary(writer http.ResponseWriter, request *http.Request) {
 		RenderError(r, writer, ErrorBadJSON(err))
 		return
 	}
-	_, err = util.PathID(consts.IDPathValue, request)
-	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.IDPathValue))
+	if data.Libraryid, err = util.PathUUID(consts.LibraryIDPathValue, request); err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.LibraryIDPathValue))
 		return
 	}
-	libraryUUID, err := util.PathUUID("library-uuid", request)
-	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, "library-uuid"))
-		return
-	}
-	data.Libraryid = libraryUUID
 
 	if PingDB(r, writer) != nil {
 		return
@@ -306,17 +329,17 @@ func AddBookToLibrary(writer http.ResponseWriter, request *http.Request) {
 //	@accept			plain
 //	@produce		json
 //
-//	@tags			Библиотеки
+//	@tags			Библиотеки,Книги
 //
-//	@param			uuid	path		pgtype.UUID	true	"UUID библиотеки"
-//	@param			limit	query		int			false	"Лимит количества возвращаемых элементов"	Example(10)
-//	@param			offset	query		int			false	"Смещение возвращаемых элементов"			Example(5)
+//	@param			library-id	path		pgtype.UUID	true	"UUID библиотеки"
+//	@param			limit		query		int			false	"Лимит количества возвращаемых элементов"	Example(10)
+//	@param			offset		query		int			false	"Смещение возвращаемых элементов"			Example(5)
 //
-//	@success		200		{array}		db.LibraryBook
-//	@failure		400		{object}	ErrorResponse
-//	@failure		404		{object}	ErrorResponse
-//	@failure		500		{object}	ErrorResponse
-//	@router			/api/libraries/{uuid}/books [get]
+//	@success		200			{array}		db.LibraryBook
+//	@failure		400			{object}	ErrorResponse
+//	@failure		404			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/libraries/{library-id}/books [get]
 func ListLibraryBooks(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err    error
@@ -325,20 +348,11 @@ func ListLibraryBooks(writer http.ResponseWriter, request *http.Request) {
 		r      = render.New()
 		q      = db.New(database.Pool)
 	)
-	userID, err := util.PathID(consts.IDPathValue, request)
-	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.IDPathValue))
+	if params.ID, err = util.PathUUID(consts.LibraryIDPathValue, request); err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.LibraryIDPathValue))
 		return
 	}
-	params.Userid = userID
-	libraryUUID, err := util.PathUUID("library-uuid", request)
-	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, "library-uuid"))
-		return
-	}
-	params.ID = libraryUUID
-	params.Limit, params.Offset, err = util.GetSearchPagination(query)
-	if err != nil {
+	if params.Limit, params.Offset, err = util.GetSearchPagination(query); err != nil {
 		RenderError(r, writer, ErrorBadPaginationParams(err))
 		return
 	}
@@ -373,15 +387,15 @@ func ListLibraryBooks(writer http.ResponseWriter, request *http.Request) {
 //	@accept			json
 //	@produce		json
 //
-//	@tags			Библиотеки
+//	@tags			Библиотеки,Книги
 //
-//	@param			library-uuid	path		pgtype.UUID	true	"UUID библиотеки"
-//	@param			book-uuid		path		pgtype.UUID	true	"UUID книги"
+//	@param			library-id	path		pgtype.UUID	true	"UUID библиотеки"
+//	@param			book-id		path		pgtype.UUID	true	"UUID книги"
 //
-//	@success		201				{string}	string		""
-//	@failure		400				{object}	ErrorResponse
-//	@failure		500				{object}	ErrorResponse
-//	@router			/api/libraries/{library-uuid}/books/{book-uuid} [delete]
+//	@success		201			{string}	string		""
+//	@failure		400			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/libraries/{library-id}/books/{book-id} [delete]
 func DeleteBookFromLibrary(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err    error
@@ -390,23 +404,14 @@ func DeleteBookFromLibrary(writer http.ResponseWriter, request *http.Request) {
 		q      = db.New(database.Pool)
 	)
 
-	_, err = util.PathID(consts.IDPathValue, request)
-	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.IDPathValue))
+	if params.Libraryid, err = util.PathUUID(consts.LibraryIDPath, request); err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.LibraryIDPath))
 		return
 	}
-	libraryUUID, err := util.PathUUID("library-uuid", request)
-	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, "library-uuid"))
+	if params.Bookid, err = util.PathUUID(consts.BookIDPathValue, request); err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
 		return
 	}
-	params.Libraryid = libraryUUID
-	bookID, err := util.PathUUID("book-uuid", request)
-	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, "book-uuid"))
-		return
-	}
-	params.Bookid = bookID
 
 	if PingDB(r, writer) != nil {
 		return
@@ -416,8 +421,8 @@ func DeleteBookFromLibrary(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	Logger.Info().
-		Interface("libraryID", libraryUUID).
-		Interface("bookID", bookID).
+		Interface("libraryID", params.Libraryid).
+		Interface("bookID", params.Bookid).
 		Msg("book deleted from library")
 
 	writer.WriteHeader(http.StatusOK)

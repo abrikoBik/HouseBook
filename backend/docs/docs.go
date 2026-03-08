@@ -313,7 +313,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/books/{uuid}": {
+        "/api/books/{book-id}": {
             "get": {
                 "description": "Возвращает информацию о книге.",
                 "consumes": [
@@ -518,7 +518,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/books/{uuid}/comments": {
+        "/api/books/{book-id}/comments": {
             "get": {
                 "description": "Возвращает список всех отзывов о книге, хранящихся на сервере.",
                 "consumes": [
@@ -528,7 +528,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Отзывы"
+                    "Отзывы",
+                    "Книги"
                 ],
                 "summary": "Список отзывов о книге",
                 "parameters": [
@@ -578,7 +579,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/books/{uuid}/cover": {
+        "/api/books/{book-id}/cover": {
             "put": {
                 "description": "Задаёт обложку для книги.",
                 "consumes": [
@@ -692,7 +693,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/comments/{uuid}": {
+        "/api/comments/{comment-id}": {
             "get": {
                 "description": "Возвращает информацию об отзыве.",
                 "consumes": [
@@ -767,6 +768,64 @@ const docTemplate = `{
             }
         },
         "/api/libraries": {
+            "get": {
+                "description": "Возвращает список всех библиотек, хранящихся на сервере.",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Библиотеки"
+                ],
+                "summary": "Список библиотек",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Лимит количества возвращаемых элементов",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Смещение возвращаемых элементов",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Library"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Создаёт новую пользовательскую библиотеку.",
                 "consumes": [
@@ -822,42 +881,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/libraries/{library-uuid}/books/{book-uuid}": {
-            "delete": {
-                "description": "Удаляет книгу из существующей библиотеки.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Библиотеки"
-                ],
-                "summary": "Удалить книгу",
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/libraries/{uuid}": {
+        "/api/libraries/{library-id}": {
             "get": {
                 "description": "Возвращает информацию о библиотеке.",
                 "consumes": [
@@ -931,7 +955,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/libraries/{uuid}/books": {
+        "/api/libraries/{library-id}/books": {
             "get": {
                 "description": "Возвращает список всех книг, имеющихся в библиотеке.",
                 "consumes": [
@@ -941,7 +965,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Библиотеки"
+                    "Библиотеки",
+                    "Книги"
                 ],
                 "summary": "Список книг в библиотеке",
                 "parameters": [
@@ -999,14 +1024,15 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Библиотеки"
+                    "Библиотеки",
+                    "Книги"
                 ],
                 "summary": "Добавить книгу",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "UUID библиотеки",
-                        "name": "uuid",
+                        "name": "library-id",
                         "in": "path",
                         "required": true
                     },
@@ -1043,6 +1069,42 @@ const docTemplate = `{
                     },
                     "409": {
                         "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/libraries/{library-id}/books/{book-id}": {
+            "delete": {
+                "description": "Удаляет книгу из существующей библиотеки.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Библиотеки",
+                    "Книги"
+                ],
+                "summary": "Удалить книгу",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponse"
                         }
@@ -1139,7 +1201,7 @@ const docTemplate = `{
                     },
                     {
                         "description": "ID другой стороны сделки",
-                        "name": "buyer_id",
+                        "name": "buyerid",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -1169,42 +1231,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/trades/{trade-uuid}/books/{book-uuid}": {
-            "delete": {
-                "description": "Удаляет книгу из существующей сделки.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Сделки"
-                ],
-                "summary": "Удалить книгу",
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/trades/{uuid}": {
+        "/api/trades/{trade-id}": {
             "get": {
                 "description": "Возвращает информацию о сделке.",
                 "consumes": [
@@ -1276,9 +1303,53 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "patch": {
+                "description": "Помечает сделку завершённой со стороны пользователя.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Сделки"
+                ],
+                "summary": "Завершить сделку",
+                "parameters": [
+                    {
+                        "description": "ID пользователя",
+                        "name": "userid",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Trade"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
             }
         },
-        "/api/trades/{uuid}/books": {
+        "/api/trades/{trade-id}/books": {
             "get": {
                 "description": "Возвращает список всех книг, включённых в сделку.",
                 "consumes": [
@@ -1288,7 +1359,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Сделки"
+                    "Сделки",
+                    "Книги"
                 ],
                 "summary": "Список книг в сделке",
                 "parameters": [
@@ -1346,7 +1418,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Сделки"
+                    "Сделки",
+                    "Книги"
                 ],
                 "summary": "Добавить книгу",
                 "parameters": [
@@ -1384,6 +1457,110 @@ const docTemplate = `{
                     },
                     "409": {
                         "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/trades/{trade-id}/books/{book-id}": {
+            "delete": {
+                "description": "Удаляет книгу из существующей сделки.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Сделки",
+                    "Книги"
+                ],
+                "summary": "Удалить книгу",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/{user-id}/trades": {
+            "get": {
+                "description": "Возвращает список сделок пользователя.",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Сделки",
+                    "Пользователи"
+                ],
+                "summary": "Список сделок пользователя",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID пользователя",
+                        "name": "user-id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Лимит количества возвращаемых элементов",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Смещение возвращаемых элементов",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Trade"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponse"
                         }
@@ -1480,7 +1657,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/{id}": {
+        "/api/users/{user-id}": {
             "get": {
                 "description": "Получает информацию о пользователе.",
                 "consumes": [
@@ -1497,7 +1674,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "ID пользователя",
-                        "name": "id",
+                        "name": "user-id",
                         "in": "path",
                         "required": true
                     }
@@ -1545,7 +1722,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "ID пользователя",
-                        "name": "id",
+                        "name": "user-id",
                         "in": "path",
                         "required": true
                     }
@@ -1587,7 +1764,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "ID пользователя",
-                        "name": "id",
+                        "name": "user-id",
                         "in": "path",
                         "required": true
                     },
@@ -1656,7 +1833,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/{id}/comments": {
+        "/api/users/{user-id}/comments": {
             "get": {
                 "description": "Возвращает список всех отзывов, написанных пользователем.",
                 "consumes": [
@@ -1666,14 +1843,15 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Отзывы"
+                    "Отзывы",
+                    "Пользователи"
                 ],
                 "summary": "Список отзывов пользователя",
                 "parameters": [
                     {
                         "type": "integer",
                         "description": "ID пользователя",
-                        "name": "id",
+                        "name": "user-id",
                         "in": "path",
                         "required": true
                     },
@@ -1723,7 +1901,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/{id}/image": {
+        "/api/users/{user-id}/image": {
             "put": {
                 "description": "Задаёт аватар пользователя.",
                 "consumes": [
@@ -1740,7 +1918,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "ID пользователя",
-                        "name": "id",
+                        "name": "user-id",
                         "in": "path",
                         "required": true
                     },
@@ -1774,7 +1952,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/{id}/libraries": {
+        "/api/users/{user-id}/libraries": {
             "get": {
                 "description": "Возвращает список всех библиотек, принадлежащих пользователю.",
                 "consumes": [
@@ -1784,14 +1962,15 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Библиотеки"
+                    "Библиотеки",
+                    "Пользователи"
                 ],
-                "summary": "Список библиотек",
+                "summary": "Список библиотек пользователя",
                 "parameters": [
                     {
                         "type": "integer",
                         "description": "ID пользователя",
-                        "name": "id",
+                        "name": "user-id",
                         "in": "path",
                         "required": true
                     },
@@ -1873,6 +2052,9 @@ const docTemplate = `{
                 "language": {
                     "$ref": "#/definitions/pgtype.Text"
                 },
+                "link": {
+                    "$ref": "#/definitions/pgtype.Text"
+                },
                 "page_count": {
                     "$ref": "#/definitions/pgtype.Numeric"
                 },
@@ -1935,6 +2117,9 @@ const docTemplate = `{
         "db.Trade": {
             "type": "object",
             "properties": {
+                "buyer_confirmed": {
+                    "type": "boolean"
+                },
                 "buyer_id": {
                     "type": "integer"
                 },
@@ -1946,6 +2131,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "string"
+                },
+                "owner_confirmed": {
+                    "type": "boolean"
                 },
                 "owner_id": {
                     "type": "integer"
@@ -1972,6 +2160,9 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
+                "finished_reading_id": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -1982,6 +2173,15 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "now_reading_id": {
+                    "type": "string"
+                },
+                "rating": {
+                    "type": "number"
+                },
+                "trade_ready_id": {
                     "type": "string"
                 }
             }

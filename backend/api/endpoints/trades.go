@@ -10,14 +10,17 @@ import (
 
 func routeTrades(router chi.Router) {
 	router.Route(consts.TradesEndpoint, func(r chi.Router) {
-		// TODO: nest
 		r.With(middleware.JSONResponse).Get("/", handlers.ListTrades)
 		r.With(middleware.JSONResponse).Post("/", handlers.CreateTrade)
-		r.With(middleware.JSONResponse).Get("/{uuid}", handlers.GetTrade)
-		r.Delete("/{uuid}", handlers.DeleteTrade)
-
-		r.With(middleware.JSONResponse).Get("/{uuid}/books", handlers.ListTradeBooks)
-		r.Patch("/{uuid}/books", handlers.AddBookToTrade)
-		r.Delete("/{trade-uuid}/books/{book-uuid}", handlers.DeleteTradeBook)
+		r.Route(consts.TradeIDPath, func(r chi.Router) {
+			r.With(middleware.JSONResponse).Get("/", handlers.GetTrade)
+			r.With(middleware.JSONResponse).Patch("/", handlers.ConfirmTrade)
+			r.Delete("/", handlers.DeleteTrade)
+			r.Route(consts.BooksEndpoint, func(r chi.Router) {
+				r.With(middleware.JSONResponse).Get("/", handlers.ListTradeBooks)
+				r.Patch("/", handlers.AddBookToTrade)
+				r.Delete(consts.BookIDPath, handlers.DeleteTradeBook)
+			})
+		})
 	})
 }

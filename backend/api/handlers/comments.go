@@ -80,22 +80,22 @@ func CreateComment(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Отзывы
 //
-//	@param			uuid	path		pgtype.UUID	true	"UUID отзыва"
+//	@param			comment-id	path		pgtype.UUID	true	"UUID отзыва"
 //
-//	@success		200		{object}	db.Comment
-//	@failure		400		{object}	ErrorResponse
-//	@failure		404		{object}	ErrorResponse
-//	@failure		500		{object}	ErrorResponse
-//	@router			/api/comments/{uuid} [get]
+//	@success		200			{object}	db.Comment
+//	@failure		400			{object}	ErrorResponse
+//	@failure		404			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/comments/{comment-id} [get]
 func GetComment(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err error
 		r   = render.New()
 		q   = db.New(database.Pool)
 	)
-	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
+	uuid, err := util.PathUUID(consts.CommentIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.CommentIDPathValue))
 		return
 	}
 
@@ -131,21 +131,21 @@ func GetComment(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Отзывы
 //
-//	@param			uuid	path		pgtype.UUID	true	"UUID отзыва"
+//	@param			comment-id	path		pgtype.UUID	true	"UUID отзыва"
 //
-//	@success		200		{object}	string		""
-//	@failure		400		{object}	ErrorResponse
-//	@failure		500		{object}	ErrorResponse
-//	@router			/api/comments/{uuid} [delete]
+//	@success		200			{object}	string		""
+//	@failure		400			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/comments/{comment-id} [delete]
 func DeleteComment(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err error
 		r   = render.New()
 		q   = db.New(database.Pool)
 	)
-	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
+	uuid, err := util.PathUUID(consts.CommentIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.CommentIDPathValue))
 		return
 	}
 
@@ -168,9 +168,9 @@ func DeleteComment(writer http.ResponseWriter, request *http.Request) {
 //	@accept			plain
 //	@produce		json
 //
-//	@tags			Отзывы
+//	@tags			Отзывы,Книги
 //
-//	@param			uuid	path		pgtype.UUID	true	"UUID книги"
+//	@param			book-id	path		pgtype.UUID	true	"UUID книги"
 //	@param			limit	query		int			false	"Лимит количества возвращаемых элементов"	Example(10)
 //	@param			offset	query		int			false	"Смещение возвращаемых элементов"			Example(5)
 //
@@ -178,7 +178,7 @@ func DeleteComment(writer http.ResponseWriter, request *http.Request) {
 //	@failure		400		{object}	ErrorResponse
 //	@failure		404		{object}	ErrorResponse
 //	@failure		500		{object}	ErrorResponse
-//	@router			/api/books/{uuid}/comments [get]
+//	@router			/api/books/{book-id}/comments [get]
 func ListBookComments(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err    error
@@ -187,14 +187,11 @@ func ListBookComments(writer http.ResponseWriter, request *http.Request) {
 		r      = render.New()
 		q      = db.New(database.Pool)
 	)
-	bookUUID, err := util.PathUUID(consts.UUIDPathValue, request)
-	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+	if params.Bookid, err = util.PathUUID(consts.BookIDPathValue, request); err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
 		return
 	}
-	params.Bookid = bookUUID
-	params.Limit, params.Offset, err = util.GetSearchPagination(query)
-	if err != nil {
+	if params.Limit, params.Offset, err = util.GetSearchPagination(query); err != nil {
 		RenderError(r, writer, ErrorBadPaginationParams(err))
 		return
 	}
@@ -229,9 +226,9 @@ func ListBookComments(writer http.ResponseWriter, request *http.Request) {
 //	@accept			plain
 //	@produce		json
 //
-//	@tags			Отзывы
+//	@tags			Отзывы,Пользователи
 //
-//	@param			id		path		int	true	"ID пользователя"
+//	@param			user-id	path		int	true	"ID пользователя"
 //	@param			limit	query		int	false	"Лимит количества возвращаемых элементов"	Example(10)
 //	@param			offset	query		int	false	"Смещение возвращаемых элементов"			Example(5)
 //
@@ -239,7 +236,7 @@ func ListBookComments(writer http.ResponseWriter, request *http.Request) {
 //	@failure		400		{object}	ErrorResponse
 //	@failure		404		{object}	ErrorResponse
 //	@failure		500		{object}	ErrorResponse
-//	@router			/api/users/{id}/comments [get]
+//	@router			/api/users/{user-id}/comments [get]
 func ListUserComments(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err    error
@@ -248,9 +245,9 @@ func ListUserComments(writer http.ResponseWriter, request *http.Request) {
 		r      = render.New()
 		q      = db.New(database.Pool)
 	)
-	userID, err := util.PathID(consts.IDPathValue, request)
+	userID, err := util.PathID(consts.UserIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.IDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.UserIDPathValue))
 		return
 	}
 	params.Userid = userID

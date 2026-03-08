@@ -37,3 +37,21 @@ update users
 set image_uuid = @imageUUID
 where id = @id
 returning *;
+
+-- name: SetNowReadingLibrary :one
+update users
+set now_reading_id = @libraryUUID
+where id = @id
+returning *;
+
+-- name: SetFinishedReadingLibrary :one
+update users
+set finished_reading_id = @libraryUUID
+where id = @id
+returning *;
+
+-- name: SetTradeReadyLibrary :one
+update users
+set trade_ready_id = @libraryUUID
+where id = @id
+returning *;

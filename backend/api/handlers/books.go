@@ -87,22 +87,22 @@ func CreateBook(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Книги
 //
-//	@param			uuid	path		pgtype.UUID	true	"UUID книги"
+//	@param			book-id	path		pgtype.UUID	true	"UUID книги"
 //
 //	@success		200		{object}	db.Book
 //	@failure		400		{object}	ErrorResponse
 //	@failure		404		{object}	ErrorResponse
 //	@failure		500		{object}	ErrorResponse
-//	@router			/api/books/{uuid} [get]
+//	@router			/api/books/{book-id} [get]
 func GetBook(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err error
 		r   = render.New()
 		q   = db.New(database.Pool)
 	)
-	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
+	uuid, err := util.PathUUID(consts.BookIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
 		return
 	}
 
@@ -138,7 +138,7 @@ func GetBook(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Книги
 //
-//	@param			uuid		path		pgtype.UUID	true	"UUID книги"
+//	@param			book-id		path		pgtype.UUID	true	"UUID книги"
 //	@param			author		body		string		false	"Полное имя автора"				Example(Известный автор)
 //	@param			cover_type	body		string		false	"Тип обложки (твёрдая, мягкая)"	Example(твёрдая)
 //	@param			description	body		string		false	"Описание книги"				Example(Крайне интересная книга об очень интересных вещах)
@@ -154,7 +154,7 @@ func GetBook(writer http.ResponseWriter, request *http.Request) {
 //	@failure		400			{object}	ErrorResponse
 //	@failure		409			{object}	ErrorResponse
 //	@failure		500			{object}	ErrorResponse
-//	@router			/api/books/{uuid} [patch]
+//	@router			/api/books/{book-id} [patch]
 func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err  error
@@ -162,9 +162,9 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 		r    = render.New()
 		q    = db.New(database.Pool)
 	)
-	data.ID, err = util.PathUUID(consts.UUIDPathValue, request)
+	data.ID, err = util.PathUUID(consts.BookIDPathValue, request)
 	if err = errors.Join(err, json.NewDecoder(request.Body).Decode(&data)); err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
 		return
 	}
 
@@ -204,13 +204,13 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Книги
 //
-//	@param			uuid	path		pgtype.UUID	true	"UUID книги"
+//	@param			book-id	path		pgtype.UUID	true	"UUID книги"
 //	@param			image	formData	file		true	"Файл обложки (PNG или JPEG)"
 //
 //	@success		200		{object}	db.Book
 //	@failure		400		{object}	ErrorResponse
 //	@failure		500		{object}	ErrorResponse
-//	@router			/api/books/{uuid}/cover [put]
+//	@router			/api/books/{book-id}/cover [put]
 func SetBookCover(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err  error
@@ -219,8 +219,8 @@ func SetBookCover(writer http.ResponseWriter, request *http.Request) {
 		q    = db.New(database.Pool)
 	)
 
-	if data.ID, err = util.PathUUID(consts.UUIDPathValue, request); err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+	if data.ID, err = util.PathUUID(consts.BookIDPathValue, request); err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
 		return
 	}
 
@@ -295,21 +295,21 @@ func SetBookCover(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Книги
 //
-//	@param			uuid	path		pgtype.UUID	true	"UUID книги"
+//	@param			book-id	path		pgtype.UUID	true	"UUID книги"
 //
 //	@success		200		{string}	string		""
 //	@failure		400		{object}	ErrorResponse
 //	@failure		500		{object}	ErrorResponse
-//	@router			/api/books/{uuid} [delete]
+//	@router			/api/books/{book-id} [delete]
 func DeleteBook(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err error
 		r   = render.New()
 		q   = db.New(database.Pool)
 	)
-	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
+	uuid, err := util.PathUUID(consts.BookIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
 		return
 	}
 

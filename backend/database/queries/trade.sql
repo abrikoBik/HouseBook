@@ -12,6 +12,14 @@ select * from trades
 limit $1
 offset $2;
 
+-- name: ListUserTrades :many
+select * from trades
+where
+owner_id = @userID or
+buyer_id = @userID
+limit $1
+offset $2;
+
 -- name: ListTradeBooks :many
 select book_id, owner_id from trade_books
 where trade_id = @id
@@ -30,9 +38,27 @@ insert into trades (
 )
 returning *;
 
--- name: CompleteTrade :one
+-- name: ConfirmTrade :one
 update trades
-set completed_at = now()
+set
+owner_confirmed = case
+    when owner_id = @userID then true
+    else owner_confirmed
+end,
+buyer_confirmed = case
+    when buyer_id = @userID then true
+    else buyer_confirmed
+end,
+completed_at = case
+    when
+        (
+            (owner_confirmed = true or owner_id = @userID) and
+            (buyer_confirmed = true or buyer_id = @userID)
+        ) and
+        completed_at is null
+    then now()
+    else completed_at
+end
 where id = @id
 returning *;
 

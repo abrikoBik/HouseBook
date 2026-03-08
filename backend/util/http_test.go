@@ -20,10 +20,10 @@ func TestPathID(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest("GET", "/{id}", nil)
 	rctx := chi.NewRouteContext()
-	rctx.URLParams.Add(consts.IDPathValue, strconv.Itoa(wanted))
+	rctx.URLParams.Add(consts.GenericIDPathValue, strconv.Itoa(wanted))
 	r = r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, rctx))
 	func(w http.ResponseWriter, r *http.Request) {
-		id, err := PathID(consts.IDPathValue, r)
+		id, err := PathID(consts.GenericIDPathValue, r)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -40,10 +40,10 @@ func TestPathUUID(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest("GET", "/{uuid}", nil)
 	rctx := chi.NewRouteContext()
-	rctx.URLParams.Add(consts.UUIDPathValue, wanted.String())
+	rctx.URLParams.Add(consts.GenericIDPathValue, wanted.String())
 	r = r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, rctx))
 	func(w http.ResponseWriter, r *http.Request) {
-		uuid, err := PathUUID(consts.UUIDPathValue, r)
+		uuid, err := PathUUID(consts.GenericIDPathValue, r)
 		if err != nil {
 			t.Fatal(err)
 		}

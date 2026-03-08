@@ -25,7 +25,7 @@ insert into users (
     $4,
     $5
 )
-returning id, email, login, name, salt, hash, image_uuid
+returning id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id
 `
 
 type CreateUserParams struct {
@@ -53,6 +53,10 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Salt,
 		&i.Hash,
 		&i.ImageUuid,
+		&i.Rating,
+		&i.NowReadingID,
+		&i.FinishedReadingID,
+		&i.TradeReadyID,
 	)
 	return i, err
 }
@@ -68,7 +72,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 }
 
 const getUser = `-- name: GetUser :one
-select id, email, login, name, salt, hash, image_uuid from users
+select id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id from users
 where id = $1
 limit 1
 `
@@ -84,6 +88,72 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 		&i.Salt,
 		&i.Hash,
 		&i.ImageUuid,
+		&i.Rating,
+		&i.NowReadingID,
+		&i.FinishedReadingID,
+		&i.TradeReadyID,
+	)
+	return i, err
+}
+
+const setFinishedReadingLibrary = `-- name: SetFinishedReadingLibrary :one
+update users
+set finished_reading_id = $1
+where id = $2
+returning id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id
+`
+
+type SetFinishedReadingLibraryParams struct {
+	Libraryuuid pgtype.UUID `db:"libraryuuid" json:"libraryuuid"`
+	ID          int64       `db:"id" json:"id"`
+}
+
+func (q *Queries) SetFinishedReadingLibrary(ctx context.Context, arg SetFinishedReadingLibraryParams) (User, error) {
+	row := q.db.QueryRow(ctx, setFinishedReadingLibrary, arg.Libraryuuid, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Login,
+		&i.Name,
+		&i.Salt,
+		&i.Hash,
+		&i.ImageUuid,
+		&i.Rating,
+		&i.NowReadingID,
+		&i.FinishedReadingID,
+		&i.TradeReadyID,
+	)
+	return i, err
+}
+
+const setNowReadingLibrary = `-- name: SetNowReadingLibrary :one
+update users
+set now_reading_id = $1
+where id = $2
+returning id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id
+`
+
+type SetNowReadingLibraryParams struct {
+	Libraryuuid pgtype.UUID `db:"libraryuuid" json:"libraryuuid"`
+	ID          int64       `db:"id" json:"id"`
+}
+
+func (q *Queries) SetNowReadingLibrary(ctx context.Context, arg SetNowReadingLibraryParams) (User, error) {
+	row := q.db.QueryRow(ctx, setNowReadingLibrary, arg.Libraryuuid, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Login,
+		&i.Name,
+		&i.Salt,
+		&i.Hash,
+		&i.ImageUuid,
+		&i.Rating,
+		&i.NowReadingID,
+		&i.FinishedReadingID,
+		&i.TradeReadyID,
 	)
 	return i, err
 }
@@ -92,7 +162,7 @@ const setProfilePicture = `-- name: SetProfilePicture :one
 update users
 set image_uuid = $1
 where id = $2
-returning id, email, login, name, salt, hash, image_uuid
+returning id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id
 `
 
 type SetProfilePictureParams struct {
@@ -111,6 +181,41 @@ func (q *Queries) SetProfilePicture(ctx context.Context, arg SetProfilePicturePa
 		&i.Salt,
 		&i.Hash,
 		&i.ImageUuid,
+		&i.Rating,
+		&i.NowReadingID,
+		&i.FinishedReadingID,
+		&i.TradeReadyID,
+	)
+	return i, err
+}
+
+const setTradeReadyLibrary = `-- name: SetTradeReadyLibrary :one
+update users
+set trade_ready_id = $1
+where id = $2
+returning id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id
+`
+
+type SetTradeReadyLibraryParams struct {
+	Libraryuuid pgtype.UUID `db:"libraryuuid" json:"libraryuuid"`
+	ID          int64       `db:"id" json:"id"`
+}
+
+func (q *Queries) SetTradeReadyLibrary(ctx context.Context, arg SetTradeReadyLibraryParams) (User, error) {
+	row := q.db.QueryRow(ctx, setTradeReadyLibrary, arg.Libraryuuid, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Login,
+		&i.Name,
+		&i.Salt,
+		&i.Hash,
+		&i.ImageUuid,
+		&i.Rating,
+		&i.NowReadingID,
+		&i.FinishedReadingID,
+		&i.TradeReadyID,
 	)
 	return i, err
 }
@@ -122,7 +227,7 @@ set
     login = coalesce($2, login),
     name = coalesce($3, name)
 where id = $4
-returning id, email, login, name, salt, hash, image_uuid
+returning id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id
 `
 
 type UpdateUserParams struct {
@@ -148,6 +253,10 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.Salt,
 		&i.Hash,
 		&i.ImageUuid,
+		&i.Rating,
+		&i.NowReadingID,
+		&i.FinishedReadingID,
+		&i.TradeReadyID,
 	)
 	return i, err
 }

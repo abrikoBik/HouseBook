@@ -14,5 +14,6 @@ func Register(router chi.Router) {
 	routeUsers(router)
 	routeBooks(router)
 	routeTrades(router)
+	routeLibraries(router)
 	routeComments(router)
 }
