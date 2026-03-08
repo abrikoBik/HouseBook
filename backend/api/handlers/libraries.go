@@ -86,7 +86,7 @@ func GetLibrary(writer http.ResponseWriter, request *http.Request) {
 		r    = render.New()
 		q    = db.New(database.Pool)
 	)
-	// TODO: clean up
+	// TODO: clean up, match the docs
 	userID, err := util.PathID(consts.IDPathValue, request)
 	if err != nil {
 		RenderError(r, writer, ErrorBadID(err, consts.IDPathValue))

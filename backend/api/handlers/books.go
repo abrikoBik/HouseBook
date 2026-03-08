@@ -208,7 +208,73 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 //	@failure		500		{object}	ErrorResponse
 //	@router			/api/books/{uuid}/cover [put]
 func SetBookCover(writer http.ResponseWriter, request *http.Request) {
-	writer.WriteHeader(http.StatusNotImplemented)
+	var (
+		err  error
+		data db.SetCoverImageParams
+		r    = render.New()
+		q    = db.New(database.Pool)
+	)
+
+	if data.ID, err = util.PathUUID(consts.UUIDPathValue, request); err != nil {
+		RenderError(r, writer, ErrorBadJSON(err))
+		return
+	}
+
+	var client http.Client
+	req, err := http.NewRequest("POST", consts.StorageURL, nil)
+	if err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+	req.Body = request.Body
+	req.Header.Set("Content-Type", request.Header.Get("Content-Type"))
+	response, err := client.Do(req)
+	if err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+	defer response.Body.Close()
+
+	var errored bool
+	switch response.StatusCode {
+	case http.StatusCreated:
+		idJSON := StorageIDResponse{}
+		if err := json.NewDecoder(response.Body).Decode(&idJSON); err != nil {
+			RenderError(r, writer, ErrorGeneric(err))
+			errored = true
+			return
+		}
+		if err := data.Imageuuid.Scan(idJSON.ID); err != nil {
+			RenderError(r, writer, ErrorGeneric(err))
+			errored = true
+		}
+	default:
+		errorJSON := StorageErrorResponse{}
+		if err := json.NewDecoder(response.Body).Decode(&errorJSON); err != nil {
+			RenderError(r, writer, ErrorGeneric(err))
+			errored = true
+			return
+		}
+		RenderError(r, writer, ErrorImage(errorJSON.Error))
+		errored = true
+	}
+	if errored {
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	if err := q.SetCoverImage(database.Context, data); err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+	Logger.Info().
+		Str("id", data.ID.String()).
+		Str("imageUUID", data.Imageuuid.String()).
+		Msg("book cover set")
+
+	writer.WriteHeader(http.StatusOK)
 }
 
 // DeleteBook godoc

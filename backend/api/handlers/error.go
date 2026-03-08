@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/jackc/pgx/v5/pgconn"
@@ -88,6 +89,15 @@ func ErrorDuplicate(err error, pgErr *pgconn.PgError) ErrorResponse {
 		Error:       "duplicate key provided",
 		Explanation: pgErr.ConstraintName,
 		err:         err,
+	}
+}
+
+func ErrorImage(err string) ErrorResponse {
+	return ErrorResponse{
+		Status:      http.StatusInternalServerError,
+		Error:       "image error",
+		Explanation: err,
+		err:         errors.New(err),
 	}
 }
 

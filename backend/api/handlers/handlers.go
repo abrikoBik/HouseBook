@@ -31,3 +31,11 @@ func PingDB(renderer *render.Render, writer http.ResponseWriter) error {
 	}
 	return nil
 }
+
+type StorageIDResponse struct {
+	ID string `json:"id"`
+}
+
+type StorageErrorResponse struct {
+	Error string `json:"error"`
+}
