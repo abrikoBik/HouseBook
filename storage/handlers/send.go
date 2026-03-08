@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"housebook_storage/consts"
 	"image"
@@ -14,67 +15,52 @@ import (
 	"strconv"
 
 	"github.com/google/uuid"
-	"github.com/rs/zerolog"
 	"golang.org/x/image/draw"
 )
 
 func SendFile(writer http.ResponseWriter, request *http.Request) {
-	writer.Header().Set("Content-Type", "application/json")
 	var (
 		base64Query = request.URL.Query().Get("base64")
 		widthQuery  = request.URL.Query().Get("width")
 		heightQuery = request.URL.Query().Get("height")
 		err         error
 	)
-	response := zerolog.New(writer)
 	id := request.PathValue("id")
 	if err := uuid.Validate(id); err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		response.Error().Err(err).Send()
+		RenderError(writer, Error{http.StatusBadRequest, err, ""})
 		return
 	}
 	path := filepath.Join(consts.StoragePath, id)
 	logger.Debug().Str("path", path).Send()
 	file, err := os.Open(path)
 	if err != nil {
-		logger.Error().Err(err).Msg("exiting at os.Open")
+		var status int
 		if os.IsNotExist(err) {
-			writer.WriteHeader(http.StatusNotFound)
+			status = http.StatusNotFound
 		} else {
-			writer.WriteHeader(http.StatusInternalServerError)
+			status = http.StatusInternalServerError
 		}
-		response.Error().Err(err).Send()
+		RenderError(writer, Error{status, err, ""})
 		return
 	}
 	defer file.Close()
-
 	var writeTo io.Writer = writer
 	if base64Query != "" {
 		base64Encoder := base64.NewEncoder(base64.StdEncoding, writer)
 		defer base64Encoder.Close()
 		writeTo = base64Encoder
 	}
-
 	var responseImage *image.RGBA
 	img, format, err := image.Decode(file)
 	if err != nil {
-		logger.Error().Err(err).Msg("exiting at image.Decode")
-		writer.WriteHeader(http.StatusInternalServerError)
-		response.Error().Err(err).Send()
+		RenderError(writer, Error{http.StatusInternalServerError, err, ""})
 		return
 	}
-
 	if widthQuery != "" && heightQuery != "" {
-		width, err := strconv.Atoi(widthQuery)
-		if err != nil {
-			writer.WriteHeader(http.StatusBadRequest)
-			response.Error().Err(err).Send()
-			return
-		}
-		height, err := strconv.Atoi(heightQuery)
-		if err != nil {
-			writer.WriteHeader(http.StatusBadRequest)
-			response.Error().Err(err).Send()
+		width, werr := strconv.Atoi(widthQuery)
+		height, herr := strconv.Atoi(heightQuery)
+		if err := errors.Join(werr, herr); err != nil {
+			RenderError(writer, Error{http.StatusBadRequest, err, ""})
 			return
 		}
 		logger.Debug().Int("width", width).Int("height", height).Msg("resizing")
@@ -84,7 +70,6 @@ func SendFile(writer http.ResponseWriter, request *http.Request) {
 		responseImage = image.NewRGBA(image.Rect(0, 0, img.Bounds().Max.X, img.Bounds().Max.Y))
 		draw.Copy(responseImage, img.Bounds().Min, img, img.Bounds(), draw.Over, nil)
 	}
-
 	if base64Query == "" {
 		writer.Header().Set("Content-Type", fmt.Sprintf("image/%s", format))
 	} else {
@@ -98,10 +83,7 @@ func SendFile(writer http.ResponseWriter, request *http.Request) {
 		err = jpeg.Encode(writeTo, responseImage, nil)
 	}
 	if err != nil {
-		writer.Header().Set("Content-Type", "application/json")
-		logger.Error().Err(err).Str("format", format).Msg("exiting at image.Encode")
-		writer.WriteHeader(http.StatusInternalServerError)
-		response.Error().Err(err).Send()
+		RenderError(writer, Error{http.StatusInternalServerError, err, ""})
 		return
 	}
 	logger.Info().Str("id", id).Send()
