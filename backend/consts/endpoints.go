@@ -1,6 +1,7 @@
 package consts
 
 const (
+	DocsEndpoint      = "/docs"
 	BooksEndpoint     = "/books"
 	UsersEndpoint     = "/users"
 	TradesEndpoint    = "/trades"

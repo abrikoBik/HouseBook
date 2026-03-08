@@ -13,6 +13,8 @@ definitions:
         type: string
       id:
         type: string
+      image_uuid:
+        type: string
       isbn:
         type: string
       language:
@@ -83,6 +85,8 @@ definitions:
         type: string
       id:
         type: integer
+      image_uuid:
+        type: string
       login:
         type: string
       name:
@@ -448,6 +452,35 @@ paths:
       summary: Список отзывов о книге
       tags:
       - Отзывы
+  /api/books/{uuid}/cover:
+    put:
+      consumes:
+      - multipart/form-data
+      description: Задаёт обложку для книги.
+      parameters:
+      - description: Файл обложки (PNG или JPEG)
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Book'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Задать обложку
+      tags:
+      - Книги
   /api/books/search:
     get:
       consumes:
@@ -767,6 +800,11 @@ paths:
       - application/json
       description: Добавляет книгу в существующую библиотеку.
       parameters:
+      - description: UUID библиотеки
+        in: path
+        name: uuid
+        required: true
+        type: string
       - description: ID книги
         in: body
         name: bookid
@@ -1087,6 +1125,12 @@ paths:
       consumes:
       - text/plain
       description: Удаляет пользователя из базы данных.
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -1109,6 +1153,12 @@ paths:
       consumes:
       - text/plain
       description: Получает информацию о пользователе.
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -1136,6 +1186,11 @@ paths:
       - application/json
       description: Изменяет информацию о существующем пользователе.
       parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
       - description: Электронная почта пользователя
         example: ivanov@example.com
         in: body
@@ -1188,6 +1243,11 @@ paths:
       - text/plain
       description: Возвращает список всех отзывов, написанных пользователем.
       parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
       - description: Лимит количества возвращаемых элементов
         example: 10
         in: query
@@ -1222,12 +1282,51 @@ paths:
       summary: Список отзывов пользователя
       tags:
       - Отзывы
+  /api/users/{id}/image:
+    put:
+      consumes:
+      - multipart/form-data
+      description: Задаёт аватар пользователя.
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Файл аватара (PNG или JPEG)
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Задать аватар
+      tags:
+      - Пользователи
   /api/users/{id}/libraries:
     get:
       consumes:
       - text/plain
       description: Возвращает список всех библиотек, принадлежащих пользователю.
       parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
       - description: Лимит количества возвращаемых элементов
         example: 10
         in: query

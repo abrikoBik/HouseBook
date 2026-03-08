@@ -16,6 +16,7 @@ func routeBooks(router chi.Router) {
 		r.Route("/{uuid}", func(r chi.Router) {
 			r.With(middleware.JSONResponse).Get("/", handlers.GetBook)
 			r.With(middleware.JSONResponse).Patch("/", handlers.UpdateBook)
+			r.With(middleware.JSONResponse).Put("/cover", handlers.SetBookCover)
 			r.Delete("/", handlers.DeleteBook)
 			r.With(middleware.JSONResponse).Get("/comments", handlers.ListBookComments)
 		})

@@ -68,10 +68,12 @@ func CreateTrade(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Сделки
 //
-//	@success		200	{object}	db.Trade
-//	@failure		400	{object}	ErrorResponse
-//	@failure		404	{object}	ErrorResponse
-//	@failure		500	{object}	ErrorResponse
+//	@param			uuid	path		pgtype.UUID	true	"UUID сделки"
+//
+//	@success		200		{object}	db.Trade
+//	@failure		400		{object}	ErrorResponse
+//	@failure		404		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
 //	@router			/api/trades/{uuid} [get]
 func GetTrade(writer http.ResponseWriter, request *http.Request) {
 	var (
@@ -117,9 +119,11 @@ func GetTrade(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Сделки
 //
-//	@success		200	{string}	string	""
-//	@failure		400	{object}	ErrorResponse
-//	@failure		500	{object}	ErrorResponse
+//	@param			uuid	path		pgtype.UUID	true	"UUID сделки"
+//
+//	@success		200		{string}	string		""
+//	@failure		400		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
 //	@router			/api/trades/{uuid} [delete]
 func DeleteTrade(writer http.ResponseWriter, request *http.Request) {
 	var (
@@ -209,6 +213,7 @@ func ListTrades(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Сделки
 //
+//	@param			uuid	path		pgtype.UUID	true	"UUID сделки"
 //	@param			ownerid	body		int			true	"ID владельца книги"
 //	@param			bookid	body		pgtype.UUID	true	"ID книги"
 //
@@ -269,8 +274,9 @@ func AddBookToTrade(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Сделки
 //
-//	@param			limit	query		int	false	"Лимит количества возвращаемых элементов"	Example(10)
-//	@param			offset	query		int	false	"Смещение возвращаемых элементов"			Example(5)
+//	@param			uuid	path		pgtype.UUID	true	"UUID сделки"
+//	@param			limit	query		int			false	"Лимит количества возвращаемых элементов"	Example(10)
+//	@param			offset	query		int			false	"Смещение возвращаемых элементов"			Example(5)
 //
 //	@success		200		{array}		db.TradeBook
 //	@failure		400		{object}	ErrorResponse
@@ -329,9 +335,12 @@ func ListTradeBooks(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Сделки
 //
-//	@success		201	{string}	string	""
-//	@failure		400	{object}	ErrorResponse
-//	@failure		500	{object}	ErrorResponse
+//	@param			library-uuid	path		pgtype.UUID	true	"UUID библиотеки"
+//	@param			book-uuid		path		pgtype.UUID	true	"UUID книги"
+//
+//	@success		201				{string}	string		""
+//	@failure		400				{object}	ErrorResponse
+//	@failure		500				{object}	ErrorResponse
 //	@router			/api/trades/{trade-uuid}/books/{book-uuid} [delete]
 func DeleteTradeBook(writer http.ResponseWriter, request *http.Request) {
 	var (

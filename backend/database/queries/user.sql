@@ -31,3 +31,9 @@ returning *;
 -- name: DeleteUser :exec
 delete from users
 where id = @id;
+
+-- name: SetProfilePicture :one
+update users
+set image_uuid = @imageUUID
+where id = @id
+returning *;

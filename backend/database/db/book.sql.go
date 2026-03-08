@@ -35,7 +35,7 @@ insert into books (
     $9,
     $10
 )
-returning id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description
+returning id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid
 `
 
 type CreateBookParams struct {
@@ -77,6 +77,7 @@ func (q *Queries) CreateBook(ctx context.Context, arg CreateBookParams) (Book, e
 		&i.CoverType,
 		&i.PageCount,
 		&i.Description,
+		&i.ImageUuid,
 	)
 	return i, err
 }
@@ -92,7 +93,7 @@ func (q *Queries) DeleteBook(ctx context.Context, id pgtype.UUID) error {
 }
 
 const getBook = `-- name: GetBook :one
-select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description from books
+select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid from books
 where id = $1
 limit 1
 `
@@ -112,12 +113,13 @@ func (q *Queries) GetBook(ctx context.Context, id pgtype.UUID) (Book, error) {
 		&i.CoverType,
 		&i.PageCount,
 		&i.Description,
+		&i.ImageUuid,
 	)
 	return i, err
 }
 
 const listBooks = `-- name: ListBooks :many
-select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description from books
+select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid from books
 limit $1
 offset $2
 `
@@ -148,6 +150,7 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, e
 			&i.CoverType,
 			&i.PageCount,
 			&i.Description,
+			&i.ImageUuid,
 		); err != nil {
 			return nil, err
 		}
@@ -160,7 +163,7 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, e
 }
 
 const searchBooks = `-- name: SearchBooks :many
-select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description from books
+select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid from books
 where
     (title = $3 or $3 = '') and
     (author = $4 or $4 = '') and
@@ -213,6 +216,7 @@ func (q *Queries) SearchBooks(ctx context.Context, arg SearchBooksParams) ([]Boo
 			&i.CoverType,
 			&i.PageCount,
 			&i.Description,
+			&i.ImageUuid,
 		); err != nil {
 			return nil, err
 		}
@@ -222,6 +226,38 @@ func (q *Queries) SearchBooks(ctx context.Context, arg SearchBooksParams) ([]Boo
 		return nil, err
 	}
 	return items, nil
+}
+
+const setCoverImage = `-- name: SetCoverImage :one
+update books
+set image_uuid = $1
+where id = $2
+returning id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid
+`
+
+type SetCoverImageParams struct {
+	Imageuuid pgtype.UUID `db:"imageuuid" json:"imageuuid"`
+	ID        pgtype.UUID `db:"id" json:"id"`
+}
+
+func (q *Queries) SetCoverImage(ctx context.Context, arg SetCoverImageParams) (Book, error) {
+	row := q.db.QueryRow(ctx, setCoverImage, arg.Imageuuid, arg.ID)
+	var i Book
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Author,
+		&i.Isbn,
+		&i.Genre,
+		&i.Publisher,
+		&i.Year,
+		&i.Language,
+		&i.CoverType,
+		&i.PageCount,
+		&i.Description,
+		&i.ImageUuid,
+	)
+	return i, err
 }
 
 const updateBook = `-- name: UpdateBook :one
@@ -238,7 +274,7 @@ set
     page_count = coalesce($9, page_count),
     description = coalesce($10, description)
 where id = $11
-returning id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description
+returning id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid
 `
 
 type UpdateBookParams struct {
@@ -282,6 +318,7 @@ func (q *Queries) UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, e
 		&i.CoverType,
 		&i.PageCount,
 		&i.Description,
+		&i.ImageUuid,
 	)
 	return i, err
 }

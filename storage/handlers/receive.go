@@ -1,42 +1,36 @@
 package handlers
 
 import (
+	"encoding/json"
 	"errors"
 	"housebook_storage/consts"
-	"io"
+	"image"
+	"image/jpeg"
+	"image/png"
 	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/google/uuid"
-	"github.com/rs/zerolog"
 )
 
+type IDResponse struct {
+	ID string `json:"id"`
+}
+
 func ReceiveFile(writer http.ResponseWriter, request *http.Request) {
-	writer.Header().Set("Content-Type", "application/json")
-	response := zerolog.New(writer)
 	if err := request.ParseMultipartForm(consts.MaxSize); err != nil {
-		logger.Error().Err(err).Msg("exiting at request.ParseMultipartForm")
-		writer.WriteHeader(http.StatusInternalServerError)
-		// TODO: delete in production?
-		response.Error().Err(err).Send()
+		RenderError(writer, Error{http.StatusInternalServerError, err, ""})
 		return
 	}
 	stream, header, err := request.FormFile(consts.Key)
 	if err != nil {
-		logger.Error().Err(err).Msg("exiting at request.FormFile")
-		writer.WriteHeader(http.StatusInternalServerError)
-		response.Error().Err(err).Send()
+		RenderError(writer, Error{http.StatusInternalServerError, err, ""})
 		return
 	}
 	defer stream.Close()
 	if header.Size > consts.MaxSize {
-		logger.Error().
-			Int64("header.Size", header.Size).
-			Int("consts.MaxSize", consts.MaxSize).
-			Msg("file is too big")
-		writer.WriteHeader(http.StatusBadRequest)
-		response.Error().Err(errors.New("file is too big")).Send()
+		RenderError(writer, Error{http.StatusBadRequest, errors.New("file is too big"), ""})
 		return
 	}
 	logger.Debug().Str("header.Filename", header.Filename).Msg("receiving")
@@ -44,20 +38,27 @@ func ReceiveFile(writer http.ResponseWriter, request *http.Request) {
 	path := filepath.Join(consts.StoragePath, id.String())
 	file, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
-		logger.Error().Err(err).Msg("exiting at os.OpenFile")
-		writer.WriteHeader(http.StatusInternalServerError)
-		response.Error().Err(err).Send()
+		RenderError(writer, Error{http.StatusInternalServerError, err, ""})
 		return
 	}
 	defer file.Close()
-	written, err := io.Copy(file, stream)
+	img, format, err := image.Decode(stream)
 	if err != nil {
-		logger.Error().Err(err).Msg("exiting at io.Copy")
-		writer.WriteHeader(http.StatusInternalServerError)
-		response.Error().Err(err).Send()
+		RenderError(writer, Error{http.StatusBadRequest, err, ""})
 		return
 	}
-	logger.Info().Int64("written", written).Str("id", id.String()).Send()
+	switch format {
+	case "png":
+		err = png.Encode(file, img)
+	case "jpeg":
+		err = jpeg.Encode(file, img, nil)
+	}
+	if err != nil {
+		RenderError(writer, Error{http.StatusInternalServerError, err, ""})
+		return
+	}
+	logger.Info().Str("format", format).Str("id", id.String()).Send()
+	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusCreated)
-	response.Log().Str("id", id.String()).Send()
+	json.NewEncoder(writer).Encode(IDResponse{id.String()})
 }

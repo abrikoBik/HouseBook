@@ -14,7 +14,9 @@ create table books (
     language text,
     cover_type text,
     page_count numeric,
-    description text
+    description text,
+
+    image_uuid uuid
 );
 
 create table users (
@@ -25,7 +27,9 @@ create table users (
     name text not null,
 
     salt bytea not null,
-    hash bytea not null
+    hash bytea not null,
+
+    image_uuid uuid
 );
 
 create table trades (

@@ -20,6 +20,7 @@ type Book struct {
 	CoverType   pgtype.Text    `db:"cover_type" json:"cover_type"`
 	PageCount   pgtype.Numeric `db:"page_count" json:"page_count"`
 	Description pgtype.Text    `db:"description" json:"description"`
+	ImageUuid   pgtype.UUID    `db:"image_uuid" json:"image_uuid"`
 }
 
 type Comment struct {
@@ -56,10 +57,11 @@ type TradeBook struct {
 }
 
 type User struct {
-	ID    int64  `db:"id" json:"id"`
-	Email string `db:"email" json:"email"`
-	Login string `db:"login" json:"login"`
-	Name  string `db:"name" json:"name"`
-	Salt  []byte `db:"salt" json:"-"`
-	Hash  []byte `db:"hash" json:"-"`
+	ID        int64       `db:"id" json:"id"`
+	Email     string      `db:"email" json:"email"`
+	Login     string      `db:"login" json:"login"`
+	Name      string      `db:"name" json:"name"`
+	Salt      []byte      `db:"salt" json:"-"`
+	Hash      []byte      `db:"hash" json:"-"`
+	ImageUuid pgtype.UUID `db:"image_uuid" json:"image_uuid"`
 }

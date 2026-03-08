@@ -578,6 +578,50 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/books/{uuid}/cover": {
+            "put": {
+                "description": "Задаёт обложку для книги.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Книги"
+                ],
+                "summary": "Задать обложку",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Файл обложки (PNG или JPEG)",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Book"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/comments": {
             "post": {
                 "description": "Создаёт новый отзыв о книге.",
@@ -959,6 +1003,13 @@ const docTemplate = `{
                 ],
                 "summary": "Добавить книгу",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID библиотеки",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "description": "ID книги",
                         "name": "bookid",
@@ -1442,6 +1493,15 @@ const docTemplate = `{
                     "Пользователи"
                 ],
                 "summary": "Получить пользователя",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID пользователя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1481,6 +1541,15 @@ const docTemplate = `{
                     "Пользователи"
                 ],
                 "summary": "Удалить пользователя",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID пользователя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1515,6 +1584,13 @@ const docTemplate = `{
                 ],
                 "summary": "Изменить пользователя",
                 "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID пользователя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "example": "ivanov@example.com",
                         "description": "Электронная почта пользователя",
@@ -1596,6 +1672,13 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
+                        "description": "ID пользователя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
                         "example": 10,
                         "description": "Лимит количества возвращаемых элементов",
                         "name": "limit",
@@ -1640,6 +1723,57 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/users/{id}/image": {
+            "put": {
+                "description": "Задаёт аватар пользователя.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Пользователи"
+                ],
+                "summary": "Задать аватар",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID пользователя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Файл аватара (PNG или JPEG)",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/users/{id}/libraries": {
             "get": {
                 "description": "Возвращает список всех библиотек, принадлежащих пользователю.",
@@ -1654,6 +1788,13 @@ const docTemplate = `{
                 ],
                 "summary": "Список библиотек",
                 "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID пользователя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "example": 10,
@@ -1721,6 +1862,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
+                    "type": "string"
+                },
+                "image_uuid": {
                     "type": "string"
                 },
                 "isbn": {
@@ -1830,6 +1974,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "image_uuid": {
+                    "type": "string"
                 },
                 "login": {
                     "type": "string"
