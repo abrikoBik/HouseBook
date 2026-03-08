@@ -290,7 +290,7 @@ paths:
       summary: Создать книгу
       tags:
       - Книги
-  /api/books/{uuid}:
+  /api/books/{book-id}:
     delete:
       consumes:
       - text/plain
@@ -426,7 +426,7 @@ paths:
       summary: Изменить книгу
       tags:
       - Книги
-  /api/books/{uuid}/comments:
+  /api/books/{book-id}/comments:
     get:
       consumes:
       - text/plain
@@ -466,7 +466,7 @@ paths:
       summary: Список отзывов о книге
       tags:
       - Отзывы
-  /api/books/{uuid}/cover:
+  /api/books/{book-id}/cover:
     put:
       consumes:
       - multipart/form-data
@@ -611,7 +611,7 @@ paths:
       summary: Создать отзыв
       tags:
       - Отзывы
-  /api/comments/{uuid}:
+  /api/comments/{comment-id}:
     delete:
       consumes:
       - text/plain
@@ -661,6 +661,45 @@ paths:
       tags:
       - Отзывы
   /api/libraries:
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает список всех библиотек, хранящихся на сервере.
+      parameters:
+      - description: Лимит количества возвращаемых элементов
+        example: 10
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение возвращаемых элементов
+        example: 5
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Library'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Список библиотек
+      tags:
+      - Библиотеки
     post:
       consumes:
       - application/json
@@ -697,30 +736,7 @@ paths:
       summary: Создать библиотеку
       tags:
       - Библиотеки
-  /api/libraries/{library-uuid}/books/{book-uuid}:
-    delete:
-      consumes:
-      - application/json
-      description: Удаляет книгу из существующей библиотеки.
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            type: string
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
-      summary: Удалить книгу
-      tags:
-      - Библиотеки
-  /api/libraries/{uuid}:
+  /api/libraries/{library-id}:
     delete:
       consumes:
       - text/plain
@@ -769,7 +785,7 @@ paths:
       summary: Получить библиотеку
       tags:
       - Библиотеки
-  /api/libraries/{uuid}/books:
+  /api/libraries/{library-id}/books:
     get:
       consumes:
       - text/plain
@@ -816,7 +832,7 @@ paths:
       parameters:
       - description: UUID библиотеки
         in: path
-        name: uuid
+        name: library-id
         required: true
         type: string
       - description: ID книги
@@ -850,6 +866,29 @@ paths:
           schema:
             $ref: '#/definitions/handlers.ErrorResponse'
       summary: Добавить книгу
+      tags:
+      - Библиотеки
+  /api/libraries/{library-id}/books/{book-id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет книгу из существующей библиотеки.
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Удалить книгу
       tags:
       - Библиотеки
   /api/trades:
@@ -905,7 +944,7 @@ paths:
           type: integer
       - description: ID другой стороны сделки
         in: body
-        name: buyer_id
+        name: buyerid
         required: true
         schema:
           type: integer
@@ -927,30 +966,7 @@ paths:
       summary: Создать сделку
       tags:
       - Сделки
-  /api/trades/{trade-uuid}/books/{book-uuid}:
-    delete:
-      consumes:
-      - application/json
-      description: Удаляет книгу из существующей сделки.
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            type: string
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
-      summary: Удалить книгу
-      tags:
-      - Сделки
-  /api/trades/{uuid}:
+  /api/trades/{trade-id}:
     delete:
       consumes:
       - text/plain
@@ -1028,7 +1044,7 @@ paths:
       summary: Завершить сделку
       tags:
       - Сделки
-  /api/trades/{uuid}/books:
+  /api/trades/{trade-id}/books:
     get:
       consumes:
       - text/plain
@@ -1107,6 +1123,74 @@ paths:
       summary: Добавить книгу
       tags:
       - Сделки
+  /api/trades/{trade-id}/books/{book-id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет книгу из существующей сделки.
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Удалить книгу
+      tags:
+      - Сделки
+  /api/user/{user-id}/trades:
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает список сделок пользователя.
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: user-id
+        required: true
+        type: integer
+      - description: Лимит количества возвращаемых элементов
+        example: 10
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение возвращаемых элементов
+        example: 5
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Trade'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Список сделок пользователя
+      tags:
+      - Сделки
   /api/users:
     post:
       consumes:
@@ -1163,7 +1247,7 @@ paths:
       summary: Создать пользователя
       tags:
       - Пользователи
-  /api/users/{id}:
+  /api/users/{user-id}:
     delete:
       consumes:
       - text/plain
@@ -1171,7 +1255,7 @@ paths:
       parameters:
       - description: ID пользователя
         in: path
-        name: id
+        name: user-id
         required: true
         type: integer
       produces:
@@ -1199,7 +1283,7 @@ paths:
       parameters:
       - description: ID пользователя
         in: path
-        name: id
+        name: user-id
         required: true
         type: integer
       produces:
@@ -1231,7 +1315,7 @@ paths:
       parameters:
       - description: ID пользователя
         in: path
-        name: id
+        name: user-id
         required: true
         type: integer
       - description: Электронная почта пользователя
@@ -1280,7 +1364,7 @@ paths:
       summary: Изменить пользователя
       tags:
       - Пользователи
-  /api/users/{id}/comments:
+  /api/users/{user-id}/comments:
     get:
       consumes:
       - text/plain
@@ -1288,7 +1372,7 @@ paths:
       parameters:
       - description: ID пользователя
         in: path
-        name: id
+        name: user-id
         required: true
         type: integer
       - description: Лимит количества возвращаемых элементов
@@ -1325,7 +1409,7 @@ paths:
       summary: Список отзывов пользователя
       tags:
       - Отзывы
-  /api/users/{id}/image:
+  /api/users/{user-id}/image:
     put:
       consumes:
       - multipart/form-data
@@ -1333,7 +1417,7 @@ paths:
       parameters:
       - description: ID пользователя
         in: path
-        name: id
+        name: user-id
         required: true
         type: integer
       - description: Файл аватара (PNG или JPEG)
@@ -1359,7 +1443,7 @@ paths:
       summary: Задать аватар
       tags:
       - Пользователи
-  /api/users/{id}/libraries:
+  /api/users/{user-id}/libraries:
     get:
       consumes:
       - text/plain
@@ -1367,7 +1451,7 @@ paths:
       parameters:
       - description: ID пользователя
         in: path
-        name: id
+        name: user-id
         required: true
         type: integer
       - description: Лимит количества возвращаемых элементов
@@ -1401,7 +1485,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.ErrorResponse'
-      summary: Список библиотек
+      summary: Список библиотек пользователя
       tags:
       - Библиотеки
 swagger: "2.0"

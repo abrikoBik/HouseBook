@@ -23,12 +23,12 @@ import (
 //
 //	@tags			Сделки
 //
-//	@param			ownerid		body		int	true	"ID инициатора сделки"
-//	@param			buyer_id	body		int	true	"ID другой стороны сделки"
+//	@param			ownerid	body		int	true	"ID инициатора сделки"
+//	@param			buyerid	body		int	true	"ID другой стороны сделки"
 //
-//	@success		201			{object}	db.Trade
-//	@failure		400			{object}	ErrorResponse
-//	@failure		500			{object}	ErrorResponse
+//	@success		201		{object}	db.Trade
+//	@failure		400		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
 //	@router			/api/trades [post]
 func CreateTrade(writer http.ResponseWriter, request *http.Request) {
 	var (
@@ -68,13 +68,13 @@ func CreateTrade(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Сделки
 //
-//	@param			uuid	path		pgtype.UUID	true	"UUID сделки"
+//	@param			trade-id	path		pgtype.UUID	true	"UUID сделки"
 //
-//	@success		200		{object}	db.Trade
-//	@failure		400		{object}	ErrorResponse
-//	@failure		404		{object}	ErrorResponse
-//	@failure		500		{object}	ErrorResponse
-//	@router			/api/trades/{uuid} [get]
+//	@success		200			{object}	db.Trade
+//	@failure		400			{object}	ErrorResponse
+//	@failure		404			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/trades/{trade-id} [get]
 func GetTrade(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err error
@@ -119,12 +119,12 @@ func GetTrade(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Сделки
 //
-//	@param			uuid	path		pgtype.UUID	true	"UUID сделки"
+//	@param			trade-id	path		pgtype.UUID	true	"UUID сделки"
 //
-//	@success		200		{string}	string		""
-//	@failure		400		{object}	ErrorResponse
-//	@failure		500		{object}	ErrorResponse
-//	@router			/api/trades/{uuid} [delete]
+//	@success		200			{string}	string		""
+//	@failure		400			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/trades/{trade-id} [delete]
 func DeleteTrade(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err error
@@ -212,7 +212,7 @@ func ListTrades(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Сделки
 //
-//	@param			id path		int	true	"ID пользователя"
+//	@param			user-id	path		int	true	"ID пользователя"
 //	@param			limit	query		int	false	"Лимит количества возвращаемых элементов"	Example(10)
 //	@param			offset	query		int	false	"Смещение возвращаемых элементов"			Example(5)
 //
@@ -220,7 +220,7 @@ func ListTrades(writer http.ResponseWriter, request *http.Request) {
 //	@failure		400		{object}	ErrorResponse
 //	@failure		404		{object}	ErrorResponse
 //	@failure		500		{object}	ErrorResponse
-//	@router			/api/user/{id}/trades [get]
+//	@router			/api/user/{user-id}/trades [get]
 func ListUserTrades(writer http.ResponseWriter, request *http.Request) {
 	// TODO: move function to users
 	var (
@@ -275,15 +275,15 @@ func ListUserTrades(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Сделки
 //
-//	@param			uuid	path		pgtype.UUID	true	"UUID сделки"
-//	@param			ownerid	body		int			true	"ID владельца книги"
-//	@param			bookid	body		pgtype.UUID	true	"ID книги"
+//	@param			trade-id	path		pgtype.UUID	true	"UUID сделки"
+//	@param			ownerid		body		int			true	"ID владельца книги"
+//	@param			bookid		body		pgtype.UUID	true	"ID книги"
 //
-//	@success		201		{string}	string		""
-//	@failure		400		{object}	ErrorResponse
-//	@failure		409		{object}	ErrorResponse
-//	@failure		500		{object}	ErrorResponse
-//	@router			/api/trades/{uuid}/books [patch]
+//	@success		201			{string}	string		""
+//	@failure		400			{object}	ErrorResponse
+//	@failure		409			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/trades/{trade-id}/books [patch]
 func AddBookToTrade(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err  error
@@ -336,15 +336,15 @@ func AddBookToTrade(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Сделки
 //
-//	@param			uuid	path		pgtype.UUID	true	"UUID сделки"
-//	@param			limit	query		int			false	"Лимит количества возвращаемых элементов"	Example(10)
-//	@param			offset	query		int			false	"Смещение возвращаемых элементов"			Example(5)
+//	@param			trade-id	path		pgtype.UUID	true	"UUID сделки"
+//	@param			limit		query		int			false	"Лимит количества возвращаемых элементов"	Example(10)
+//	@param			offset		query		int			false	"Смещение возвращаемых элементов"			Example(5)
 //
-//	@success		200		{array}		db.TradeBook
-//	@failure		400		{object}	ErrorResponse
-//	@failure		404		{object}	ErrorResponse
-//	@failure		500		{object}	ErrorResponse
-//	@router			/api/trades/{uuid}/books [get]
+//	@success		200			{array}		db.TradeBook
+//	@failure		400			{object}	ErrorResponse
+//	@failure		404			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/trades/{trade-id}/books [get]
 func ListTradeBooks(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err    error
@@ -397,13 +397,13 @@ func ListTradeBooks(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Сделки
 //
-//	@param			library-uuid	path		pgtype.UUID	true	"UUID библиотеки"
-//	@param			book-uuid		path		pgtype.UUID	true	"UUID книги"
+//	@param			library-id	path		pgtype.UUID	true	"UUID библиотеки"
+//	@param			book-id		path		pgtype.UUID	true	"UUID книги"
 //
-//	@success		201				{string}	string		""
-//	@failure		400				{object}	ErrorResponse
-//	@failure		500				{object}	ErrorResponse
-//	@router			/api/trades/{trade-uuid}/books/{book-uuid} [delete]
+//	@success		201			{string}	string		""
+//	@failure		400			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/trades/{trade-id}/books/{book-id} [delete]
 func DeleteTradeBook(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err    error
@@ -448,13 +448,13 @@ func DeleteTradeBook(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Сделки
 //
-//	@param			uuid	path		pgtype.UUID	true	"UUID сделки"
-//	@param			userid	body		int			true	"ID пользователя"
+//	@param			trade-id	path		pgtype.UUID	true	"UUID сделки"
+//	@param			userid		body		int			true	"ID пользователя"
 //
-//	@success		200		{object}	db.Trade
-//	@failure		400		{object}	ErrorResponse
-//	@failure		500		{object}	ErrorResponse
-//	@router			/api/trades/{uuid} [patch]
+//	@success		200			{object}	db.Trade
+//	@failure		400			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/trades/{trade-id} [patch]
 func ConfirmTrade(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err  error

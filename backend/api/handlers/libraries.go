@@ -68,13 +68,13 @@ func CreateLibrary(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Библиотеки
 //
-//	@param			uuid	path		pgtype.UUID	true	"UUID библиотеки"
+//	@param			library-id	path		pgtype.UUID	true	"UUID библиотеки"
 //
-//	@success		200		{object}	db.Library
-//	@failure		400		{object}	ErrorResponse
-//	@failure		404		{object}	ErrorResponse
-//	@failure		500		{object}	ErrorResponse
-//	@router			/api/libraries/{uuid} [get]
+//	@success		200			{object}	db.Library
+//	@failure		400			{object}	ErrorResponse
+//	@failure		404			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/libraries/{library-id} [get]
 func GetLibrary(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err error
@@ -119,12 +119,12 @@ func GetLibrary(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Библиотеки
 //
-//	@param			uuid	path		pgtype.UUID	true	"UUID библиотеки"
+//	@param			library-id	path		pgtype.UUID	true	"UUID библиотеки"
 //
-//	@success		200		{string}	string		""
-//	@failure		400		{object}	ErrorResponse
-//	@failure		500		{object}	ErrorResponse
-//	@router			/api/libraries/{uuid} [delete]
+//	@success		200			{string}	string		""
+//	@failure		400			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/libraries/{library-id} [delete]
 func DeleteLibrary(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err error
@@ -211,7 +211,7 @@ func ListLibraries(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Библиотеки
 //
-//	@param			id		path		int	true	"ID пользователя"
+//	@param			user-id	path		int	true	"ID пользователя"
 //	@param			limit	query		int	false	"Лимит количества возвращаемых элементов"	Example(10)
 //	@param			offset	query		int	false	"Смещение возвращаемых элементов"			Example(5)
 //
@@ -219,7 +219,7 @@ func ListLibraries(writer http.ResponseWriter, request *http.Request) {
 //	@failure		400		{object}	ErrorResponse
 //	@failure		404		{object}	ErrorResponse
 //	@failure		500		{object}	ErrorResponse
-//	@router			/api/users/{id}/libraries [get]
+//	@router			/api/users/{user-id}/libraries [get]
 func ListUserLibraries(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err    error
@@ -272,7 +272,7 @@ func ListUserLibraries(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Библиотеки
 //
-//	@param			uuid		path		string		true	"UUID библиотеки"
+//	@param			library-id	path		string		true	"UUID библиотеки"
 //	@param			bookid		body		pgtype.UUID	true	"ID книги"
 //	@param			quantity	body		int			false	"Количество экземпляров книги"
 //
@@ -280,7 +280,7 @@ func ListUserLibraries(writer http.ResponseWriter, request *http.Request) {
 //	@failure		400			{object}	ErrorResponse
 //	@failure		409			{object}	ErrorResponse
 //	@failure		500			{object}	ErrorResponse
-//	@router			/api/libraries/{uuid}/books [patch]
+//	@router			/api/libraries/{library-id}/books [patch]
 func AddBookToLibrary(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err  error
@@ -331,15 +331,15 @@ func AddBookToLibrary(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Библиотеки
 //
-//	@param			uuid	path		pgtype.UUID	true	"UUID библиотеки"
-//	@param			limit	query		int			false	"Лимит количества возвращаемых элементов"	Example(10)
-//	@param			offset	query		int			false	"Смещение возвращаемых элементов"			Example(5)
+//	@param			library-id	path		pgtype.UUID	true	"UUID библиотеки"
+//	@param			limit		query		int			false	"Лимит количества возвращаемых элементов"	Example(10)
+//	@param			offset		query		int			false	"Смещение возвращаемых элементов"			Example(5)
 //
-//	@success		200		{array}		db.LibraryBook
-//	@failure		400		{object}	ErrorResponse
-//	@failure		404		{object}	ErrorResponse
-//	@failure		500		{object}	ErrorResponse
-//	@router			/api/libraries/{uuid}/books [get]
+//	@success		200			{array}		db.LibraryBook
+//	@failure		400			{object}	ErrorResponse
+//	@failure		404			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/libraries/{library-id}/books [get]
 func ListLibraryBooks(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err    error
@@ -389,13 +389,13 @@ func ListLibraryBooks(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Библиотеки
 //
-//	@param			library-uuid	path		pgtype.UUID	true	"UUID библиотеки"
-//	@param			book-uuid		path		pgtype.UUID	true	"UUID книги"
+//	@param			library-id	path		pgtype.UUID	true	"UUID библиотеки"
+//	@param			book-id		path		pgtype.UUID	true	"UUID книги"
 //
-//	@success		201				{string}	string		""
-//	@failure		400				{object}	ErrorResponse
-//	@failure		500				{object}	ErrorResponse
-//	@router			/api/libraries/{library-uuid}/books/{book-uuid} [delete]
+//	@success		201			{string}	string		""
+//	@failure		400			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/libraries/{library-id}/books/{book-id} [delete]
 func DeleteBookFromLibrary(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err    error
