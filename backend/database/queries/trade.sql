@@ -43,8 +43,10 @@ buyer_confirmed = case
 end,
 completed_at = case
     when
-        owner_confirmed = true and
-        buyer_confirmed = true and
+        (
+            (owner_confirmed = true or owner_id = @userID) and
+            (buyer_confirmed = true or buyer_id = @userID)
+        ) and
         completed_at is null
     then now()
     else completed_at
