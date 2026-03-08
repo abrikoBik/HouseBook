@@ -30,9 +30,23 @@ insert into trades (
 )
 returning *;
 
--- name: CompleteTrade :one
+-- name: ConfirmOwnerTrade :one
 update trades
-set completed_at = now()
+set owner_confirmed = true,
+completed_at = case
+    when buyer_confirmed = true and completed_at is null then now()
+    else completed_at
+end
+where id = @id
+returning *;
+
+-- name: ConfirmBuyerTrade :one
+update trades
+set buyer_confirmed = true,
+completed_at = case
+    when owner_confirmed = true and completed_at is null then now()
+    else completed_at
+end
 where id = @id
 returning *;
 
