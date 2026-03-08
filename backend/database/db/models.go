@@ -21,6 +21,7 @@ type Book struct {
 	PageCount   pgtype.Numeric `db:"page_count" json:"page_count"`
 	Description pgtype.Text    `db:"description" json:"description"`
 	ImageUuid   pgtype.UUID    `db:"image_uuid" json:"image_uuid"`
+	Link        pgtype.Text    `db:"link" json:"link"`
 }
 
 type Comment struct {
@@ -64,4 +65,5 @@ type User struct {
 	Salt      []byte      `db:"salt" json:"-"`
 	Hash      []byte      `db:"hash" json:"-"`
 	ImageUuid pgtype.UUID `db:"image_uuid" json:"image_uuid"`
+	Rating    float32     `db:"rating" json:"rating"`
 }

@@ -16,7 +16,8 @@ create table books (
     page_count numeric,
     description text,
 
-    image_uuid uuid
+    image_uuid uuid,
+    link text
 );
 
 create table users (
@@ -29,7 +30,8 @@ create table users (
     salt bytea not null,
     hash bytea not null,
 
-    image_uuid uuid
+    image_uuid uuid,
+    rating real not null default 5 check (rating >= 1 and rating <= 5)
 );
 
 create table trades (
