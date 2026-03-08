@@ -6,7 +6,7 @@
 [![Scraper CI](https://github.com/e829dce/HouseBook/actions/workflows/scraper.yml/badge.svg)](https://github.com/e829dce/HouseBook/actions/workflows/scraper.yml)
 
 Перед началом работы необходимо создать файл `.env` в корне проекта. Примерно выглядит так:
-```python
+```dotenv
 POSTGRES_DB=database
 POSTGRES_USER=username
 POSTGRES_PASSWORD=password
@@ -14,7 +14,7 @@ POSTGRES_PASSWORD=password
 Также перед первым запуском необходимо запустить миграции.
 
 ## Запуск миграций
-> [!NOTE]
+> [!IMPORTANT]
 > Перед запуском миграций необходимо запустить контейнеры `backend` и `db`.
 
 ```shell
@@ -47,7 +47,7 @@ $ npm run format
 > ```shell
 > $ go tool swag init --parseDependency --parseInternal
 > ```
-> Далее документация будет доступна на `http://localhost/api/docs/`.
+> Далее документация будет доступна по адресу `http://localhost/api/docs/`.
 
 ```shell
 $ docker compose build
