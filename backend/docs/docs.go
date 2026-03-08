@@ -1004,6 +1004,13 @@ const docTemplate = `{
                 "summary": "Добавить книгу",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "UUID библиотеки",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
                         "description": "ID книги",
                         "name": "bookid",
                         "in": "body",
@@ -1486,6 +1493,15 @@ const docTemplate = `{
                     "Пользователи"
                 ],
                 "summary": "Получить пользователя",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID пользователя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1525,6 +1541,15 @@ const docTemplate = `{
                     "Пользователи"
                 ],
                 "summary": "Удалить пользователя",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID пользователя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1559,6 +1584,13 @@ const docTemplate = `{
                 ],
                 "summary": "Изменить пользователя",
                 "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID пользователя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "example": "ivanov@example.com",
                         "description": "Электронная почта пользователя",
@@ -1640,6 +1672,13 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
+                        "description": "ID пользователя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
                         "example": 10,
                         "description": "Лимит количества возвращаемых элементов",
                         "name": "limit",
@@ -1699,6 +1738,13 @@ const docTemplate = `{
                 "summary": "Задать аватар",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "description": "ID пользователя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
                         "type": "file",
                         "description": "Файл аватара (PNG или JPEG)",
                         "name": "image",
@@ -1742,6 +1788,13 @@ const docTemplate = `{
                 ],
                 "summary": "Список библиотек",
                 "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID пользователя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "example": 10,

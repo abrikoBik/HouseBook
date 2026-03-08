@@ -87,10 +87,12 @@ func CreateBook(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Книги
 //
-//	@success		200	{object}	db.Book
-//	@failure		400	{object}	ErrorResponse
-//	@failure		404	{object}	ErrorResponse
-//	@failure		500	{object}	ErrorResponse
+//	@param			uuid	path		pgtype.UUID	true	"UUID книги"
+//
+//	@success		200		{object}	db.Book
+//	@failure		400		{object}	ErrorResponse
+//	@failure		404		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
 //	@router			/api/books/{uuid} [get]
 func GetBook(writer http.ResponseWriter, request *http.Request) {
 	var (
@@ -136,16 +138,17 @@ func GetBook(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Книги
 //
-//	@param			author		body		string	false	"Полное имя автора"				Example(Известный автор)
-//	@param			cover_type	body		string	false	"Тип обложки (твёрдая, мягкая)"	Example(твёрдая)
-//	@param			description	body		string	false	"Описание книги"				Example(Крайне интересная книга об очень интересных вещах)
-//	@param			genre		body		string	false	"Жанр книги"					Example(Роман)
-//	@param			isbn		body		string	false	"ISBN книги"					Example(978-3-16-148410-0)
-//	@param			language	body		string	false	"Язык книги"					Example(Русский)
-//	@param			page_count	body		int		false	"Количество страниц в книге"	Example(100)
-//	@param			publisher	body		string	false	"Издательство книги"			Example(Хороший Издатель)
-//	@param			title		body		string	false	"Название книги"				Example(Интересная книга)
-//	@param			year		body		int		false	"Год выпуска книги"				Example(2026)
+//	@param			uuid		path		pgtype.UUID	true	"UUID книги"
+//	@param			author		body		string		false	"Полное имя автора"				Example(Известный автор)
+//	@param			cover_type	body		string		false	"Тип обложки (твёрдая, мягкая)"	Example(твёрдая)
+//	@param			description	body		string		false	"Описание книги"				Example(Крайне интересная книга об очень интересных вещах)
+//	@param			genre		body		string		false	"Жанр книги"					Example(Роман)
+//	@param			isbn		body		string		false	"ISBN книги"					Example(978-3-16-148410-0)
+//	@param			language	body		string		false	"Язык книги"					Example(Русский)
+//	@param			page_count	body		int			false	"Количество страниц в книге"	Example(100)
+//	@param			publisher	body		string		false	"Издательство книги"			Example(Хороший Издатель)
+//	@param			title		body		string		false	"Название книги"				Example(Интересная книга)
+//	@param			year		body		int			false	"Год выпуска книги"				Example(2026)
 //
 //	@success		200			{object}	db.Book
 //	@failure		400			{object}	ErrorResponse
@@ -201,7 +204,8 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Книги
 //
-//	@param			image	formData	file	true	"Файл обложки (PNG или JPEG)"
+//	@param			uuid	path		pgtype.UUID	true	"UUID книги"
+//	@param			image	formData	file		true	"Файл обложки (PNG или JPEG)"
 //
 //	@success		200		{object}	db.Book
 //	@failure		400		{object}	ErrorResponse
@@ -291,9 +295,11 @@ func SetBookCover(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Книги
 //
-//	@success		200	{string}	string	""
-//	@failure		400	{object}	ErrorResponse
-//	@failure		500	{object}	ErrorResponse
+//	@param			uuid	path		pgtype.UUID	true	"UUID книги"
+//
+//	@success		200		{string}	string		""
+//	@failure		400		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
 //	@router			/api/books/{uuid} [delete]
 func DeleteBook(writer http.ResponseWriter, request *http.Request) {
 	var (

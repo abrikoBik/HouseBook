@@ -80,10 +80,12 @@ func CreateComment(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Отзывы
 //
-//	@success		200	{object}	db.Comment
-//	@failure		400	{object}	ErrorResponse
-//	@failure		404	{object}	ErrorResponse
-//	@failure		500	{object}	ErrorResponse
+//	@param			uuid	path		pgtype.UUID	true	"UUID отзыва"
+//
+//	@success		200		{object}	db.Comment
+//	@failure		400		{object}	ErrorResponse
+//	@failure		404		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
 //	@router			/api/comments/{uuid} [get]
 func GetComment(writer http.ResponseWriter, request *http.Request) {
 	var (
@@ -129,9 +131,11 @@ func GetComment(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Отзывы
 //
-//	@success		200	{object}	string	""
-//	@failure		400	{object}	ErrorResponse
-//	@failure		500	{object}	ErrorResponse
+//	@param			uuid	path		pgtype.UUID	true	"UUID отзыва"
+//
+//	@success		200		{object}	string		""
+//	@failure		400		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
 //	@router			/api/comments/{uuid} [delete]
 func DeleteComment(writer http.ResponseWriter, request *http.Request) {
 	var (
@@ -166,8 +170,9 @@ func DeleteComment(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Отзывы
 //
-//	@param			limit	query		int	false	"Лимит количества возвращаемых элементов"	Example(10)
-//	@param			offset	query		int	false	"Смещение возвращаемых элементов"			Example(5)
+//	@param			uuid	path		pgtype.UUID	true	"UUID книги"
+//	@param			limit	query		int			false	"Лимит количества возвращаемых элементов"	Example(10)
+//	@param			offset	query		int			false	"Смещение возвращаемых элементов"			Example(5)
 //
 //	@success		200		{array}		db.Comment
 //	@failure		400		{object}	ErrorResponse
@@ -226,6 +231,7 @@ func ListBookComments(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Отзывы
 //
+//	@param			id		path		int	true	"ID пользователя"
 //	@param			limit	query		int	false	"Лимит количества возвращаемых элементов"	Example(10)
 //	@param			offset	query		int	false	"Смещение возвращаемых элементов"			Example(5)
 //

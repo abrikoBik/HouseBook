@@ -98,6 +98,8 @@ func CreateUser(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Пользователи
 //
+//	@param			id	path		int	true	"ID пользователя"
+//
 //	@success		200	{object}	db.User
 //	@failure		400	{object}	ErrorResponse
 //	@failure		404	{object}	ErrorResponse
@@ -147,6 +149,7 @@ func GetUser(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Пользователи
 //
+//	@param			id			path		int		true	"ID пользователя"
 //	@param			email		body		string	false	"Электронная почта пользователя"	Example(ivanov@example.com)
 //	@param			login		body		string	false	"Логин пользователя"				Example(ivanov)
 //	@param			name		body		string	false	"ФИО пользователя"					Example(Иванов Иван Иванович)
@@ -206,6 +209,7 @@ func UpdateUser(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Пользователи
 //
+//	@param			id		path		int		true	"ID пользователя"
 //	@param			image	formData	file	true	"Файл аватара (PNG или JPEG)"
 //
 //	@success		200		{object}	db.User
@@ -296,6 +300,8 @@ func SetProfileImage(writer http.ResponseWriter, request *http.Request) {
 //	@produce		json
 //
 //	@tags			Пользователи
+//
+//	@param			id	path		int		true	"ID пользователя"
 //
 //	@success		200	{string}	string	""
 //	@failure		400	{object}	ErrorResponse

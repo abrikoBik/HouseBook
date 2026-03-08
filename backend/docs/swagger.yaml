@@ -800,6 +800,11 @@ paths:
       - application/json
       description: Добавляет книгу в существующую библиотеку.
       parameters:
+      - description: UUID библиотеки
+        in: path
+        name: uuid
+        required: true
+        type: string
       - description: ID книги
         in: body
         name: bookid
@@ -1120,6 +1125,12 @@ paths:
       consumes:
       - text/plain
       description: Удаляет пользователя из базы данных.
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -1142,6 +1153,12 @@ paths:
       consumes:
       - text/plain
       description: Получает информацию о пользователе.
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -1169,6 +1186,11 @@ paths:
       - application/json
       description: Изменяет информацию о существующем пользователе.
       parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
       - description: Электронная почта пользователя
         example: ivanov@example.com
         in: body
@@ -1221,6 +1243,11 @@ paths:
       - text/plain
       description: Возвращает список всех отзывов, написанных пользователем.
       parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
       - description: Лимит количества возвращаемых элементов
         example: 10
         in: query
@@ -1261,6 +1288,11 @@ paths:
       - multipart/form-data
       description: Задаёт аватар пользователя.
       parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
       - description: Файл аватара (PNG или JPEG)
         in: formData
         name: image
@@ -1290,6 +1322,11 @@ paths:
       - text/plain
       description: Возвращает список всех библиотек, принадлежащих пользователю.
       parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
       - description: Лимит количества возвращаемых элементов
         example: 10
         in: query
