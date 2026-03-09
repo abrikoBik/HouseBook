@@ -1,7 +1,7 @@
 import HomeIcon from "../assets/Home_Black.svg";
 import LogoIcon from "../assets/LogoWOText.svg";
 import FavoritesIcon from "../assets/Favourite_Black.svg";
-import LibraryIcon from "../assets/Library_Black.svg"
+import LibraryIcon from "../assets/Library_Black.svg";
 import ExitIcon from "../assets/Exit_Black.svg";
 import "../styles/sideBar.css";
 
@@ -28,7 +28,7 @@ const SideBar = () => {
         </section>
 
         <div id="exit_button">
-            <img src={ExitIcon} alt="exit" />
+          <img src={ExitIcon} alt="exit" />
         </div>
       </nav>
     </aside>

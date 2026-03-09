@@ -37,8 +37,7 @@ const Book = () => {
 
   return (
     <section id="layout">
-      
-      <Header/>
+      <Header />
       <SideBar />
       <section id="bookBody">
         <div id="cover">
@@ -69,21 +68,20 @@ const Book = () => {
                 <h4>Издатель</h4>
                 <div>{book?.publisher}</div>
               </div>
-              {
-              book?.language != null ?
+              {book?.language != null ? (
                 <div id="language">
                   <h4>Язык</h4>
                   <div>{book?.language}</div>
                 </div>
-              :
+              ) : (
                 <></>
-              }
+              )}
 
               <div id="type">
                 <h4>Тип обложки</h4>
                 <div>
                   {/*TODO: склонение страниц, убрать пустые поля*/}
-                  {`${book?.cover_type == null ? '' : book?.cover_type} ${book?.page_count != null ? `, ${book?.page_count} страниц ` : ''} \n ISBN: ${book?.isbn}`}
+                  {`${book?.cover_type == null ? "" : book?.cover_type} ${book?.page_count != null ? `, ${book?.page_count} страниц ` : ""} \n ISBN: ${book?.isbn}`}
                 </div>
               </div>
             </section>
