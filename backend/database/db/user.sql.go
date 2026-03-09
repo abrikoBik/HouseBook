@@ -96,68 +96,6 @@ func (q *Queries) GetUser(ctx context.Context, id pgtype.UUID) (User, error) {
 	return i, err
 }
 
-const setFinishedReadingLibrary = `-- name: SetFinishedReadingLibrary :one
-update users
-set finished_reading_id = $1
-where id = $2
-returning id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id
-`
-
-type SetFinishedReadingLibraryParams struct {
-	Libraryuuid pgtype.UUID `db:"libraryuuid" json:"libraryuuid"`
-	ID          pgtype.UUID `db:"id" json:"id"`
-}
-
-func (q *Queries) SetFinishedReadingLibrary(ctx context.Context, arg SetFinishedReadingLibraryParams) (User, error) {
-	row := q.db.QueryRow(ctx, setFinishedReadingLibrary, arg.Libraryuuid, arg.ID)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.Email,
-		&i.Login,
-		&i.Name,
-		&i.Salt,
-		&i.Hash,
-		&i.ImageUuid,
-		&i.Rating,
-		&i.NowReadingID,
-		&i.FinishedReadingID,
-		&i.TradeReadyID,
-	)
-	return i, err
-}
-
-const setNowReadingLibrary = `-- name: SetNowReadingLibrary :one
-update users
-set now_reading_id = $1
-where id = $2
-returning id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id
-`
-
-type SetNowReadingLibraryParams struct {
-	Libraryuuid pgtype.UUID `db:"libraryuuid" json:"libraryuuid"`
-	ID          pgtype.UUID `db:"id" json:"id"`
-}
-
-func (q *Queries) SetNowReadingLibrary(ctx context.Context, arg SetNowReadingLibraryParams) (User, error) {
-	row := q.db.QueryRow(ctx, setNowReadingLibrary, arg.Libraryuuid, arg.ID)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.Email,
-		&i.Login,
-		&i.Name,
-		&i.Salt,
-		&i.Hash,
-		&i.ImageUuid,
-		&i.Rating,
-		&i.NowReadingID,
-		&i.FinishedReadingID,
-		&i.TradeReadyID,
-	)
-	return i, err
-}
-
 const setProfilePicture = `-- name: SetProfilePicture :one
 update users
 set image_uuid = $1
@@ -189,20 +127,30 @@ func (q *Queries) SetProfilePicture(ctx context.Context, arg SetProfilePicturePa
 	return i, err
 }
 
-const setTradeReadyLibrary = `-- name: SetTradeReadyLibrary :one
+const setUserLibraries = `-- name: SetUserLibraries :one
 update users
-set trade_ready_id = $1
-where id = $2
+set
+    now_reading_id = coalesce($1, now_reading_id),
+    finished_reading_id = coalesce($2, finished_reading_id),
+    trade_ready_id = coalesce($3, trade_ready_id)
+where id = $4
 returning id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id
 `
 
-type SetTradeReadyLibraryParams struct {
-	Libraryuuid pgtype.UUID `db:"libraryuuid" json:"libraryuuid"`
-	ID          pgtype.UUID `db:"id" json:"id"`
+type SetUserLibrariesParams struct {
+	NowReading      pgtype.UUID `db:"@nowReading" json:"@nowReading"`
+	FinishedReading pgtype.UUID `db:"finishedReading" json:"finishedReading"`
+	TradeReady      pgtype.UUID `db:"tradeReady" json:"tradeReady"`
+	ID              pgtype.UUID `db:"id" json:"id"`
 }
 
-func (q *Queries) SetTradeReadyLibrary(ctx context.Context, arg SetTradeReadyLibraryParams) (User, error) {
-	row := q.db.QueryRow(ctx, setTradeReadyLibrary, arg.Libraryuuid, arg.ID)
+func (q *Queries) SetUserLibraries(ctx context.Context, arg SetUserLibrariesParams) (User, error) {
+	row := q.db.QueryRow(ctx, setUserLibraries,
+		arg.NowReading,
+		arg.FinishedReading,
+		arg.TradeReady,
+		arg.ID,
+	)
 	var i User
 	err := row.Scan(
 		&i.ID,

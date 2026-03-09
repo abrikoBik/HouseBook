@@ -38,20 +38,11 @@ set image_uuid = @imageUUID
 where id = @id
 returning *;
 
--- name: SetNowReadingLibrary :one
+-- name: SetUserLibraries :one
 update users
-set now_reading_id = @libraryUUID
-where id = @id
-returning *;
-
--- name: SetFinishedReadingLibrary :one
-update users
-set finished_reading_id = @libraryUUID
-where id = @id
-returning *;
-
--- name: SetTradeReadyLibrary :one
-update users
-set trade_ready_id = @libraryUUID
+set
+    now_reading_id = coalesce(sqlc.narg('@nowReading'), now_reading_id),
+    finished_reading_id = coalesce(sqlc.narg('finishedReading'), finished_reading_id),
+    trade_ready_id = coalesce(sqlc.narg('tradeReady'), trade_ready_id)
 where id = @id
 returning *;
