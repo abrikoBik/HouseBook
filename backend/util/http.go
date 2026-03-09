@@ -11,16 +11,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-// PathID adds basic error checking, as well as integer conversion for the respective URL parameter.
-func PathID(name string, request *http.Request) (int64, error) {
-	s := chi.URLParam(request, name)
-	if s == "" {
-		return 0, errors.New("id not provided")
-	}
-	id, err := strconv.ParseInt(s, 10, 64)
-	return id, err
-}
-
 // PathUUID adds basic error checking, as well as pgtype.UUID conversion for the respective URL parameter.
 func PathUUID(name string, request *http.Request) (result pgtype.UUID, err error) {
 	s := chi.URLParam(request, name)

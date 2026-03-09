@@ -7,31 +7,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"strconv"
 	"testing"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 )
-
-func TestPathID(t *testing.T) {
-	wanted := 1
-
-	w := httptest.NewRecorder()
-	r := httptest.NewRequest("GET", "/{id}", nil)
-	rctx := chi.NewRouteContext()
-	rctx.URLParams.Add(consts.GenericIDPathValue, strconv.Itoa(wanted))
-	r = r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, rctx))
-	func(w http.ResponseWriter, r *http.Request) {
-		id, err := PathID(consts.GenericIDPathValue, r)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if id != int64(wanted) {
-			t.Errorf("PathID returned %d; wanted %d", id, wanted)
-		}
-	}(w, r)
-}
 
 func TestPathUUID(t *testing.T) {
 	var wanted pgtype.UUID

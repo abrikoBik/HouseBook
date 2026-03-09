@@ -1191,21 +1191,21 @@ const docTemplate = `{
                 "summary": "Создать сделку",
                 "parameters": [
                     {
-                        "description": "ID инициатора сделки",
+                        "description": "UUID инициатора сделки",
                         "name": "ownerid",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "string"
                         }
                     },
                     {
-                        "description": "ID другой стороны сделки",
+                        "description": "UUID другой стороны сделки",
                         "name": "buyerid",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "string"
                         }
                     }
                 ],
@@ -1318,12 +1318,12 @@ const docTemplate = `{
                 "summary": "Завершить сделку",
                 "parameters": [
                     {
-                        "description": "ID пользователя",
+                        "description": "UUID пользователя",
                         "name": "userid",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "string"
                         }
                     }
                 ],
@@ -1424,12 +1424,12 @@ const docTemplate = `{
                 "summary": "Добавить книгу",
                 "parameters": [
                     {
-                        "description": "ID владельца книги",
+                        "description": "UUID владельца книги",
                         "name": "ownerid",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "string"
                         }
                     },
                     {
@@ -1521,13 +1521,6 @@ const docTemplate = `{
                 ],
                 "summary": "Список сделок пользователя",
                 "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID пользователя",
-                        "name": "user-id",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "type": "integer",
                         "example": 10,
@@ -1670,15 +1663,6 @@ const docTemplate = `{
                     "Пользователи"
                 ],
                 "summary": "Получить пользователя",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID пользователя",
-                        "name": "user-id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1718,15 +1702,6 @@ const docTemplate = `{
                     "Пользователи"
                 ],
                 "summary": "Удалить пользователя",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID пользователя",
-                        "name": "user-id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1761,13 +1736,6 @@ const docTemplate = `{
                 ],
                 "summary": "Изменить пользователя",
                 "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID пользователя",
-                        "name": "user-id",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "example": "ivanov@example.com",
                         "description": "Электронная почта пользователя",
@@ -1850,13 +1818,6 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID пользователя",
-                        "name": "user-id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
                         "example": 10,
                         "description": "Лимит количества возвращаемых элементов",
                         "name": "limit",
@@ -1916,13 +1877,6 @@ const docTemplate = `{
                 "summary": "Задать аватар",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "ID пользователя",
-                        "name": "user-id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "type": "file",
                         "description": "Файл аватара (PNG или JPEG)",
                         "name": "image",
@@ -1967,13 +1921,6 @@ const docTemplate = `{
                 ],
                 "summary": "Список библиотек пользователя",
                 "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID пользователя",
-                        "name": "user-id",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "type": "integer",
                         "example": 10,
@@ -2082,7 +2029,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user_id": {
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
@@ -2096,7 +2043,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user_id": {
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
@@ -2121,7 +2068,7 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "buyer_id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "completed_at": {
                     "$ref": "#/definitions/pgtype.Timestamp"
@@ -2136,7 +2083,7 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "owner_id": {
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
@@ -2147,7 +2094,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "owner_id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "trade_id": {
                     "type": "string"
@@ -2164,7 +2111,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "image_uuid": {
                     "type": "string"

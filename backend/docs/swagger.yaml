@@ -39,7 +39,7 @@ definitions:
       id:
         type: string
       user_id:
-        type: integer
+        type: string
     type: object
   db.Library:
     properties:
@@ -48,7 +48,7 @@ definitions:
       name:
         type: string
       user_id:
-        type: integer
+        type: string
     type: object
   db.LibraryBook:
     properties:
@@ -64,7 +64,7 @@ definitions:
       buyer_confirmed:
         type: boolean
       buyer_id:
-        type: integer
+        type: string
       completed_at:
         $ref: '#/definitions/pgtype.Timestamp'
       created_at:
@@ -74,14 +74,14 @@ definitions:
       owner_confirmed:
         type: boolean
       owner_id:
-        type: integer
+        type: string
     type: object
   db.TradeBook:
     properties:
       book_id:
         type: string
       owner_id:
-        type: integer
+        type: string
       trade_id:
         type: string
     type: object
@@ -92,7 +92,7 @@ definitions:
       finished_reading_id:
         type: string
       id:
-        type: integer
+        type: string
       image_uuid:
         type: string
       login:
@@ -940,18 +940,18 @@ paths:
       - application/json
       description: Создаёт новую сделку.
       parameters:
-      - description: ID инициатора сделки
+      - description: UUID инициатора сделки
         in: body
         name: ownerid
         required: true
         schema:
-          type: integer
-      - description: ID другой стороны сделки
+          type: string
+      - description: UUID другой стороны сделки
         in: body
         name: buyerid
         required: true
         schema:
-          type: integer
+          type: string
       produces:
       - application/json
       responses:
@@ -1024,12 +1024,12 @@ paths:
       - application/json
       description: Помечает сделку завершённой со стороны пользователя.
       parameters:
-      - description: ID пользователя
+      - description: UUID пользователя
         in: body
         name: userid
         required: true
         schema:
-          type: integer
+          type: string
       produces:
       - application/json
       responses:
@@ -1094,12 +1094,12 @@ paths:
       - application/json
       description: Добавляет книгу в существующую сделку.
       parameters:
-      - description: ID владельца книги
+      - description: UUID владельца книги
         in: body
         name: ownerid
         required: true
         schema:
-          type: integer
+          type: string
       - description: ID книги
         in: body
         name: bookid
@@ -1159,11 +1159,6 @@ paths:
       - text/plain
       description: Возвращает список сделок пользователя.
       parameters:
-      - description: ID пользователя
-        in: path
-        name: user-id
-        required: true
-        type: integer
       - description: Лимит количества возвращаемых элементов
         example: 10
         in: query
@@ -1260,12 +1255,6 @@ paths:
       consumes:
       - text/plain
       description: Удаляет пользователя из базы данных.
-      parameters:
-      - description: ID пользователя
-        in: path
-        name: user-id
-        required: true
-        type: integer
       produces:
       - application/json
       responses:
@@ -1288,12 +1277,6 @@ paths:
       consumes:
       - text/plain
       description: Получает информацию о пользователе.
-      parameters:
-      - description: ID пользователя
-        in: path
-        name: user-id
-        required: true
-        type: integer
       produces:
       - application/json
       responses:
@@ -1321,11 +1304,6 @@ paths:
       - application/json
       description: Изменяет информацию о существующем пользователе.
       parameters:
-      - description: ID пользователя
-        in: path
-        name: user-id
-        required: true
-        type: integer
       - description: Электронная почта пользователя
         example: ivanov@example.com
         in: body
@@ -1378,11 +1356,6 @@ paths:
       - text/plain
       description: Возвращает список всех отзывов, написанных пользователем.
       parameters:
-      - description: ID пользователя
-        in: path
-        name: user-id
-        required: true
-        type: integer
       - description: Лимит количества возвращаемых элементов
         example: 10
         in: query
@@ -1424,11 +1397,6 @@ paths:
       - multipart/form-data
       description: Задаёт аватар пользователя.
       parameters:
-      - description: ID пользователя
-        in: path
-        name: user-id
-        required: true
-        type: integer
       - description: Файл аватара (PNG или JPEG)
         in: formData
         name: image
@@ -1458,11 +1426,6 @@ paths:
       - text/plain
       description: Возвращает список всех библиотек, принадлежащих пользователю.
       parameters:
-      - description: ID пользователя
-        in: path
-        name: user-id
-        required: true
-        type: integer
       - description: Лимит количества возвращаемых элементов
         example: 10
         in: query

@@ -46,8 +46,8 @@ returning id, user_id, name
 `
 
 type CreateLibraryParams struct {
-	Userid int64  `db:"userid" json:"userid"`
-	Name   string `db:"name" json:"name"`
+	Userid pgtype.UUID `db:"userid" json:"userid"`
+	Name   string      `db:"name" json:"name"`
 }
 
 func (q *Queries) CreateLibrary(ctx context.Context, arg CreateLibraryParams) (Library, error) {
@@ -85,16 +85,33 @@ func (q *Queries) DeleteLibrary(ctx context.Context, id pgtype.UUID) error {
 }
 
 const getLibrary = `-- name: GetLibrary :one
-select libraries.id, libraries.user_id, libraries.name from libraries
+select
+    libraries.id, libraries.user_id, libraries.name,
+    count(library_books.book_id)::int as book_count
+from libraries
 join users on libraries.user_id = users.id
+left join library_books on libraries.id = library_books.library_id
 where libraries.id = $1
+group by libraries.id
 limit 1
 `
 
-func (q *Queries) GetLibrary(ctx context.Context, id pgtype.UUID) (Library, error) {
+type GetLibraryRow struct {
+	ID        pgtype.UUID `db:"id" json:"id"`
+	UserID    pgtype.UUID `db:"user_id" json:"user_id"`
+	Name      string      `db:"name" json:"name"`
+	BookCount int32       `db:"book_count" json:"book_count"`
+}
+
+func (q *Queries) GetLibrary(ctx context.Context, id pgtype.UUID) (GetLibraryRow, error) {
 	row := q.db.QueryRow(ctx, getLibrary, id)
-	var i Library
-	err := row.Scan(&i.ID, &i.UserID, &i.Name)
+	var i GetLibraryRow
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Name,
+		&i.BookCount,
+	)
 	return i, err
 }
 
@@ -173,9 +190,9 @@ offset $2
 `
 
 type ListUserLibrariesParams struct {
-	Limit  int32 `db:"limit" json:"limit"`
-	Offset int32 `db:"offset" json:"offset"`
-	Userid int64 `db:"userid" json:"userid"`
+	Limit  int32       `db:"limit" json:"limit"`
+	Offset int32       `db:"offset" json:"offset"`
+	Userid pgtype.UUID `db:"userid" json:"userid"`
 }
 
 func (q *Queries) ListUserLibraries(ctx context.Context, arg ListUserLibrariesParams) ([]Library, error) {

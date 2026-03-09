@@ -1,4 +1,3 @@
-create extension if not exists "uuid-ossp";
 alter table books add image_uuid uuid;
 alter table users add image_uuid uuid;
 

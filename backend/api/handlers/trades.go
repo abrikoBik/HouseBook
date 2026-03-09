@@ -23,8 +23,8 @@ import (
 //
 //	@tags			Сделки
 //
-//	@param			ownerid	body		int	true	"ID инициатора сделки"
-//	@param			buyerid	body		int	true	"ID другой стороны сделки"
+//	@param			ownerid	body		pgtype.UUID	true	"UUID инициатора сделки"
+//	@param			buyerid	body		pgtype.UUID	true	"UUID другой стороны сделки"
 //
 //	@success		201		{object}	db.Trade
 //	@failure		400		{object}	ErrorResponse
@@ -212,9 +212,9 @@ func ListTrades(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Сделки,Пользователи
 //
-//	@param			user-id	path		int	true	"ID пользователя"
-//	@param			limit	query		int	false	"Лимит количества возвращаемых элементов"	Example(10)
-//	@param			offset	query		int	false	"Смещение возвращаемых элементов"			Example(5)
+//	@param			user-id	path		pgtype.UUID	true	"UUID пользователя"
+//	@param			limit	query		int			false	"Лимит количества возвращаемых элементов"	Example(10)
+//	@param			offset	query		int			false	"Смещение возвращаемых элементов"			Example(5)
 //
 //	@success		200		{array}		db.Trade
 //	@failure		400		{object}	ErrorResponse
@@ -230,8 +230,7 @@ func ListUserTrades(writer http.ResponseWriter, request *http.Request) {
 		r      = render.New()
 		q      = db.New(database.Pool)
 	)
-	params.Userid, err = util.PathID(consts.UserIDPathValue, request)
-	if err != nil {
+	if params.Userid, err = util.PathUUID(consts.UserIDPathValue, request); err != nil {
 		RenderError(r, writer, ErrorBadID(err, consts.UserIDPathValue))
 		return
 	}
@@ -255,7 +254,7 @@ func ListUserTrades(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	Logger.Info().
-		Int64("id", params.Userid).
+		Str("id", params.Userid.String()).
 		Int("len(trades)", len(trades)).
 		Msg("user trades listed")
 
@@ -276,7 +275,7 @@ func ListUserTrades(writer http.ResponseWriter, request *http.Request) {
 //	@tags			Сделки,Книги
 //
 //	@param			trade-id	path		pgtype.UUID	true	"UUID сделки"
-//	@param			ownerid		body		int			true	"ID владельца книги"
+//	@param			ownerid		body		pgtype.UUID	true	"UUID владельца книги"
 //	@param			bookid		body		pgtype.UUID	true	"ID книги"
 //
 //	@success		201			{string}	string		""
@@ -449,7 +448,7 @@ func DeleteTradeBook(writer http.ResponseWriter, request *http.Request) {
 //	@tags			Сделки
 //
 //	@param			trade-id	path		pgtype.UUID	true	"UUID сделки"
-//	@param			userid		body		int			true	"ID пользователя"
+//	@param			userid		body		pgtype.UUID	true	"UUID пользователя"
 //
 //	@success		200			{object}	db.Trade
 //	@failure		400			{object}	ErrorResponse

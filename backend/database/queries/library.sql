@@ -1,7 +1,12 @@
 -- name: GetLibrary :one
-select libraries.* from libraries
+select
+    libraries.*,
+    count(library_books.book_id)::int as book_count
+from libraries
 join users on libraries.user_id = users.id
+left join library_books on libraries.id = library_books.library_id
 where libraries.id = @id
+group by libraries.id
 limit 1;
 
 -- name: ListLibraryBooks :many
