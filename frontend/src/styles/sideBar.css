@@ -1,0 +1,33 @@
+#side_menu {
+  position: fixed;
+  padding-left: 30px;
+  padding-right: 25px;
+
+  height: 92.5%;
+
+  margin-top: 2%;
+
+  box-shadow: 4px 0px #d9d7cc;
+
+  & > nav {
+    height: 100%;
+  }
+}
+
+#menu_items {
+  margin-top: 200px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 15%;
+  align-items: center;
+  height: 300px;
+}
+
+#exit_button {
+  display: flex;
+  align-self: center;
+  justify-content: center;
+
+  margin-top: 30vh;
+}

@@ -1,8 +1,9 @@
-import HomeIcon from "../assets/Home.png";
-import LogoIcon from "../assets/Logo.png";
-import FavoritesIcon from "../assets/Favorites.png";
-import ExitIcon from "../assets/Exit.png";
-import "../styles/book.css";
+import HomeIcon from "../assets/Home_Black.svg";
+import LogoIcon from "../assets/LogoWOText.svg";
+import FavoritesIcon from "../assets/Favourite_Black.svg";
+import LibraryIcon from "../assets/Library_Black.svg";
+import ExitIcon from "../assets/Exit_Black.svg";
+import "../styles/sideBar.css";
 
 const SideBar = () => {
   return (
@@ -12,15 +13,21 @@ const SideBar = () => {
           <img src={LogoIcon} alt="logo" />
         </div>
 
-        <div className="menu_item">
-          <img src={HomeIcon} alt="home" />
-        </div>
+        <section id="menu_items">
+          <div>
+            <img src={HomeIcon} alt="home" />
+          </div>
 
-        <div className="menu_item">
-          <img src={FavoritesIcon} alt="favorites" />
-        </div>
+          <div>
+            <img src={FavoritesIcon} alt="favorites" />
+          </div>
 
-        <div className="menu_item">
+          <div>
+            <img src={LibraryIcon} alt="favorites" />
+          </div>
+        </section>
+
+        <div id="exit_button">
           <img src={ExitIcon} alt="exit" />
         </div>
       </nav>

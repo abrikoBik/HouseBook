@@ -1,0 +1,43 @@
+#top_menu {
+  position: absolute;
+  width: 100vw;
+  top: 0;
+  left: 0;
+}
+
+#top_actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+
+  margin-top: 10px;
+  margin-right: 40px;
+}
+
+#icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 100%;
+  background-color: #d9d9d9;
+}
+
+#profile {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  & > #name {
+    margin-left: 30px;
+    font-weight: bold;
+    font-size: 18px;
+  }
+}
+
+#notifications {
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+
+  margin-left: 50px;
+}
