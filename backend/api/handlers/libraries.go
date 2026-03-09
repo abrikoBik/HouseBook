@@ -211,9 +211,9 @@ func ListLibraries(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Библиотеки,Пользователи
 //
-//	@param			user-id	path		int	true	"ID пользователя"
-//	@param			limit	query		int	false	"Лимит количества возвращаемых элементов"	Example(10)
-//	@param			offset	query		int	false	"Смещение возвращаемых элементов"			Example(5)
+//	@param			user-id	path		pgtype.UUID	true	"UUID пользователя"
+//	@param			limit	query		int			false	"Лимит количества возвращаемых элементов"	Example(10)
+//	@param			offset	query		int			false	"Смещение возвращаемых элементов"			Example(5)
 //
 //	@success		200		{array}		db.Library
 //	@failure		400		{object}	ErrorResponse
