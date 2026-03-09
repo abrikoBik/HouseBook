@@ -6,6 +6,6 @@ const (
 	Port     = 3001
 	// About 128MB.
 	MaxSize     = 1 << 27
-	Key         = "file"
+	Key         = "image"
 	StoragePath = "/var/lib/storage"
 )

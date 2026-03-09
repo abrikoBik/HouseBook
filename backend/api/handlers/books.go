@@ -87,20 +87,22 @@ func CreateBook(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Книги
 //
-//	@success		200	{object}	db.Book
-//	@failure		400	{object}	ErrorResponse
-//	@failure		404	{object}	ErrorResponse
-//	@failure		500	{object}	ErrorResponse
-//	@router			/api/books/{uuid} [get]
+//	@param			book-id	path		pgtype.UUID	true	"UUID книги"
+//
+//	@success		200		{object}	db.Book
+//	@failure		400		{object}	ErrorResponse
+//	@failure		404		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
+//	@router			/api/books/{book-id} [get]
 func GetBook(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err error
 		r   = render.New()
 		q   = db.New(database.Pool)
 	)
-	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
+	uuid, err := util.PathUUID(consts.BookIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
 		return
 	}
 
@@ -136,22 +138,23 @@ func GetBook(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Книги
 //
-//	@param			author		body		string	false	"Полное имя автора"				Example(Известный автор)
-//	@param			cover_type	body		string	false	"Тип обложки (твёрдая, мягкая)"	Example(твёрдая)
-//	@param			description	body		string	false	"Описание книги"				Example(Крайне интересная книга об очень интересных вещах)
-//	@param			genre		body		string	false	"Жанр книги"					Example(Роман)
-//	@param			isbn		body		string	false	"ISBN книги"					Example(978-3-16-148410-0)
-//	@param			language	body		string	false	"Язык книги"					Example(Русский)
-//	@param			page_count	body		int		false	"Количество страниц в книге"	Example(100)
-//	@param			publisher	body		string	false	"Издательство книги"			Example(Хороший Издатель)
-//	@param			title		body		string	false	"Название книги"				Example(Интересная книга)
-//	@param			year		body		int		false	"Год выпуска книги"				Example(2026)
+//	@param			book-id		path		pgtype.UUID	true	"UUID книги"
+//	@param			author		body		string		false	"Полное имя автора"				Example(Известный автор)
+//	@param			cover_type	body		string		false	"Тип обложки (твёрдая, мягкая)"	Example(твёрдая)
+//	@param			description	body		string		false	"Описание книги"				Example(Крайне интересная книга об очень интересных вещах)
+//	@param			genre		body		string		false	"Жанр книги"					Example(Роман)
+//	@param			isbn		body		string		false	"ISBN книги"					Example(978-3-16-148410-0)
+//	@param			language	body		string		false	"Язык книги"					Example(Русский)
+//	@param			page_count	body		int			false	"Количество страниц в книге"	Example(100)
+//	@param			publisher	body		string		false	"Издательство книги"			Example(Хороший Издатель)
+//	@param			title		body		string		false	"Название книги"				Example(Интересная книга)
+//	@param			year		body		int			false	"Год выпуска книги"				Example(2026)
 //
 //	@success		200			{object}	db.Book
 //	@failure		400			{object}	ErrorResponse
 //	@failure		409			{object}	ErrorResponse
 //	@failure		500			{object}	ErrorResponse
-//	@router			/api/books/{uuid} [patch]
+//	@router			/api/books/{book-id} [patch]
 func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err  error
@@ -159,9 +162,9 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 		r    = render.New()
 		q    = db.New(database.Pool)
 	)
-	data.ID, err = util.PathUUID(consts.UUIDPathValue, request)
+	data.ID, err = util.PathUUID(consts.BookIDPathValue, request)
 	if err = errors.Join(err, json.NewDecoder(request.Body).Decode(&data)); err != nil {
-		RenderError(r, writer, ErrorBadJSON(err))
+		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
 		return
 	}
 
@@ -192,6 +195,97 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+// SetBookCover godoc
+//
+//	@summary		Задать обложку
+//	@description	Задаёт обложку для книги.
+//	@accept			mpfd
+//	@produce		json
+//
+//	@tags			Книги
+//
+//	@param			book-id	path		pgtype.UUID	true	"UUID книги"
+//	@param			image	formData	file		true	"Файл обложки (PNG или JPEG)"
+//
+//	@success		200		{object}	db.Book
+//	@failure		400		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
+//	@router			/api/books/{book-id}/cover [put]
+func SetBookCover(writer http.ResponseWriter, request *http.Request) {
+	var (
+		err  error
+		data db.SetCoverImageParams
+		r    = render.New()
+		q    = db.New(database.Pool)
+	)
+
+	if data.ID, err = util.PathUUID(consts.BookIDPathValue, request); err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
+		return
+	}
+
+	var client http.Client
+	req, err := http.NewRequest("POST", consts.StorageURL, nil)
+	if err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+	req.Body = request.Body
+	req.Header.Set("Content-Type", request.Header.Get("Content-Type"))
+	response, err := client.Do(req)
+	if err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+	defer response.Body.Close()
+
+	var errored bool
+	switch response.StatusCode {
+	case http.StatusCreated:
+		idJSON := StorageIDResponse{}
+		if err := json.NewDecoder(response.Body).Decode(&idJSON); err != nil {
+			RenderError(r, writer, ErrorGeneric(err))
+			errored = true
+			return
+		}
+		if err := data.Imageuuid.Scan(idJSON.ID); err != nil {
+			RenderError(r, writer, ErrorGeneric(err))
+			errored = true
+		}
+	default:
+		errorJSON := StorageErrorResponse{}
+		if err := json.NewDecoder(response.Body).Decode(&errorJSON); err != nil {
+			RenderError(r, writer, ErrorGeneric(err))
+			errored = true
+			return
+		}
+		RenderError(r, writer, ErrorImage(errorJSON.Error))
+		errored = true
+	}
+	if errored {
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	book, err := q.SetCoverImage(database.Context, data)
+	if err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+	Logger.Info().
+		Str("id", book.ID.String()).
+		Str("imageUUID", book.ImageUuid.String()).
+		Msg("book cover set")
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(book); err != nil {
+		RenderError(r, writer, ErrorRender(err))
+		return
+	}
+}
+
 // DeleteBook godoc
 //
 //	@summary		Удалить книгу
@@ -201,19 +295,21 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Книги
 //
-//	@success		200	{string}	string	""
-//	@failure		400	{object}	ErrorResponse
-//	@failure		500	{object}	ErrorResponse
-//	@router			/api/books/{uuid} [delete]
+//	@param			book-id	path		pgtype.UUID	true	"UUID книги"
+//
+//	@success		200		{string}	string		""
+//	@failure		400		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
+//	@router			/api/books/{book-id} [delete]
 func DeleteBook(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err error
 		r   = render.New()
 		q   = db.New(database.Pool)
 	)
-	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
+	uuid, err := util.PathUUID(consts.BookIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
 		return
 	}
 
