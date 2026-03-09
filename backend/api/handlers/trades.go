@@ -23,12 +23,12 @@ import (
 //
 //	@tags			Сделки
 //
-//	@param			ownerid		body		int	true	"ID инициатора сделки"
-//	@param			buyer_id	body		int	true	"ID другой стороны сделки"
+//	@param			ownerid	body		pgtype.UUID	true	"UUID инициатора сделки"
+//	@param			buyerid	body		pgtype.UUID	true	"UUID другой стороны сделки"
 //
-//	@success		201			{object}	db.Trade
-//	@failure		400			{object}	ErrorResponse
-//	@failure		500			{object}	ErrorResponse
+//	@success		201		{object}	db.Trade
+//	@failure		400		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
 //	@router			/api/trades [post]
 func CreateTrade(writer http.ResponseWriter, request *http.Request) {
 	var (
@@ -68,20 +68,22 @@ func CreateTrade(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Сделки
 //
-//	@success		200	{object}	db.Trade
-//	@failure		400	{object}	ErrorResponse
-//	@failure		404	{object}	ErrorResponse
-//	@failure		500	{object}	ErrorResponse
-//	@router			/api/trades/{uuid} [get]
+//	@param			trade-id	path		pgtype.UUID	true	"UUID сделки"
+//
+//	@success		200			{object}	db.Trade
+//	@failure		400			{object}	ErrorResponse
+//	@failure		404			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/trades/{trade-id} [get]
 func GetTrade(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err error
 		r   = render.New()
 		q   = db.New(database.Pool)
 	)
-	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
+	uuid, err := util.PathUUID(consts.TradeIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.TradeIDPathValue))
 		return
 	}
 
@@ -117,19 +119,21 @@ func GetTrade(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Сделки
 //
-//	@success		200	{string}	string	""
-//	@failure		400	{object}	ErrorResponse
-//	@failure		500	{object}	ErrorResponse
-//	@router			/api/trades/{uuid} [delete]
+//	@param			trade-id	path		pgtype.UUID	true	"UUID сделки"
+//
+//	@success		200			{string}	string		""
+//	@failure		400			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/trades/{trade-id} [delete]
 func DeleteTrade(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err error
 		r   = render.New()
 		q   = db.New(database.Pool)
 	)
-	uuid, err := util.PathUUID(consts.UUIDPathValue, request)
+	uuid, err := util.PathUUID(consts.TradeIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.TradeIDPathValue))
 		return
 	}
 
@@ -163,7 +167,6 @@ func DeleteTrade(writer http.ResponseWriter, request *http.Request) {
 //	@failure		500		{object}	ErrorResponse
 //	@router			/api/trades [get]
 func ListTrades(writer http.ResponseWriter, request *http.Request) {
-	// TODO: allow listing a specific user's trades
 	var (
 		err    error
 		params db.ListTradesParams
@@ -200,6 +203,68 @@ func ListTrades(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+// ListUserTrades godoc
+//
+//	@summary		Список сделок пользователя
+//	@description	Возвращает список сделок пользователя.
+//	@accept			plain
+//	@produce		json
+//
+//	@tags			Сделки,Пользователи
+//
+//	@param			user-id	path		pgtype.UUID	true	"UUID пользователя"
+//	@param			limit	query		int			false	"Лимит количества возвращаемых элементов"	Example(10)
+//	@param			offset	query		int			false	"Смещение возвращаемых элементов"			Example(5)
+//
+//	@success		200		{array}		db.Trade
+//	@failure		400		{object}	ErrorResponse
+//	@failure		404		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
+//	@router			/api/user/{user-id}/trades [get]
+func ListUserTrades(writer http.ResponseWriter, request *http.Request) {
+	// TODO: move function to users
+	var (
+		err    error
+		params db.ListUserTradesParams
+		query  = request.URL.Query()
+		r      = render.New()
+		q      = db.New(database.Pool)
+	)
+	if params.Userid, err = util.PathUUID(consts.UserIDPathValue, request); err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.UserIDPathValue))
+		return
+	}
+	if params.Limit, params.Offset, err = util.GetSearchPagination(query); err != nil {
+		RenderError(r, writer, ErrorBadPaginationParams(err))
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	trades, err := q.ListUserTrades(database.Context, params)
+	if err != nil {
+		var toWrite ErrorResponse
+		if errors.Is(err, pgx.ErrNoRows) {
+			toWrite = ErrorNotFound(err)
+		} else {
+			toWrite = ErrorGeneric(err)
+		}
+		RenderError(r, writer, toWrite)
+		return
+	}
+	Logger.Info().
+		Str("id", params.Userid.String()).
+		Int("len(trades)", len(trades)).
+		Msg("user trades listed")
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(trades); err != nil {
+		RenderError(r, writer, ErrorRender(err))
+		return
+	}
+}
+
 // AddBookToTrade godoc
 //
 //	@summary		Добавить книгу
@@ -207,16 +272,17 @@ func ListTrades(writer http.ResponseWriter, request *http.Request) {
 //	@accept			json
 //	@produce		json
 //
-//	@tags			Сделки
+//	@tags			Сделки,Книги
 //
-//	@param			ownerid	body		int			true	"ID владельца книги"
-//	@param			bookid	body		pgtype.UUID	true	"ID книги"
+//	@param			trade-id	path		pgtype.UUID	true	"UUID сделки"
+//	@param			ownerid		body		pgtype.UUID	true	"UUID владельца книги"
+//	@param			bookid		body		pgtype.UUID	true	"ID книги"
 //
-//	@success		201		{string}	string		""
-//	@failure		400		{object}	ErrorResponse
-//	@failure		409		{object}	ErrorResponse
-//	@failure		500		{object}	ErrorResponse
-//	@router			/api/trades/{uuid}/books [patch]
+//	@success		201			{string}	string		""
+//	@failure		400			{object}	ErrorResponse
+//	@failure		409			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/trades/{trade-id}/books [patch]
 func AddBookToTrade(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err  error
@@ -224,9 +290,9 @@ func AddBookToTrade(writer http.ResponseWriter, request *http.Request) {
 		r    = render.New()
 		q    = db.New(database.Pool)
 	)
-	tradeID, err := util.PathUUID(consts.UUIDPathValue, request)
+	tradeID, err := util.PathUUID(consts.TradeIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.TradeIDPathValue))
 		return
 	}
 	if err := json.NewDecoder(request.Body).Decode(&data); err != nil {
@@ -267,16 +333,17 @@ func AddBookToTrade(writer http.ResponseWriter, request *http.Request) {
 //	@accept			plain
 //	@produce		json
 //
-//	@tags			Сделки
+//	@tags			Сделки,Книги
 //
-//	@param			limit	query		int	false	"Лимит количества возвращаемых элементов"	Example(10)
-//	@param			offset	query		int	false	"Смещение возвращаемых элементов"			Example(5)
+//	@param			trade-id	path		pgtype.UUID	true	"UUID сделки"
+//	@param			limit		query		int			false	"Лимит количества возвращаемых элементов"	Example(10)
+//	@param			offset		query		int			false	"Смещение возвращаемых элементов"			Example(5)
 //
-//	@success		200		{array}		db.TradeBook
-//	@failure		400		{object}	ErrorResponse
-//	@failure		404		{object}	ErrorResponse
-//	@failure		500		{object}	ErrorResponse
-//	@router			/api/trades/{uuid}/books [get]
+//	@success		200			{array}		db.TradeBook
+//	@failure		400			{object}	ErrorResponse
+//	@failure		404			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/trades/{trade-id}/books [get]
 func ListTradeBooks(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err    error
@@ -290,9 +357,9 @@ func ListTradeBooks(writer http.ResponseWriter, request *http.Request) {
 		RenderError(r, writer, ErrorBadPaginationParams(err))
 		return
 	}
-	tradeID, err := util.PathUUID(consts.UUIDPathValue, request)
+	tradeID, err := util.PathUUID(consts.TradeIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.UUIDPathValue))
+		RenderError(r, writer, ErrorBadID(err, consts.TradeIDPathValue))
 		return
 	}
 	params.ID = tradeID
@@ -327,12 +394,15 @@ func ListTradeBooks(writer http.ResponseWriter, request *http.Request) {
 //	@accept			json
 //	@produce		json
 //
-//	@tags			Сделки
+//	@tags			Сделки,Книги
 //
-//	@success		201	{string}	string	""
-//	@failure		400	{object}	ErrorResponse
-//	@failure		500	{object}	ErrorResponse
-//	@router			/api/trades/{trade-uuid}/books/{book-uuid} [delete]
+//	@param			library-id	path		pgtype.UUID	true	"UUID библиотеки"
+//	@param			book-id		path		pgtype.UUID	true	"UUID книги"
+//
+//	@success		201			{string}	string		""
+//	@failure		400			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/trades/{trade-id}/books/{book-id} [delete]
 func DeleteTradeBook(writer http.ResponseWriter, request *http.Request) {
 	var (
 		err    error
@@ -340,15 +410,15 @@ func DeleteTradeBook(writer http.ResponseWriter, request *http.Request) {
 		r      = render.New()
 		q      = db.New(database.Pool)
 	)
-	tradeID, err := util.PathUUID("trade-uuid", request)
+	tradeID, err := util.PathUUID(consts.TradeIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, "trade-uuid"))
+		RenderError(r, writer, ErrorBadID(err, consts.TradeIDPathValue))
 		return
 	}
 	params.TradeID = tradeID
-	bookID, err := util.PathUUID("book-uuid", request)
+	bookID, err := util.PathUUID(consts.BookIDPathValue, request)
 	if err != nil {
-		RenderError(r, writer, ErrorBadID(err, "book-uuid"))
+		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
 		return
 	}
 	params.BookID = bookID
@@ -366,4 +436,59 @@ func DeleteTradeBook(writer http.ResponseWriter, request *http.Request) {
 		Msg("book deleted from trade")
 
 	writer.WriteHeader(http.StatusOK)
+}
+
+// ConfirmTrade godoc
+//
+//	@summary		Завершить сделку
+//	@description	Помечает сделку завершённой со стороны пользователя.
+//	@accept			json
+//	@produce		json
+//
+//	@tags			Сделки
+//
+//	@param			trade-id	path		pgtype.UUID	true	"UUID сделки"
+//	@param			userid		body		pgtype.UUID	true	"UUID пользователя"
+//
+//	@success		200			{object}	db.Trade
+//	@failure		400			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/trades/{trade-id} [patch]
+func ConfirmTrade(writer http.ResponseWriter, request *http.Request) {
+	var (
+		err  error
+		data db.ConfirmTradeParams
+		r    = render.New()
+		q    = db.New(database.Pool)
+	)
+	if err := json.NewDecoder(request.Body).Decode(&data); err != nil {
+		RenderError(r, writer, ErrorBadJSON(err))
+		return
+	}
+	data.ID, err = util.PathUUID(consts.TradeIDPathValue, request)
+	if err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.TradeIDPathValue))
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	trade, err := q.ConfirmTrade(database.Context, data)
+	if err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+	Logger.Info().
+		Str("id", trade.ID.String()).
+		Bool("ownerConfirmed", trade.OwnerConfirmed).
+		Bool("buyerConfirmed", trade.BuyerConfirmed).
+		Time("completedAt", trade.CompletedAt.Time).
+		Msg("trade confirmed")
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(trade); err != nil {
+		RenderError(r, writer, ErrorRender(err))
+		return
+	}
 }

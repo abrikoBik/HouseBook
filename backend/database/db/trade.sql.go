@@ -26,7 +26,7 @@ insert into trade_books (
 type AddBookToTradeParams struct {
 	Tradeid pgtype.UUID `db:"tradeid" json:"tradeid"`
 	Bookid  pgtype.UUID `db:"bookid" json:"bookid"`
-	Ownerid int64       `db:"ownerid" json:"ownerid"`
+	Ownerid pgtype.UUID `db:"ownerid" json:"ownerid"`
 }
 
 func (q *Queries) AddBookToTrade(ctx context.Context, arg AddBookToTradeParams) error {
@@ -34,20 +34,45 @@ func (q *Queries) AddBookToTrade(ctx context.Context, arg AddBookToTradeParams) 
 	return err
 }
 
-const completeTrade = `-- name: CompleteTrade :one
+const confirmTrade = `-- name: ConfirmTrade :one
 update trades
-set completed_at = now()
-where id = $1
-returning id, owner_id, buyer_id, created_at, completed_at
+set
+owner_confirmed = case
+    when owner_id = $1 then true
+    else owner_confirmed
+end,
+buyer_confirmed = case
+    when buyer_id = $1 then true
+    else buyer_confirmed
+end,
+completed_at = case
+    when
+        (
+            (owner_confirmed = true or owner_id = $1) and
+            (buyer_confirmed = true or buyer_id = $1)
+        ) and
+        completed_at is null
+    then now()
+    else completed_at
+end
+where id = $2
+returning id, owner_id, buyer_id, owner_confirmed, buyer_confirmed, created_at, completed_at
 `
 
-func (q *Queries) CompleteTrade(ctx context.Context, id pgtype.UUID) (Trade, error) {
-	row := q.db.QueryRow(ctx, completeTrade, id)
+type ConfirmTradeParams struct {
+	Userid pgtype.UUID `db:"userid" json:"userid"`
+	ID     pgtype.UUID `db:"id" json:"id"`
+}
+
+func (q *Queries) ConfirmTrade(ctx context.Context, arg ConfirmTradeParams) (Trade, error) {
+	row := q.db.QueryRow(ctx, confirmTrade, arg.Userid, arg.ID)
 	var i Trade
 	err := row.Scan(
 		&i.ID,
 		&i.OwnerID,
 		&i.BuyerID,
+		&i.OwnerConfirmed,
+		&i.BuyerConfirmed,
 		&i.CreatedAt,
 		&i.CompletedAt,
 	)
@@ -64,12 +89,12 @@ insert into trades (
     $2,
     now()
 )
-returning id, owner_id, buyer_id, created_at, completed_at
+returning id, owner_id, buyer_id, owner_confirmed, buyer_confirmed, created_at, completed_at
 `
 
 type CreateTradeParams struct {
-	Ownerid int64 `db:"ownerid" json:"ownerid"`
-	Buyerid int64 `db:"buyerid" json:"buyerid"`
+	Ownerid pgtype.UUID `db:"ownerid" json:"ownerid"`
+	Buyerid pgtype.UUID `db:"buyerid" json:"buyerid"`
 }
 
 func (q *Queries) CreateTrade(ctx context.Context, arg CreateTradeParams) (Trade, error) {
@@ -79,6 +104,8 @@ func (q *Queries) CreateTrade(ctx context.Context, arg CreateTradeParams) (Trade
 		&i.ID,
 		&i.OwnerID,
 		&i.BuyerID,
+		&i.OwnerConfirmed,
+		&i.BuyerConfirmed,
 		&i.CreatedAt,
 		&i.CompletedAt,
 	)
@@ -113,7 +140,7 @@ func (q *Queries) DeleteTrade(ctx context.Context, id pgtype.UUID) error {
 }
 
 const getTrade = `-- name: GetTrade :one
-select trades.id, trades.owner_id, trades.buyer_id, trades.created_at, trades.completed_at from trades
+select trades.id, trades.owner_id, trades.buyer_id, trades.owner_confirmed, trades.buyer_confirmed, trades.created_at, trades.completed_at from trades
 join users as owner on trades.owner_id = owner.id
 join users as buyer on trades.buyer_id = buyer.id
 left join trade_books on trades.id = trade_books.trade_id
@@ -129,6 +156,8 @@ func (q *Queries) GetTrade(ctx context.Context, id pgtype.UUID) (Trade, error) {
 		&i.ID,
 		&i.OwnerID,
 		&i.BuyerID,
+		&i.OwnerConfirmed,
+		&i.BuyerConfirmed,
 		&i.CreatedAt,
 		&i.CompletedAt,
 	)
@@ -150,7 +179,7 @@ type ListTradeBooksParams struct {
 
 type ListTradeBooksRow struct {
 	BookID  pgtype.UUID `db:"book_id" json:"book_id"`
-	OwnerID int64       `db:"owner_id" json:"owner_id"`
+	OwnerID pgtype.UUID `db:"owner_id" json:"owner_id"`
 }
 
 func (q *Queries) ListTradeBooks(ctx context.Context, arg ListTradeBooksParams) ([]ListTradeBooksRow, error) {
@@ -174,7 +203,7 @@ func (q *Queries) ListTradeBooks(ctx context.Context, arg ListTradeBooksParams) 
 }
 
 const listTrades = `-- name: ListTrades :many
-select id, owner_id, buyer_id, created_at, completed_at from trades
+select id, owner_id, buyer_id, owner_confirmed, buyer_confirmed, created_at, completed_at from trades
 limit $1
 offset $2
 `
@@ -197,6 +226,51 @@ func (q *Queries) ListTrades(ctx context.Context, arg ListTradesParams) ([]Trade
 			&i.ID,
 			&i.OwnerID,
 			&i.BuyerID,
+			&i.OwnerConfirmed,
+			&i.BuyerConfirmed,
+			&i.CreatedAt,
+			&i.CompletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listUserTrades = `-- name: ListUserTrades :many
+select id, owner_id, buyer_id, owner_confirmed, buyer_confirmed, created_at, completed_at from trades
+where
+owner_id = $3 or
+buyer_id = $3
+limit $1
+offset $2
+`
+
+type ListUserTradesParams struct {
+	Limit  int32       `db:"limit" json:"limit"`
+	Offset int32       `db:"offset" json:"offset"`
+	Userid pgtype.UUID `db:"userid" json:"userid"`
+}
+
+func (q *Queries) ListUserTrades(ctx context.Context, arg ListUserTradesParams) ([]Trade, error) {
+	rows, err := q.db.Query(ctx, listUserTrades, arg.Limit, arg.Offset, arg.Userid)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Trade
+	for rows.Next() {
+		var i Trade
+		if err := rows.Scan(
+			&i.ID,
+			&i.OwnerID,
+			&i.BuyerID,
+			&i.OwnerConfirmed,
+			&i.BuyerConfirmed,
 			&i.CreatedAt,
 			&i.CompletedAt,
 		); err != nil {

@@ -313,7 +313,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/books/{uuid}": {
+        "/api/books/{book-id}": {
             "get": {
                 "description": "Возвращает информацию о книге.",
                 "consumes": [
@@ -518,7 +518,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/books/{uuid}/comments": {
+        "/api/books/{book-id}/comments": {
             "get": {
                 "description": "Возвращает список всех отзывов о книге, хранящихся на сервере.",
                 "consumes": [
@@ -528,7 +528,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Отзывы"
+                    "Отзывы",
+                    "Книги"
                 ],
                 "summary": "Список отзывов о книге",
                 "parameters": [
@@ -565,6 +566,50 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/books/{book-id}/cover": {
+            "put": {
+                "description": "Задаёт обложку для книги.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Книги"
+                ],
+                "summary": "Задать обложку",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Файл обложки (PNG или JPEG)",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Book"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponse"
                         }
@@ -648,7 +693,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/comments/{uuid}": {
+        "/api/comments/{comment-id}": {
             "get": {
                 "description": "Возвращает информацию об отзыве.",
                 "consumes": [
@@ -723,6 +768,64 @@ const docTemplate = `{
             }
         },
         "/api/libraries": {
+            "get": {
+                "description": "Возвращает список всех библиотек, хранящихся на сервере.",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Библиотеки"
+                ],
+                "summary": "Список библиотек",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Лимит количества возвращаемых элементов",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Смещение возвращаемых элементов",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Library"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Создаёт новую пользовательскую библиотеку.",
                 "consumes": [
@@ -778,42 +881,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/libraries/{library-uuid}/books/{book-uuid}": {
-            "delete": {
-                "description": "Удаляет книгу из существующей библиотеки.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Библиотеки"
-                ],
-                "summary": "Удалить книгу",
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/libraries/{uuid}": {
+        "/api/libraries/{library-id}": {
             "get": {
                 "description": "Возвращает информацию о библиотеке.",
                 "consumes": [
@@ -887,7 +955,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/libraries/{uuid}/books": {
+        "/api/libraries/{library-id}/books": {
             "get": {
                 "description": "Возвращает список всех книг, имеющихся в библиотеке.",
                 "consumes": [
@@ -897,7 +965,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Библиотеки"
+                    "Библиотеки",
+                    "Книги"
                 ],
                 "summary": "Список книг в библиотеке",
                 "parameters": [
@@ -955,10 +1024,18 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Библиотеки"
+                    "Библиотеки",
+                    "Книги"
                 ],
                 "summary": "Добавить книгу",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID библиотеки",
+                        "name": "library-id",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "description": "ID книги",
                         "name": "bookid",
@@ -992,6 +1069,42 @@ const docTemplate = `{
                     },
                     "409": {
                         "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/libraries/{library-id}/books/{book-id}": {
+            "delete": {
+                "description": "Удаляет книгу из существующей библиотеки.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Библиотеки",
+                    "Книги"
+                ],
+                "summary": "Удалить книгу",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponse"
                         }
@@ -1078,21 +1191,21 @@ const docTemplate = `{
                 "summary": "Создать сделку",
                 "parameters": [
                     {
-                        "description": "ID инициатора сделки",
+                        "description": "UUID инициатора сделки",
                         "name": "ownerid",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "string"
                         }
                     },
                     {
-                        "description": "ID другой стороны сделки",
-                        "name": "buyer_id",
+                        "description": "UUID другой стороны сделки",
+                        "name": "buyerid",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "string"
                         }
                     }
                 ],
@@ -1118,42 +1231,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/trades/{trade-uuid}/books/{book-uuid}": {
-            "delete": {
-                "description": "Удаляет книгу из существующей сделки.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Сделки"
-                ],
-                "summary": "Удалить книгу",
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/trades/{uuid}": {
+        "/api/trades/{trade-id}": {
             "get": {
                 "description": "Возвращает информацию о сделке.",
                 "consumes": [
@@ -1225,9 +1303,53 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "patch": {
+                "description": "Помечает сделку завершённой со стороны пользователя.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Сделки"
+                ],
+                "summary": "Завершить сделку",
+                "parameters": [
+                    {
+                        "description": "UUID пользователя",
+                        "name": "userid",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Trade"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
             }
         },
-        "/api/trades/{uuid}/books": {
+        "/api/trades/{trade-id}/books": {
             "get": {
                 "description": "Возвращает список всех книг, включённых в сделку.",
                 "consumes": [
@@ -1237,7 +1359,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Сделки"
+                    "Сделки",
+                    "Книги"
                 ],
                 "summary": "Список книг в сделке",
                 "parameters": [
@@ -1295,17 +1418,18 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Сделки"
+                    "Сделки",
+                    "Книги"
                 ],
                 "summary": "Добавить книгу",
                 "parameters": [
                     {
-                        "description": "ID владельца книги",
+                        "description": "UUID владельца книги",
                         "name": "ownerid",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "string"
                         }
                     },
                     {
@@ -1333,6 +1457,103 @@ const docTemplate = `{
                     },
                     "409": {
                         "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/trades/{trade-id}/books/{book-id}": {
+            "delete": {
+                "description": "Удаляет книгу из существующей сделки.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Сделки",
+                    "Книги"
+                ],
+                "summary": "Удалить книгу",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/{user-id}/trades": {
+            "get": {
+                "description": "Возвращает список сделок пользователя.",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Сделки",
+                    "Пользователи"
+                ],
+                "summary": "Список сделок пользователя",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Лимит количества возвращаемых элементов",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Смещение возвращаемых элементов",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Trade"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponse"
                         }
@@ -1429,7 +1650,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/{id}": {
+        "/api/users/{user-id}": {
             "get": {
                 "description": "Получает информацию о пользователе.",
                 "consumes": [
@@ -1580,7 +1801,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/{id}/comments": {
+        "/api/users/{user-id}/comments": {
             "get": {
                 "description": "Возвращает список всех отзывов, написанных пользователем.",
                 "consumes": [
@@ -1590,7 +1811,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Отзывы"
+                    "Отзывы",
+                    "Пользователи"
                 ],
                 "summary": "Список отзывов пользователя",
                 "parameters": [
@@ -1640,7 +1862,51 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/{id}/libraries": {
+        "/api/users/{user-id}/image": {
+            "put": {
+                "description": "Задаёт аватар пользователя.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Пользователи"
+                ],
+                "summary": "Задать аватар",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Файл аватара (PNG или JPEG)",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/{user-id}/libraries": {
             "get": {
                 "description": "Возвращает список всех библиотек, принадлежащих пользователю.",
                 "consumes": [
@@ -1650,9 +1916,10 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Библиотеки"
+                    "Библиотеки",
+                    "Пользователи"
                 ],
-                "summary": "Список библиотек",
+                "summary": "Список библиотек пользователя",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1723,10 +1990,16 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "image_uuid": {
+                    "type": "string"
+                },
                 "isbn": {
                     "type": "string"
                 },
                 "language": {
+                    "$ref": "#/definitions/pgtype.Text"
+                },
+                "link": {
                     "$ref": "#/definitions/pgtype.Text"
                 },
                 "page_count": {
@@ -1756,7 +2029,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user_id": {
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
@@ -1770,7 +2043,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user_id": {
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
@@ -1791,8 +2064,11 @@ const docTemplate = `{
         "db.Trade": {
             "type": "object",
             "properties": {
+                "buyer_confirmed": {
+                    "type": "boolean"
+                },
                 "buyer_id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "completed_at": {
                     "$ref": "#/definitions/pgtype.Timestamp"
@@ -1803,8 +2079,11 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "owner_confirmed": {
+                    "type": "boolean"
+                },
                 "owner_id": {
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
@@ -1815,7 +2094,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "owner_id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "trade_id": {
                     "type": "string"
@@ -1828,13 +2107,28 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
+                "finished_reading_id": {
+                    "type": "string"
+                },
                 "id": {
-                    "type": "integer"
+                    "type": "string"
+                },
+                "image_uuid": {
+                    "type": "string"
                 },
                 "login": {
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "now_reading_id": {
+                    "type": "string"
+                },
+                "rating": {
+                    "type": "number"
+                },
+                "trade_ready_id": {
                     "type": "string"
                 }
             }

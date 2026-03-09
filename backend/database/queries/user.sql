@@ -31,3 +31,18 @@ returning *;
 -- name: DeleteUser :exec
 delete from users
 where id = @id;
+
+-- name: SetProfilePicture :one
+update users
+set image_uuid = @imageUUID
+where id = @id
+returning *;
+
+-- name: SetUserLibraries :one
+update users
+set
+    now_reading_id = coalesce(sqlc.narg('nowReading'), now_reading_id),
+    finished_reading_id = coalesce(sqlc.narg('finishedReading'), finished_reading_id),
+    trade_ready_id = coalesce(sqlc.narg('tradeReady'), trade_ready_id)
+where id = @id
+returning *;

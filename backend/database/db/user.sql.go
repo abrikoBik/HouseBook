@@ -25,7 +25,7 @@ insert into users (
     $4,
     $5
 )
-returning id, email, login, name, salt, hash
+returning id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id
 `
 
 type CreateUserParams struct {
@@ -52,6 +52,11 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Name,
 		&i.Salt,
 		&i.Hash,
+		&i.ImageUuid,
+		&i.Rating,
+		&i.NowReadingID,
+		&i.FinishedReadingID,
+		&i.TradeReadyID,
 	)
 	return i, err
 }
@@ -61,18 +66,18 @@ delete from users
 where id = $1
 `
 
-func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
+func (q *Queries) DeleteUser(ctx context.Context, id pgtype.UUID) error {
 	_, err := q.db.Exec(ctx, deleteUser, id)
 	return err
 }
 
 const getUser = `-- name: GetUser :one
-select id, email, login, name, salt, hash from users
+select id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id from users
 where id = $1
 limit 1
 `
 
-func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
+func (q *Queries) GetUser(ctx context.Context, id pgtype.UUID) (User, error) {
 	row := q.db.QueryRow(ctx, getUser, id)
 	var i User
 	err := row.Scan(
@@ -82,6 +87,83 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 		&i.Name,
 		&i.Salt,
 		&i.Hash,
+		&i.ImageUuid,
+		&i.Rating,
+		&i.NowReadingID,
+		&i.FinishedReadingID,
+		&i.TradeReadyID,
+	)
+	return i, err
+}
+
+const setProfilePicture = `-- name: SetProfilePicture :one
+update users
+set image_uuid = $1
+where id = $2
+returning id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id
+`
+
+type SetProfilePictureParams struct {
+	Imageuuid pgtype.UUID `db:"imageuuid" json:"imageuuid"`
+	ID        pgtype.UUID `db:"id" json:"id"`
+}
+
+func (q *Queries) SetProfilePicture(ctx context.Context, arg SetProfilePictureParams) (User, error) {
+	row := q.db.QueryRow(ctx, setProfilePicture, arg.Imageuuid, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Login,
+		&i.Name,
+		&i.Salt,
+		&i.Hash,
+		&i.ImageUuid,
+		&i.Rating,
+		&i.NowReadingID,
+		&i.FinishedReadingID,
+		&i.TradeReadyID,
+	)
+	return i, err
+}
+
+const setUserLibraries = `-- name: SetUserLibraries :one
+update users
+set
+    now_reading_id = coalesce($1, now_reading_id),
+    finished_reading_id = coalesce($2, finished_reading_id),
+    trade_ready_id = coalesce($3, trade_ready_id)
+where id = $4
+returning id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id
+`
+
+type SetUserLibrariesParams struct {
+	NowReading      pgtype.UUID `db:"nowReading" json:"nowReading"`
+	FinishedReading pgtype.UUID `db:"finishedReading" json:"finishedReading"`
+	TradeReady      pgtype.UUID `db:"tradeReady" json:"tradeReady"`
+	ID              pgtype.UUID `db:"id" json:"id"`
+}
+
+func (q *Queries) SetUserLibraries(ctx context.Context, arg SetUserLibrariesParams) (User, error) {
+	row := q.db.QueryRow(ctx, setUserLibraries,
+		arg.NowReading,
+		arg.FinishedReading,
+		arg.TradeReady,
+		arg.ID,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Login,
+		&i.Name,
+		&i.Salt,
+		&i.Hash,
+		&i.ImageUuid,
+		&i.Rating,
+		&i.NowReadingID,
+		&i.FinishedReadingID,
+		&i.TradeReadyID,
 	)
 	return i, err
 }
@@ -93,14 +175,14 @@ set
     login = coalesce($2, login),
     name = coalesce($3, name)
 where id = $4
-returning id, email, login, name, salt, hash
+returning id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id
 `
 
 type UpdateUserParams struct {
 	Email pgtype.Text `db:"email" json:"email"`
 	Login pgtype.Text `db:"login" json:"login"`
 	Name  pgtype.Text `db:"name" json:"name"`
-	ID    int64       `db:"id" json:"id"`
+	ID    pgtype.UUID `db:"id" json:"id"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
@@ -118,6 +200,11 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.Name,
 		&i.Salt,
 		&i.Hash,
+		&i.ImageUuid,
+		&i.Rating,
+		&i.NowReadingID,
+		&i.FinishedReadingID,
+		&i.TradeReadyID,
 	)
 	return i, err
 }
