@@ -230,8 +230,7 @@ func ListUserTrades(writer http.ResponseWriter, request *http.Request) {
 		r      = render.New()
 		q      = db.New(database.Pool)
 	)
-	params.Userid, err = util.PathID(consts.UserIDPathValue, request)
-	if err != nil {
+	if params.Userid, err = util.PathUUID(consts.UserIDPathValue, request); err != nil {
 		RenderError(r, writer, ErrorBadID(err, consts.UserIDPathValue))
 		return
 	}
@@ -255,7 +254,7 @@ func ListUserTrades(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	Logger.Info().
-		Int64("id", params.Userid).
+		Str("id", params.Userid.String()).
 		Int("len(trades)", len(trades)).
 		Msg("user trades listed")
 

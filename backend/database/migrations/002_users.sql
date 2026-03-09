@@ -1,5 +1,5 @@
 create table users (
-    id bigserial primary key,
+    id uuid primary key default uuidv7(),
 
     email text unique not null,
     login text unique not null,

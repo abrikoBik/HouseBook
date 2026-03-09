@@ -21,7 +21,7 @@ create table books (
 );
 
 create table users (
-    id bigserial primary key,
+    id uuid primary key default uuidv7(),
 
     email text unique not null,
     login text unique not null,
@@ -41,8 +41,8 @@ create table users (
 create table trades (
     id uuid primary key default uuid_generate_v4(),
 
-    owner_id bigserial not null references users(id),
-    buyer_id bigserial not null references users(id),
+    owner_id uuid not null references users(id),
+    buyer_id uuid not null references users(id),
     owner_confirmed boolean not null default false,
     buyer_confirmed boolean not null default false,
 
@@ -53,13 +53,13 @@ create table trades (
 create table trade_books (
     trade_id uuid references trades(id) on delete cascade,
     book_id uuid references books(id),
-    owner_id bigserial not null references users(id),
+    owner_id uuid not null references users(id),
     primary key (trade_id, book_id)
 );
 
 create table libraries (
     id uuid primary key default uuid_generate_v4(),
-    user_id bigserial not null references users(id),
+    user_id uuid not null references users(id),
     name text not null default 'Библиотека'
 );
 
@@ -72,7 +72,7 @@ create table library_books (
 
 create table comments (
     id uuid default uuid_generate_v4(),
-    user_id bigserial references users(id) on delete cascade,
+    user_id uuid references users(id) on delete cascade,
     book_id uuid references books(id) on delete cascade,
     body text not null,
     primary key (user_id, book_id)

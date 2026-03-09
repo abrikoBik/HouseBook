@@ -26,14 +26,14 @@ type Book struct {
 
 type Comment struct {
 	ID     pgtype.UUID `db:"id" json:"id"`
-	UserID int64       `db:"user_id" json:"user_id"`
+	UserID pgtype.UUID `db:"user_id" json:"user_id"`
 	BookID pgtype.UUID `db:"book_id" json:"book_id"`
 	Body   string      `db:"body" json:"body"`
 }
 
 type Library struct {
 	ID     pgtype.UUID `db:"id" json:"id"`
-	UserID int64       `db:"user_id" json:"user_id"`
+	UserID pgtype.UUID `db:"user_id" json:"user_id"`
 	Name   string      `db:"name" json:"name"`
 }
 
@@ -45,8 +45,8 @@ type LibraryBook struct {
 
 type Trade struct {
 	ID             pgtype.UUID      `db:"id" json:"id"`
-	OwnerID        int64            `db:"owner_id" json:"owner_id"`
-	BuyerID        int64            `db:"buyer_id" json:"buyer_id"`
+	OwnerID        pgtype.UUID      `db:"owner_id" json:"owner_id"`
+	BuyerID        pgtype.UUID      `db:"buyer_id" json:"buyer_id"`
 	OwnerConfirmed bool             `db:"owner_confirmed" json:"owner_confirmed"`
 	BuyerConfirmed bool             `db:"buyer_confirmed" json:"buyer_confirmed"`
 	CreatedAt      pgtype.Timestamp `db:"created_at" json:"created_at"`
@@ -56,11 +56,11 @@ type Trade struct {
 type TradeBook struct {
 	TradeID pgtype.UUID `db:"trade_id" json:"trade_id"`
 	BookID  pgtype.UUID `db:"book_id" json:"book_id"`
-	OwnerID int64       `db:"owner_id" json:"owner_id"`
+	OwnerID pgtype.UUID `db:"owner_id" json:"owner_id"`
 }
 
 type User struct {
-	ID                int64       `db:"id" json:"id"`
+	ID                pgtype.UUID `db:"id" json:"id"`
 	Email             string      `db:"email" json:"email"`
 	Login             string      `db:"login" json:"login"`
 	Name              string      `db:"name" json:"name"`

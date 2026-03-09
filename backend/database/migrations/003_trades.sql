@@ -8,4 +8,4 @@ create table trades (
 
 ---- create above / drop below ----
 
-drop table books;
+drop table trades;

@@ -46,8 +46,8 @@ returning id, user_id, name
 `
 
 type CreateLibraryParams struct {
-	Userid int64  `db:"userid" json:"userid"`
-	Name   string `db:"name" json:"name"`
+	Userid pgtype.UUID `db:"userid" json:"userid"`
+	Name   string      `db:"name" json:"name"`
 }
 
 func (q *Queries) CreateLibrary(ctx context.Context, arg CreateLibraryParams) (Library, error) {
@@ -173,9 +173,9 @@ offset $2
 `
 
 type ListUserLibrariesParams struct {
-	Limit  int32 `db:"limit" json:"limit"`
-	Offset int32 `db:"offset" json:"offset"`
-	Userid int64 `db:"userid" json:"userid"`
+	Limit  int32       `db:"limit" json:"limit"`
+	Offset int32       `db:"offset" json:"offset"`
+	Userid pgtype.UUID `db:"userid" json:"userid"`
 }
 
 func (q *Queries) ListUserLibraries(ctx context.Context, arg ListUserLibrariesParams) ([]Library, error) {

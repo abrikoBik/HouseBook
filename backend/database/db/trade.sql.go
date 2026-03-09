@@ -26,7 +26,7 @@ insert into trade_books (
 type AddBookToTradeParams struct {
 	Tradeid pgtype.UUID `db:"tradeid" json:"tradeid"`
 	Bookid  pgtype.UUID `db:"bookid" json:"bookid"`
-	Ownerid int64       `db:"ownerid" json:"ownerid"`
+	Ownerid pgtype.UUID `db:"ownerid" json:"ownerid"`
 }
 
 func (q *Queries) AddBookToTrade(ctx context.Context, arg AddBookToTradeParams) error {
@@ -60,7 +60,7 @@ returning id, owner_id, buyer_id, owner_confirmed, buyer_confirmed, created_at, 
 `
 
 type ConfirmTradeParams struct {
-	Userid int64       `db:"userid" json:"userid"`
+	Userid pgtype.UUID `db:"userid" json:"userid"`
 	ID     pgtype.UUID `db:"id" json:"id"`
 }
 
@@ -93,8 +93,8 @@ returning id, owner_id, buyer_id, owner_confirmed, buyer_confirmed, created_at, 
 `
 
 type CreateTradeParams struct {
-	Ownerid int64 `db:"ownerid" json:"ownerid"`
-	Buyerid int64 `db:"buyerid" json:"buyerid"`
+	Ownerid pgtype.UUID `db:"ownerid" json:"ownerid"`
+	Buyerid pgtype.UUID `db:"buyerid" json:"buyerid"`
 }
 
 func (q *Queries) CreateTrade(ctx context.Context, arg CreateTradeParams) (Trade, error) {
@@ -179,7 +179,7 @@ type ListTradeBooksParams struct {
 
 type ListTradeBooksRow struct {
 	BookID  pgtype.UUID `db:"book_id" json:"book_id"`
-	OwnerID int64       `db:"owner_id" json:"owner_id"`
+	OwnerID pgtype.UUID `db:"owner_id" json:"owner_id"`
 }
 
 func (q *Queries) ListTradeBooks(ctx context.Context, arg ListTradeBooksParams) ([]ListTradeBooksRow, error) {
@@ -251,9 +251,9 @@ offset $2
 `
 
 type ListUserTradesParams struct {
-	Limit  int32 `db:"limit" json:"limit"`
-	Offset int32 `db:"offset" json:"offset"`
-	Userid int64 `db:"userid" json:"userid"`
+	Limit  int32       `db:"limit" json:"limit"`
+	Offset int32       `db:"offset" json:"offset"`
+	Userid pgtype.UUID `db:"userid" json:"userid"`
 }
 
 func (q *Queries) ListUserTrades(ctx context.Context, arg ListUserTradesParams) ([]Trade, error) {

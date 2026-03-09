@@ -245,14 +245,11 @@ func ListUserComments(writer http.ResponseWriter, request *http.Request) {
 		r      = render.New()
 		q      = db.New(database.Pool)
 	)
-	userID, err := util.PathID(consts.UserIDPathValue, request)
-	if err != nil {
+	if params.Userid, err = util.PathUUID(consts.UserIDPathValue, request); err != nil {
 		RenderError(r, writer, ErrorBadID(err, consts.UserIDPathValue))
 		return
 	}
-	params.Userid = userID
-	params.Limit, params.Offset, err = util.GetSearchPagination(query)
-	if err != nil {
+	if params.Limit, params.Offset, err = util.GetSearchPagination(query); err != nil {
 		RenderError(r, writer, ErrorBadPaginationParams(err))
 		return
 	}

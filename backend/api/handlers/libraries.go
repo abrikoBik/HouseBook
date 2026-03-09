@@ -228,7 +228,7 @@ func ListUserLibraries(writer http.ResponseWriter, request *http.Request) {
 		r      = render.New()
 		q      = db.New(database.Pool)
 	)
-	if params.Userid, err = util.PathID(consts.UserIDPathValue, request); err != nil {
+	if params.Userid, err = util.PathUUID(consts.UserIDPathValue, request); err != nil {
 		RenderError(r, writer, ErrorBadID(err, consts.UserIDPathValue))
 		return
 	}
@@ -252,7 +252,7 @@ func ListUserLibraries(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	Logger.Info().
-		Int64("userID", params.Userid).
+		Str("userID", params.Userid.String()).
 		Int("len(libraries)", len(libraries)).
 		Msg("libraries listed")
 
