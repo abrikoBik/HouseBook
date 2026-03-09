@@ -1,5 +1,5 @@
 import BookCover from "../assets/Book.png";
-import FavoritesIcon from "../assets/Favorites.png";
+import FavoritesIcon from "../assets/Favourite_Black.svg";
 import "../styles/book.css";
 import SideBar from "../modules/sideBar";
 import Header from "../modules/header";
@@ -26,7 +26,6 @@ const Book = () => {
           break;
         default:
           throw new Error((result as Error).error);
-          break;
       }
     }
     setBook(result as BookT);
@@ -38,7 +37,8 @@ const Book = () => {
 
   return (
     <section id="layout">
-      <Header />
+      
+      <Header/>
       <SideBar />
       <section id="bookBody">
         <div id="cover">
@@ -69,18 +69,21 @@ const Book = () => {
                 <h4>Издатель</h4>
                 <div>{book?.publisher}</div>
               </div>
-
-              <div id="language">
-                <h4>Язык</h4>
-                <div>{book?.language}</div>
-              </div>
+              {
+              book?.language != null ?
+                <div id="language">
+                  <h4>Язык</h4>
+                  <div>{book?.language}</div>
+                </div>
+              :
+                <></>
+              }
 
               <div id="type">
                 <h4>Тип обложки</h4>
                 <div>
                   {/*TODO: склонение страниц, убрать пустые поля*/}
-                  {book?.cover_type}, {book?.page_count} страниц <br />
-                  ISBN: {book?.isbn}
+                  {`${book?.cover_type == null ? '' : book?.cover_type} ${book?.page_count != null ? `, ${book?.page_count} страниц ` : ''} \n ISBN: ${book?.isbn}`}
                 </div>
               </div>
             </section>

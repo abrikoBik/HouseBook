@@ -1,13 +1,12 @@
-import NotificationsIcon from "../assets/Notifications.png";
-import ProfileIcon from "../assets/ProfileIcon.png";
-import "../styles/book.css";
+import NotificationsIcon from "../assets/Notification.svg";
+import "../styles/header.css";
 
 const Header = () => {
   return (
     <header id="top_menu">
       <div id="top_actions">
         <div id="profile">
-          <img id="img1" src={ProfileIcon} alt="profile" />
+          <div id="icon"></div>
           <div id="name">Шиловский Максим</div>
         </div>
         <div id="notifications">
