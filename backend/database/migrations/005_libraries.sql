@@ -1,3 +1,4 @@
+create extension if not exists "uuid-ossp";
 create table libraries (
     id uuid primary key default uuid_generate_v4(),
     user_id uuid not null references users(id),

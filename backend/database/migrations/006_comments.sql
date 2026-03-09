@@ -1,3 +1,4 @@
+create extension if not exists "uuid-ossp";
 create table comments (
     id uuid default uuid_generate_v4(),
     user_id uuid references users(id) on delete cascade,

@@ -1,8 +1,5 @@
-create extension if not exists "uuid-ossp";
-
--- TODO: original owner + current owner
 create table books (
-    id uuid primary key default uuid_generate_v4(),
+    id uuid primary key default uuidv7(),
 
     title text not null,
     author text not null,
@@ -39,7 +36,7 @@ create table users (
 );
 
 create table trades (
-    id uuid primary key default uuid_generate_v4(),
+    id uuid primary key default uuidv7(),
 
     owner_id uuid not null references users(id),
     buyer_id uuid not null references users(id),
@@ -58,7 +55,7 @@ create table trade_books (
 );
 
 create table libraries (
-    id uuid primary key default uuid_generate_v4(),
+    id uuid primary key default uuidv7(),
     user_id uuid not null references users(id),
     name text not null default 'Библиотека'
 );
@@ -71,7 +68,7 @@ create table library_books (
 );
 
 create table comments (
-    id uuid default uuid_generate_v4(),
+    id uuid default uuidv7(),
     user_id uuid references users(id) on delete cascade,
     book_id uuid references books(id) on delete cascade,
     body text not null,
