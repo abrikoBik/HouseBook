@@ -138,7 +138,7 @@ returning id, email, login, name, salt, hash, image_uuid, rating, now_reading_id
 `
 
 type SetUserLibrariesParams struct {
-	NowReading      pgtype.UUID `db:"@nowReading" json:"@nowReading"`
+	NowReading      pgtype.UUID `db:"nowReading" json:"nowReading"`
 	FinishedReading pgtype.UUID `db:"finishedReading" json:"finishedReading"`
 	TradeReady      pgtype.UUID `db:"tradeReady" json:"tradeReady"`
 	ID              pgtype.UUID `db:"id" json:"id"`

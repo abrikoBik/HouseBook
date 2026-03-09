@@ -11,6 +11,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/unrolled/render"
 )
 
@@ -44,8 +45,14 @@ func CreateUser(writer http.ResponseWriter, request *http.Request) {
 		requestData UserRequest
 		data        db.CreateUserParams
 		r           = render.New()
-		q           = db.New(database.Pool)
 	)
+	pool, err := database.Pool.Begin(database.Context)
+	if err != nil {
+		RenderError(r, writer, ErrorDatabase(err))
+		return
+	}
+	defer pool.Rollback(database.Context)
+	q := db.New(pool)
 	if err := json.NewDecoder(request.Body).Decode(&requestData); err != nil {
 		RenderError(r, writer, ErrorBadJSON(err))
 		return
@@ -82,6 +89,39 @@ func CreateUser(writer http.ResponseWriter, request *http.Request) {
 	}
 	Logger.Info().Str("id", user.ID.String()).Msg("user created")
 
+	// TODO: move hardcoded strings to consts
+	var (
+		finishedLibrary   = db.CreateLibraryParams{Userid: user.ID, Name: "Прочитано"}
+		readingLibrary    = db.CreateLibraryParams{Userid: user.ID, Name: "В процессе"}
+		tradeReadyLibrary = db.CreateLibraryParams{Userid: user.ID, Name: "Доступны для обмена"}
+		libraries         = map[string]pgtype.UUID{}
+	)
+	for _, library := range []db.CreateLibraryParams{finishedLibrary, readingLibrary, tradeReadyLibrary} {
+		newLibrary, err := q.CreateLibrary(database.Context, library)
+		if err != nil {
+			RenderError(r, writer, ErrorGeneric(err))
+			return
+		}
+		libraries[library.Name] = newLibrary.ID
+		Logger.Info().
+			Str("id", newLibrary.ID.String()).
+			Msg("library created")
+	}
+	Logger.Debug().Interface("libraries", libraries).Send()
+	if user, err = q.SetUserLibraries(database.Context, db.SetUserLibrariesParams{
+		ID:              user.ID,
+		FinishedReading: libraries["Прочитано"],
+		NowReading:      libraries["В процессе"],
+		TradeReady:      libraries["Доступны для обмена"],
+	}); err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+
+	if err := pool.Commit(database.Context); err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
 	writer.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(writer).Encode(user); err != nil {
 		RenderError(r, writer, ErrorRender(err))
