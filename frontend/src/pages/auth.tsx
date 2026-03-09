@@ -14,8 +14,8 @@ const Auth = () => {
         <div id="LabelContainer">
           <img src={Logo} alt="logo" id="LabelPhoto" />
           <div>
-            <h1>С возвращением!</h1>
-            <h4>Мы рады видеть вас</h4>
+            <h2>С возвращением!</h2>
+            <h5>Мы рады видеть вас</h5>
           </div>
         </div>
 
