@@ -1,5 +1,5 @@
 import BookCover from "../assets/Book.png";
-import FavoritesIcon from "../assets/Favorites.png";
+import FavoritesIcon from "../assets/Favourite_Black.svg";
 import "../styles/book.css";
 import SideBar from "../modules/sideBar";
 import Header from "../modules/header";
@@ -26,7 +26,6 @@ const Book = () => {
           break;
         default:
           throw new Error((result as Error).error);
-          break;
       }
     }
     setBook(result as BookT);
