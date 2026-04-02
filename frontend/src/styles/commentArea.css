@@ -1,0 +1,70 @@
+#CommentArea {
+  width: 100%;
+  padding: 0.5%;
+
+  background-color: #fdfbf7;
+  border: 2px solid #afafaf;
+  border-radius: 17px;
+
+  margin-top: 74px;
+
+  & > textarea {
+    width: 99.9%;
+    min-height: 120px;
+    padding: 24px 24px;
+    background-color: #fdfbf7;
+
+    font-family:
+      "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+      "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+
+    border: none;
+
+    font-size: 16px;
+    line-height: 1.5;
+
+    box-sizing: border-box;
+    resize: none;
+
+    outline: none;
+  }
+
+  & > div {
+    display: flex;
+    justify-content: space-between;
+
+    margin-bottom: 15px;
+
+    & > button {
+      width: 150px;
+      height: 50px;
+
+      border-radius: 20px;
+      border: none;
+
+      font-size: 16px;
+      color: white;
+
+      background-color: #272a34;
+    }
+  }
+}
+
+#Modifiers_CommentArea {
+  display: flex;
+
+  margin-left: 24px;
+
+  width: 128px;
+
+  justify-content: space-between;
+
+  & > img {
+    max-width: 35%;
+    max-height: 35%;
+  }
+
+  & > img:hover {
+    cursor: pointer;
+  }
+}

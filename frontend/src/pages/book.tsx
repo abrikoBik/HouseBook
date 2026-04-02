@@ -4,6 +4,7 @@ import "../styles/book.css";
 import SideBar from "../modules/sideBar";
 import Header from "../modules/header";
 import Comment from "../modules/comment";
+import CommentArea from "../modules/commentArea";
 import type Error from "../types/error";
 import { type default as BookT } from "../types/book";
 
@@ -89,15 +90,7 @@ const Book = () => {
 
           <Comment />
 
-          <div id="textarea">
-            <textarea />
-            <div>
-              <div>U</div>
-              <div>I</div>
-              <div>A</div>
-              <button>Отправить</button>
-            </div>
-          </div>
+          <CommentArea />
         </section>
       </section>
     </section>
