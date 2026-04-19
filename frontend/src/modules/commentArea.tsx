@@ -18,16 +18,16 @@ const CommentArea = () => {
   };
 
   const sendComment = async () => {
-      // default user ID - 019d4e40-95b2-7cf4-b41a-cb07b0bb7883
-      const book = "019cd238-df4b-7212-aea8-f22a4cfa2c7f";
-      const user = "019d4e40-95b2-7cf4-b41a-cb07b0bb7883";
-      const textareaBody = textareaRef.current?.value;
-      
-      await fetch('/api/comments/', {
-        method: "POST",
-        body: JSON.stringify({"userid": user, "bookid": book, "body": textareaBody})
-      });
-  }
+    // default user ID - 019d4e40-95b2-7cf4-b41a-cb07b0bb7883
+    const book = "019cd238-df4b-7212-aea8-f22a4cfa2c7f";
+    const user = "019d4e40-95b2-7cf4-b41a-cb07b0bb7883";
+    const textareaBody = textareaRef.current?.value;
+
+    await fetch("/api/comments/", {
+      method: "POST",
+      body: JSON.stringify({ userid: user, bookid: book, body: textareaBody }),
+    });
+  };
 
   useEffect(() => {
     adjustHeight();
