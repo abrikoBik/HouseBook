@@ -11,6 +11,7 @@ import Book from "./pages/book.tsx";
 import Notification from "./modules/notification.tsx";
 import Profile from "./pages/profile.tsx";
 import NotFound from "./pages/notfound.tsx";
+import Library from "./pages/library.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -23,6 +24,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/test" element={<Notification />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/book/:uuid" element={<Book />} />
+          <Route path="/library" element={<Library />} />
           <Route path="/*" element={<NotFound />} />
         </Routes>
       </Router>
