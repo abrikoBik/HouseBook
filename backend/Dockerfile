@@ -1,6 +1,6 @@
 FROM golang:1.25 AS builder
 WORKDIR /app
-RUN go install github.com/jackc/tern/v2@latest && go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.30.0
+RUN go install github.com/jackc/tern/v2@v2.3.6&& go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.30.0
 COPY go.mod go.sum .
 RUN go mod download
 COPY . .
