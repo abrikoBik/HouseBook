@@ -6,7 +6,7 @@ const Library = () => {
         <section id="layout">
         <SideBar />
         <Header/>
-        <h4>Моя библиотека</h4>
+        <h4>Моя библиотекаaaa</h4>
         </section>
     )
 };
