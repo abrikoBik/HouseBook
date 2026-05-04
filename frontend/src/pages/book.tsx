@@ -6,7 +6,8 @@ import Header from "../modules/header";
 import Comment from "../modules/comment";
 import CommentArea from "../modules/commentArea";
 import type Error from "../types/error";
-import { type default as BookT } from "../types/book";
+import type BookT from "../types/book";
+import type CommentT from "../types/book";
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
@@ -15,6 +16,7 @@ const Book = () => {
   const navigate = useNavigate();
   const { uuid } = useParams();
   const [book, setBook] = useState<BookT>();
+  const [bookComments, setBookComments] = useState<CommentT[]>();
 
   const getBook = async (id: string) => {
     const response = await fetch(`/api/books/${id}`);
@@ -32,8 +34,31 @@ const Book = () => {
     setBook(result as BookT);
   };
 
+  const getComments = async (id: string) => {
+    const response = await fetch(`/api/books/${id}/comments`);
+    const result = await response.json();
+    if (!response.ok) {
+      switch (response.status) {
+        case 400:
+        case 404:
+          navigate("/404", { replace: true });
+          break;
+        default:
+          throw new Error((result as Error).error);
+      }
+    }
+    setBookComments(result);
+  };
+
+  const getUsername = async (id: string) => {
+    const response = await fetch(`/api/users/${id}`);
+    const userJSON = await response.json();
+    return userJSON["name"];
+  };
+
   useEffect(() => {
     getBook(uuid!);
+    getComments(uuid!);
   }, [uuid]);
 
   return (
@@ -88,7 +113,13 @@ const Book = () => {
             </section>
           </div>
 
-          <Comment />
+          {bookComments?.map((comment) => (
+            <Comment
+              key={comment.id}
+              userID={comment.user_id}
+              commentBody={comment.body}
+            />
+          ))}
 
           <CommentArea />
         </section>

@@ -18,9 +18,8 @@ const CommentArea = () => {
   };
 
   const sendComment = async () => {
-    // default user ID - 019d4e40-95b2-7cf4-b41a-cb07b0bb7883
-    const book = "019cd238-df4b-7212-aea8-f22a4cfa2c7f";
-    const user = "019d4e40-95b2-7cf4-b41a-cb07b0bb7883";
+    const book = "019df3c0-2bd4-789f-8e57-c220660e4ff9";
+    const user = "019df3c2-50ee-797c-bcce-4c40bf2a00bc";
     const textareaBody = textareaRef.current?.value;
 
     await fetch("/api/comments/", {
