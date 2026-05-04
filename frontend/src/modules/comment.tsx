@@ -17,12 +17,8 @@ const Comment = ({
 
   useEffect(() => {
     const fetchUsername = async () => {
-      try {
-        const name = await getUsername(userID);
-        setUsername(name);
-      } catch (err) {
-        setUsername("Unknown user");
-      }
+      const name = await getUsername(userID);
+      setUsername(name);
     };
     fetchUsername();
   }, [userID]);
