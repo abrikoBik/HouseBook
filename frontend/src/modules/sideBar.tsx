@@ -5,23 +5,29 @@ import LibraryIcon from "../assets/Library_Black.svg";
 import ExitIcon from "../assets/Exit_Black.svg";
 import "../styles/sideBar.css";
 
-const sideBar = () => {
+const SideBar = () => {
   return (
     <aside id="side_menu">
-      <nav>
-        <div className="menu_item">
+      <nav id="side_nav">
+        <div className="logo">
           <img src={LogoIcon} alt="logo" />
         </div>
 
-        <div className="menu_item">
-          <img src={HomeIcon} alt="home" />
-        </div>
+        <section id="menu_items">
+          <div>
+            <img src={HomeIcon} alt="home" />
+          </div>
 
-        <div className="menu_item">
-          <img src={FavoritesIcon} alt="favorites" />
-        </div>
+          <div>
+            <img src={FavoritesIcon} alt="favorites" />
+          </div>
 
-        <div className="menu_item">
+          <div>
+            <img src={LibraryIcon} alt="favorites" />
+          </div>
+        </section>
+
+        <div id="exit_button">
           <img src={ExitIcon} alt="exit" />
         </div>
       </nav>
@@ -29,4 +35,4 @@ const sideBar = () => {
   );
 };
 
-export default sideBar;
+export default SideBar;

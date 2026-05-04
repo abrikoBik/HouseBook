@@ -8,9 +8,10 @@
 #top_actions {
   display: flex;
   flex-direction: row;
-  justify-content: end;
+  justify-content: space-between;
 
-  margin-top: 10px;
+  margin-top: 20px;
+  margin-left: 200px;
   margin-right: 40px;
 }
 
@@ -40,4 +41,33 @@
   justify-items: center;
 
   margin-left: 50px;
+}
+
+#searchBar {
+  display: flex;
+  align-items: center;
+
+  & > input {
+    font-size: 1.1rem;
+    width: 50vw;
+    margin-left: 20px;
+
+    border: none;
+    background: none;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  & > img {
+    user-select: none;
+    &:hover {
+      cursor: text;
+    }
+  }
+
+  &:hover {
+    cursor: text;
+  }
 }
