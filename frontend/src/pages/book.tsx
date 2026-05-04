@@ -50,12 +50,6 @@ const Book = () => {
     setBookComments(result);
   };
 
-  const getUsername = async (id: string) => {
-    const response = await fetch(`/api/users/${id}`);
-    const userJSON = await response.json();
-    return userJSON["name"];
-  };
-
   useEffect(() => {
     getBook(uuid!);
     getComments(uuid!);

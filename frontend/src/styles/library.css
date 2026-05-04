@@ -1,0 +1,107 @@
+#layout {
+  max-width: 80vw;
+  margin: 0 auto;
+  margin-top: 5vh;
+  margin-left: 10vw;
+  padding: 40px 24px;
+  min-height: 100vh;
+}
+
+#info {
+  margin-bottom: 40px;
+}
+
+h4 {
+  font-size: 32px;
+  font-style: bold;
+}
+
+nav ul {
+  display: flex;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-wrap: wrap;
+}
+
+nav li {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-style: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: black;
+  background: transparent;
+  white-space: nowrap;
+}
+
+nav li:hover {
+  background: white;
+  color: black;
+}
+
+nav li.active {
+  background: black;
+  color: white;
+}
+
+nav li.active:hover {
+  background: black;
+}
+
+#books {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 24px;
+}
+
+#books div {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s;
+  cursor: pointer;
+  aspect-ratio: 2/3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #999;
+  border: 2px dashed #e0e0e0;
+}
+
+#books div:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-color: white;
+  color: black;
+}
+
+@media (max-width: 768px) {
+  #layout {
+    padding: 24px 16px;
+  }
+
+  h4 {
+    font-size: 24px;
+  }
+
+  #books {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+  }
+
+  nav li {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  #books {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
