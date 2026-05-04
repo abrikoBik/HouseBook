@@ -2,21 +2,23 @@ package endpoints
 
 import (
 	"housebook/api/handlers"
+	"housebook/api/middleware"
+	"housebook/consts"
 
 	"github.com/go-chi/chi/v5"
 )
 
-const (
-	BooksPattern = "/books"
-)
-
 func routeBooks(router chi.Router) {
-	router.Route(BooksPattern, func(r chi.Router) {
-		r.Get("/", handlers.ListBooks)
-		r.Post("/", handlers.CreateBook)
-		r.Get("/{uuid}", handlers.GetBook)
-		r.Patch("/{uuid}", handlers.UpdateBook)
-		r.Delete("/{uuid}", handlers.DeleteBook)
-		r.Get("/search", handlers.SearchBook)
+	router.Route(consts.BooksEndpoint, func(r chi.Router) {
+		r.With(middleware.JSONResponse).Get("/", handlers.ListBooks)
+		r.With(middleware.JSONResponse).Post("/", handlers.CreateBook)
+		r.With(middleware.JSONResponse).Get("/search", handlers.SearchBook)
+		r.Route(consts.BookIDPath, func(r chi.Router) {
+			r.With(middleware.JSONResponse).Get("/", handlers.GetBook)
+			r.With(middleware.JSONResponse).Patch("/", handlers.UpdateBook)
+			r.With(middleware.JSONResponse).Put("/cover", handlers.SetBookCover)
+			r.Delete("/", handlers.DeleteBook)
+			r.With(middleware.JSONResponse).Get(consts.CommentsEndpoint, handlers.ListBookComments)
+		})
 	})
 }

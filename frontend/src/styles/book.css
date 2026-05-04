@@ -3,7 +3,11 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+<<<<<<< HEAD
   padding-left: 10vw;
+=======
+  padding-left: 14vw;
+>>>>>>> a6fd1c4836fd0fc8173664d471d8d480cacc4ed0
   padding-right: 5vw;
   padding-top: 5vw;
 }
@@ -12,7 +16,14 @@
   display: flex;
   z-index: 200;
   flex-direction: row;
+  justify-content: space-between;
   margin-bottom: -15%;
+<<<<<<< HEAD
+=======
+
+  width: 65%;
+
+>>>>>>> a6fd1c4836fd0fc8173664d471d8d480cacc4ed0
   & > div > div > h1 {
     font-weight: bold;
     font-size: 64px;
@@ -21,12 +32,38 @@
   & > div > :nth-child(2) {
     display: flex;
     margin-top: auto;
-    width: 100%;
     padding-bottom: 8%;
     box-shadow: 0px 2px #eceae6;
   }
+<<<<<<< HEAD
 }
 
+=======
+
+  & > div {
+    width: 100%;
+  }
+
+  & > img {
+    max-width: 383px;
+    max-height: 600px;
+    width: auto;
+    height: auto;
+
+    box-shadow: -20px 15px 40px 10px rgba(0, 0, 0, 0.25);
+  }
+}
+
+@media (max-width: 1200px) {
+  #cover > img {
+    max-width: 190px;
+    max-height: 300px;
+    width: auto;
+    height: auto;
+  }
+}
+
+>>>>>>> a6fd1c4836fd0fc8173664d471d8d480cacc4ed0
 #cover > div {
   display: flex;
   flex-direction: column;
@@ -52,18 +89,25 @@
 
 #favoriteIcon {
   display: flex;
+  justify-content: center;
   align-items: center;
   margin-left: auto;
-  padding-left: 2.2%;
-  padding-right: 2.2%;
   border-radius: 100%;
   background-color: #f3f1eb;
 
+<<<<<<< HEAD
+=======
+  min-width: 42px;
+  min-height: 40px;
+  width: auto;
+  height: auto;
+
+>>>>>>> a6fd1c4836fd0fc8173664d471d8d480cacc4ed0
   & > img {
     width: auto;
     height: auto;
-    max-width: 1.3rem;
-    min-height: 1.3rem;
+    max-width: 1.5rem;
+    max-height: 1.5rem;
   }
 
   &:hover {
@@ -78,3 +122,43 @@
   padding-top: 20%;
   border-radius: 25px;
 }
+<<<<<<< HEAD
+=======
+
+#description {
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  height: 20rem;
+
+  & > div {
+    width: 60%;
+  }
+}
+
+.kniga {
+  margin-left: 5%;
+  margin-right: 5%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  width: 30%;
+
+  & > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  & > div > h4 {
+    margin-bottom: 5%;
+    width: 80%;
+    font-weight: bold;
+  }
+
+  & > div > div {
+    width: 80%;
+  }
+}
+>>>>>>> a6fd1c4836fd0fc8173664d471d8d480cacc4ed0

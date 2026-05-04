@@ -1,63 +1,372 @@
 package handlers
 
 import (
+	"encoding/json"
+	"errors"
 	"housebook/consts"
-	"housebook/database/models"
+	"housebook/database"
+	"housebook/database/db"
 	"housebook/util"
 	"net/http"
 
-	"github.com/go-chi/render"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/unrolled/render"
 )
 
-func userResponse(user *models.User) *models.UserResponse {
-	return &models.UserResponse{User: user}
+type UserRequest struct {
+	db.CreateUserParams
+	Password string
 }
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+// CreateUser godoc
+//
+//	@summary		Создать пользователя
+//	@description	Создаёт нового пользователя.
+//	@accept			json
+//	@produce		json
+//
+//	@tags			Пользователи
+//
+//	@param			email		body		string	true	"Электронная почта пользователя"	Example(ivanov@example.com)
+//	@param			login		body		string	true	"Логин пользователя"				Example(ivanov)
+//	@param			name		body		string	true	"ФИО пользователя"					Example(Иванов Иван Иванович)
+//	@param			password	body		string	true	"Пароль пользователя"				Example(ivanov123qwerty)
+//
+//	@success		201			{object}	db.User
+//	@failure		400			{object}	ErrorResponse
+//	@failure		409			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/users [post]
+func CreateUser(writer http.ResponseWriter, request *http.Request) {
 	var (
-		user = &models.User{}
-		data = &models.UserRequest{}
+		err         error
+		requestData UserRequest
+		data        db.CreateUserParams
+		r           = render.New()
 	)
-	if err := render.Bind(r, data); err != nil {
-		render.Render(w, r, ErrorBadRequest(err))
-		return
-	}
-	if err := user.Insert(*data); err != nil {
-		render.Render(w, r, ErrorGeneric(err))
-		return
-	}
-	render.Status(r, http.StatusCreated)
-	if err := render.Render(w, r, userResponse(user)); err != nil {
-		render.Render(w, r, ErrorRender(err))
-		return
-	}
-}
-
-func GetUser(w http.ResponseWriter, r *http.Request) {
-	var (
-		user    models.User
-		id, err = util.PathID(consts.IDPathValue, r)
-	)
+	pool, err := database.Pool.Begin(database.Context)
 	if err != nil {
-		render.Render(w, r, ErrorBadRequest(err))
+		RenderError(r, writer, ErrorDatabase(err))
 		return
 	}
-	user.ID = id
-	if err := user.Select(); err != nil {
-		render.Render(w, r, ErrorGeneric(err))
+	defer pool.Rollback(database.Context)
+	q := db.New(pool)
+	if err := json.NewDecoder(request.Body).Decode(&requestData); err != nil {
+		RenderError(r, writer, ErrorBadJSON(err))
 		return
 	}
-	render.Status(r, http.StatusOK)
-	if err := render.Render(w, r, userResponse(&user)); err != nil {
-		render.Render(w, r, ErrorRender(err))
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	requestData.Salt, err = util.RandomBytes(16)
+	if err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+	requestData.Hash, err = util.GenerateHash([]byte(requestData.Password), requestData.Salt)
+	if err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+	data = requestData.CreateUserParams
+	user, err := q.CreateUser(database.Context, data)
+	if err != nil {
+		var (
+			pgErr   *pgconn.PgError
+			toWrite ErrorResponse
+		)
+		errors.As(err, &pgErr)
+		if pgErr.Code == "23505" {
+			toWrite = ErrorDuplicate(err, pgErr)
+		} else {
+			toWrite = ErrorGeneric(err)
+		}
+		RenderError(r, writer, toWrite)
+		return
+	}
+	Logger.Info().Str("id", user.ID.String()).Msg("user created")
+
+	// TODO: move hardcoded strings to consts
+	var (
+		finishedLibrary   = db.CreateLibraryParams{Userid: user.ID, Name: "Прочитано"}
+		readingLibrary    = db.CreateLibraryParams{Userid: user.ID, Name: "В процессе"}
+		tradeReadyLibrary = db.CreateLibraryParams{Userid: user.ID, Name: "Доступны для обмена"}
+		libraries         = map[string]pgtype.UUID{}
+	)
+	for _, library := range []db.CreateLibraryParams{finishedLibrary, readingLibrary, tradeReadyLibrary} {
+		newLibrary, err := q.CreateLibrary(database.Context, library)
+		if err != nil {
+			RenderError(r, writer, ErrorGeneric(err))
+			return
+		}
+		libraries[library.Name] = newLibrary.ID
+		Logger.Info().
+			Str("id", newLibrary.ID.String()).
+			Msg("library created")
+	}
+	Logger.Debug().Interface("libraries", libraries).Send()
+	if user, err = q.SetUserLibraries(database.Context, db.SetUserLibrariesParams{
+		ID:              user.ID,
+		FinishedReading: libraries["Прочитано"],
+		NowReading:      libraries["В процессе"],
+		TradeReady:      libraries["Доступны для обмена"],
+	}); err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+
+	if err := pool.Commit(database.Context); err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+	writer.WriteHeader(http.StatusCreated)
+	if err := json.NewEncoder(writer).Encode(user); err != nil {
+		RenderError(r, writer, ErrorRender(err))
 		return
 	}
 }
 
-func UpdateUser(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotImplemented)
+// GetUser godoc
+//
+//	@summary		Получить пользователя
+//	@description	Получает информацию о пользователе.
+//	@accept			plain
+//	@produce		json
+//
+//	@tags			Пользователи
+//
+//	@param			user-id	path		pgtype.UUID	true	"UUID пользователя"
+//
+//	@success		200		{object}	db.User
+//	@failure		400		{object}	ErrorResponse
+//	@failure		404		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
+//	@router			/api/users/{user-id} [get]
+func GetUser(writer http.ResponseWriter, request *http.Request) {
+	var (
+		err error
+		r   = render.New()
+		q   = db.New(database.Pool)
+	)
+	id, err := util.PathUUID(consts.UserIDPathValue, request)
+	if err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.UserIDPathValue))
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	user, err := q.GetUser(database.Context, id)
+	if err != nil {
+		var toWrite ErrorResponse
+		if errors.Is(err, pgx.ErrNoRows) {
+			toWrite = ErrorNotFound(err)
+		} else {
+			toWrite = ErrorGeneric(err)
+		}
+		RenderError(r, writer, toWrite)
+		return
+	}
+	Logger.Info().Str("id", user.ID.String()).Msg("user retrieved")
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(user); err != nil {
+		RenderError(r, writer, ErrorRender(err))
+		return
+	}
 }
 
-func DeleteUser(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotImplemented)
+// UpdateUser godoc
+//
+//	@summary		Изменить пользователя
+//	@description	Изменяет информацию о существующем пользователе.
+//	@accept			json
+//	@produce		json
+//
+//	@tags			Пользователи
+//
+//	@param			user-id		path		pgtype.UUID	true	"UUID пользователя"
+//	@param			email		body		string		false	"Электронная почта пользователя"	Example(ivanov@example.com)
+//	@param			login		body		string		false	"Логин пользователя"				Example(ivanov)
+//	@param			name		body		string		false	"ФИО пользователя"					Example(Иванов Иван Иванович)
+//	@param			password	body		string		false	"Пароль пользователя"				Example(ivanov123qwerty)
+//
+//	@success		200			{object}	db.User
+//	@failure		400			{object}	ErrorResponse
+//	@failure		409			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/users/{user-id} [patch]
+func UpdateUser(writer http.ResponseWriter, request *http.Request) {
+	var (
+		err  error
+		data db.UpdateUserParams
+		r    = render.New()
+		q    = db.New(database.Pool)
+	)
+	data.ID, err = util.PathUUID(consts.UserIDPathValue, request)
+	if err = errors.Join(err, json.NewDecoder(request.Body).Decode(&data)); err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.UserIDPathValue))
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	user, err := q.UpdateUser(database.Context, data)
+	if err != nil {
+		var (
+			pgErr   *pgconn.PgError
+			toWrite ErrorResponse
+		)
+		errors.As(err, &pgErr)
+		if pgErr.Code == "23505" {
+			toWrite = ErrorDuplicate(err, pgErr)
+		} else {
+			toWrite = ErrorGeneric(err)
+		}
+		RenderError(r, writer, toWrite)
+		return
+	}
+	Logger.Info().Str("id", user.ID.String()).Msg("user updated")
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(user); err != nil {
+		RenderError(r, writer, ErrorRender(err))
+		return
+	}
+}
+
+// SetProfileImage godoc
+//
+//	@summary		Задать аватар
+//	@description	Задаёт аватар пользователя.
+//	@accept			mpfd
+//	@produce		json
+//
+//	@tags			Пользователи
+//
+//	@param			user-id	path		pgtype.UUID	true	"UUID пользователя"
+//	@param			image	formData	file		true	"Файл аватара (PNG или JPEG)"
+//
+//	@success		200		{object}	db.User
+//	@failure		400		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
+//	@router			/api/users/{user-id}/image [put]
+func SetProfileImage(writer http.ResponseWriter, request *http.Request) {
+	// TODO: rename all functions so their names match those generated by sqlc
+	var (
+		err  error
+		data db.SetProfilePictureParams
+		r    = render.New()
+		q    = db.New(database.Pool)
+	)
+
+	if data.ID, err = util.PathUUID(consts.UserIDPathValue, request); err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.UserIDPathValue))
+		return
+	}
+
+	var client http.Client
+	req, err := http.NewRequest("POST", consts.StorageURL, nil)
+	if err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+	req.Body = request.Body
+	req.Header.Set("Content-Type", request.Header.Get("Content-Type"))
+	response, err := client.Do(req)
+	if err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+	defer response.Body.Close()
+
+	var errored bool
+	switch response.StatusCode {
+	case http.StatusCreated:
+		idJSON := StorageIDResponse{}
+		if err := json.NewDecoder(response.Body).Decode(&idJSON); err != nil {
+			RenderError(r, writer, ErrorGeneric(err))
+			errored = true
+			return
+		}
+		if err := data.Imageuuid.Scan(idJSON.ID); err != nil {
+			RenderError(r, writer, ErrorGeneric(err))
+			errored = true
+		}
+	default:
+		errorJSON := StorageErrorResponse{}
+		if err := json.NewDecoder(response.Body).Decode(&errorJSON); err != nil {
+			RenderError(r, writer, ErrorGeneric(err))
+			errored = true
+			return
+		}
+		RenderError(r, writer, ErrorImage(errorJSON.Error))
+		errored = true
+	}
+	if errored {
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	user, err := q.SetProfilePicture(database.Context, data)
+	if err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+	Logger.Info().
+		Str("id", user.ID.String()).
+		Str("imageUUID", user.ImageUuid.String()).
+		Msg("profile picture set")
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(user); err != nil {
+		RenderError(r, writer, ErrorRender(err))
+		return
+	}
+}
+
+// DeleteUser godoc
+//
+//	@summary		Удалить пользователя
+//	@description	Удаляет пользователя из базы данных.
+//	@accept			plain
+//	@produce		json
+//
+//	@tags			Пользователи
+//
+//	@param			user-id	path		pgtype.UUID	true	"UUID пользователя"
+//
+//	@success		200		{string}	string		""
+//	@failure		400		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
+//	@router			/api/users/{user-id} [delete]
+func DeleteUser(writer http.ResponseWriter, request *http.Request) {
+	var (
+		err error
+		r   = render.New()
+		q   = db.New(database.Pool)
+	)
+	id, err := util.PathUUID(consts.UserIDPathValue, request)
+	if err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.UserIDPathValue))
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	if err := q.DeleteUser(database.Context, id); err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+	Logger.Info().Str("id", id.String()).Msg("user deleted")
+
+	writer.WriteHeader(http.StatusOK)
 }

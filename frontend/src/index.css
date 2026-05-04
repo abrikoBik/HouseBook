@@ -1,7 +1,5 @@
 :root {
-  font-family:
-    "Lucida Sans Typewriter", "Lucida Sans Regular", "Lucida Sans",
-    "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  font-family: "IBM Plex Sans", sans;
   font-weight: 400;
 
   background-color: #f1eee3;
@@ -10,6 +8,24 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h4 {
+  font-family: "IBM Plex Serif", sans-serif;
+  font-weight: 600;
+
+  font-size: 1.125rem;
+}
+
+h1 {
+  font-family: "IBM Plex Serif", sans-serif;
+  font-weight: 600;
+
+  font-size: 5rem;
+}
+
+a {
+  color: #e0616a;
 }
 
 .material-symbols-outlined {

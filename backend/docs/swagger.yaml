@@ -1,0 +1,1464 @@
+definitions:
+  big.Int:
+    type: object
+  db.Book:
+    properties:
+      author:
+        type: string
+      cover_type:
+        $ref: '#/definitions/pgtype.Text'
+      description:
+        $ref: '#/definitions/pgtype.Text'
+      genre:
+        type: string
+      id:
+        type: string
+      image_uuid:
+        type: string
+      isbn:
+        type: string
+      language:
+        $ref: '#/definitions/pgtype.Text'
+      link:
+        $ref: '#/definitions/pgtype.Text'
+      page_count:
+        $ref: '#/definitions/pgtype.Numeric'
+      publisher:
+        type: string
+      title:
+        type: string
+      year:
+        $ref: '#/definitions/pgtype.Numeric'
+    type: object
+  db.Comment:
+    properties:
+      body:
+        type: string
+      book_id:
+        type: string
+      id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  db.Library:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      user_id:
+        type: string
+    type: object
+  db.LibraryBook:
+    properties:
+      book_id:
+        type: string
+      library_id:
+        type: string
+      quantity:
+        $ref: '#/definitions/pgtype.Numeric'
+    type: object
+  db.Trade:
+    properties:
+      buyer_confirmed:
+        type: boolean
+      buyer_id:
+        type: string
+      completed_at:
+        $ref: '#/definitions/pgtype.Timestamp'
+      created_at:
+        $ref: '#/definitions/pgtype.Timestamp'
+      id:
+        type: string
+      owner_confirmed:
+        type: boolean
+      owner_id:
+        type: string
+    type: object
+  db.TradeBook:
+    properties:
+      book_id:
+        type: string
+      owner_id:
+        type: string
+      trade_id:
+        type: string
+    type: object
+  db.User:
+    properties:
+      email:
+        type: string
+      finished_reading_id:
+        type: string
+      id:
+        type: string
+      image_uuid:
+        type: string
+      login:
+        type: string
+      name:
+        type: string
+      now_reading_id:
+        type: string
+      rating:
+        type: number
+      trade_ready_id:
+        type: string
+    type: object
+  handlers.ErrorResponse:
+    properties:
+      error:
+        type: string
+      explanation:
+        type: string
+    type: object
+  pgtype.InfinityModifier:
+    enum:
+    - 1
+    - 0
+    - -1
+    format: int32
+    type: integer
+    x-enum-varnames:
+    - Infinity
+    - Finite
+    - NegativeInfinity
+  pgtype.Numeric:
+    properties:
+      exp:
+        format: int32
+        type: integer
+      infinityModifier:
+        $ref: '#/definitions/pgtype.InfinityModifier'
+      int:
+        $ref: '#/definitions/big.Int'
+      naN:
+        type: boolean
+      valid:
+        type: boolean
+    type: object
+  pgtype.Text:
+    properties:
+      string:
+        type: string
+      valid:
+        type: boolean
+    type: object
+  pgtype.Timestamp:
+    properties:
+      infinityModifier:
+        $ref: '#/definitions/pgtype.InfinityModifier'
+      time:
+        description: Time zone will be ignored when encoding to PostgreSQL.
+        type: string
+      valid:
+        type: boolean
+    type: object
+info:
+  contact: {}
+paths:
+  /api/books:
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает список всех книг, хранящихся на сервере.
+      parameters:
+      - description: Лимит количества возвращаемых элементов
+        example: 10
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение возвращаемых элементов
+        example: 5
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Book'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Список книг
+      tags:
+      - Книги
+    post:
+      consumes:
+      - application/json
+      description: Создаёт новую книгу.
+      parameters:
+      - description: Полное имя автора
+        example: Известный автор
+        in: body
+        name: author
+        required: true
+        schema:
+          type: string
+      - description: Тип обложки (твёрдая, мягкая)
+        example: твёрдая
+        in: body
+        name: cover_type
+        schema:
+          type: string
+      - description: Описание книги
+        example: Крайне интересная книга об очень интересных вещах
+        in: body
+        name: description
+        schema:
+          type: string
+      - description: Жанр книги
+        example: Роман
+        in: body
+        name: genre
+        required: true
+        schema:
+          type: string
+      - description: ISBN книги
+        example: 978-3-16-148410-0
+        in: body
+        name: isbn
+        required: true
+        schema:
+          type: string
+      - description: Язык книги
+        example: Русский
+        in: body
+        name: language
+        schema:
+          type: string
+      - description: Количество страниц в книге
+        example: 100
+        in: body
+        name: page_count
+        schema:
+          type: integer
+      - description: Издательство книги
+        example: Хороший Издатель
+        in: body
+        name: publisher
+        required: true
+        schema:
+          type: string
+      - description: Название книги
+        example: Интересная книга
+        in: body
+        name: title
+        required: true
+        schema:
+          type: string
+      - description: Год выпуска книги
+        example: 2026
+        in: body
+        name: year
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.Book'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Создать книгу
+      tags:
+      - Книги
+  /api/books/{book-id}:
+    delete:
+      consumes:
+      - text/plain
+      description: Удаляет книгу из базы данных.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Удалить книгу
+      tags:
+      - Книги
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает информацию о книге.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Book'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Получить книгу
+      tags:
+      - Книги
+    patch:
+      consumes:
+      - application/json
+      description: Изменяет информацию о существующей книге.
+      parameters:
+      - description: Полное имя автора
+        example: Известный автор
+        in: body
+        name: author
+        schema:
+          type: string
+      - description: Тип обложки (твёрдая, мягкая)
+        example: твёрдая
+        in: body
+        name: cover_type
+        schema:
+          type: string
+      - description: Описание книги
+        example: Крайне интересная книга об очень интересных вещах
+        in: body
+        name: description
+        schema:
+          type: string
+      - description: Жанр книги
+        example: Роман
+        in: body
+        name: genre
+        schema:
+          type: string
+      - description: ISBN книги
+        example: 978-3-16-148410-0
+        in: body
+        name: isbn
+        schema:
+          type: string
+      - description: Язык книги
+        example: Русский
+        in: body
+        name: language
+        schema:
+          type: string
+      - description: Количество страниц в книге
+        example: 100
+        in: body
+        name: page_count
+        schema:
+          type: integer
+      - description: Издательство книги
+        example: Хороший Издатель
+        in: body
+        name: publisher
+        schema:
+          type: string
+      - description: Название книги
+        example: Интересная книга
+        in: body
+        name: title
+        schema:
+          type: string
+      - description: Год выпуска книги
+        example: 2026
+        in: body
+        name: year
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Book'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Изменить книгу
+      tags:
+      - Книги
+  /api/books/{book-id}/comments:
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает список всех отзывов о книге, хранящихся на сервере.
+      parameters:
+      - description: Лимит количества возвращаемых элементов
+        example: 10
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение возвращаемых элементов
+        example: 5
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Comment'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Список отзывов о книге
+      tags:
+      - Отзывы
+      - Книги
+  /api/books/{book-id}/cover:
+    put:
+      consumes:
+      - multipart/form-data
+      description: Задаёт обложку для книги.
+      parameters:
+      - description: Файл обложки (PNG или JPEG)
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Book'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Задать обложку
+      tags:
+      - Книги
+  /api/books/search:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает список книг, соответствующих поисковым параметрам.
+      parameters:
+      - description: Лимит количества возвращаемых элементов
+        example: 10
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение возвращаемых элементов
+        example: 5
+        in: query
+        name: offset
+        type: integer
+      - description: Полное имя автора
+        example: Известный автор
+        in: query
+        name: author
+        type: string
+      - description: Жанр книги
+        example: Роман
+        in: query
+        name: genre
+        type: string
+      - description: Язык книги
+        example: Русский
+        in: query
+        name: language
+        type: string
+      - description: Издательство книги
+        example: Хороший Издатель
+        in: query
+        name: publisher
+        type: string
+      - description: Название книги
+        example: Интересная книга
+        in: query
+        name: title
+        type: string
+      - description: Год выпуска книги
+        example: 2026
+        in: query
+        name: year
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Book'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Найти книги
+      tags:
+      - Книги
+  /api/comments:
+    post:
+      consumes:
+      - application/json
+      description: Создаёт новый отзыв о книге.
+      parameters:
+      - description: ID автора отзыва
+        in: body
+        name: userid
+        required: true
+        schema:
+          type: integer
+      - description: ID книги
+        in: body
+        name: bookid
+        required: true
+        schema:
+          type: integer
+      - description: Текст отзыва
+        in: body
+        name: body
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.Comment'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Создать отзыв
+      tags:
+      - Отзывы
+  /api/comments/{comment-id}:
+    delete:
+      consumes:
+      - text/plain
+      description: Удаляет отзыв из базы данных.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Удалить отзыв
+      tags:
+      - Отзывы
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает информацию об отзыве.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Comment'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Получить отзыв
+      tags:
+      - Отзывы
+  /api/libraries:
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает список всех библиотек, хранящихся на сервере.
+      parameters:
+      - description: Лимит количества возвращаемых элементов
+        example: 10
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение возвращаемых элементов
+        example: 5
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Library'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Список библиотек
+      tags:
+      - Библиотеки
+    post:
+      consumes:
+      - application/json
+      description: Создаёт новую пользовательскую библиотеку.
+      parameters:
+      - description: ID владельца библиотеки
+        in: body
+        name: userid
+        required: true
+        schema:
+          type: integer
+      - description: Название библиотеки
+        example: Избранное
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.Library'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Создать библиотеку
+      tags:
+      - Библиотеки
+  /api/libraries/{library-id}:
+    delete:
+      consumes:
+      - text/plain
+      description: Удаляет библиотеку из базы данных.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Удалить библиотеку
+      tags:
+      - Библиотеки
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает информацию о библиотеке.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Library'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Получить библиотеку
+      tags:
+      - Библиотеки
+  /api/libraries/{library-id}/books:
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает список всех книг, имеющихся в библиотеке.
+      parameters:
+      - description: Лимит количества возвращаемых элементов
+        example: 10
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение возвращаемых элементов
+        example: 5
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.LibraryBook'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Список книг в библиотеке
+      tags:
+      - Библиотеки
+      - Книги
+    patch:
+      consumes:
+      - application/json
+      description: Добавляет книгу в существующую библиотеку.
+      parameters:
+      - description: UUID библиотеки
+        in: path
+        name: library-id
+        required: true
+        type: string
+      - description: ID книги
+        in: body
+        name: bookid
+        required: true
+        schema:
+          type: string
+      - description: Количество экземпляров книги
+        in: body
+        name: quantity
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Добавить книгу
+      tags:
+      - Библиотеки
+      - Книги
+  /api/libraries/{library-id}/books/{book-id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет книгу из существующей библиотеки.
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Удалить книгу
+      tags:
+      - Библиотеки
+      - Книги
+  /api/trades:
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает список всех сделок, хранящихся на сервере.
+      parameters:
+      - description: Лимит количества возвращаемых элементов
+        example: 10
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение возвращаемых элементов
+        example: 5
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Trade'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Список сделок
+      tags:
+      - Сделки
+    post:
+      consumes:
+      - application/json
+      description: Создаёт новую сделку.
+      parameters:
+      - description: UUID инициатора сделки
+        in: body
+        name: ownerid
+        required: true
+        schema:
+          type: string
+      - description: UUID другой стороны сделки
+        in: body
+        name: buyerid
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.Trade'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Создать сделку
+      tags:
+      - Сделки
+  /api/trades/{trade-id}:
+    delete:
+      consumes:
+      - text/plain
+      description: Удаляет сделку из базы данных.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Удалить сделку
+      tags:
+      - Сделки
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает информацию о сделке.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Trade'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Получить сделку
+      tags:
+      - Сделки
+    patch:
+      consumes:
+      - application/json
+      description: Помечает сделку завершённой со стороны пользователя.
+      parameters:
+      - description: UUID пользователя
+        in: body
+        name: userid
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Trade'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Завершить сделку
+      tags:
+      - Сделки
+  /api/trades/{trade-id}/books:
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает список всех книг, включённых в сделку.
+      parameters:
+      - description: Лимит количества возвращаемых элементов
+        example: 10
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение возвращаемых элементов
+        example: 5
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.TradeBook'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Список книг в сделке
+      tags:
+      - Сделки
+      - Книги
+    patch:
+      consumes:
+      - application/json
+      description: Добавляет книгу в существующую сделку.
+      parameters:
+      - description: UUID владельца книги
+        in: body
+        name: ownerid
+        required: true
+        schema:
+          type: string
+      - description: ID книги
+        in: body
+        name: bookid
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Добавить книгу
+      tags:
+      - Сделки
+      - Книги
+  /api/trades/{trade-id}/books/{book-id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет книгу из существующей сделки.
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Удалить книгу
+      tags:
+      - Сделки
+      - Книги
+  /api/user/{user-id}/trades:
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает список сделок пользователя.
+      parameters:
+      - description: Лимит количества возвращаемых элементов
+        example: 10
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение возвращаемых элементов
+        example: 5
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Trade'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Список сделок пользователя
+      tags:
+      - Сделки
+      - Пользователи
+  /api/users:
+    post:
+      consumes:
+      - application/json
+      description: Создаёт нового пользователя.
+      parameters:
+      - description: Электронная почта пользователя
+        example: ivanov@example.com
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      - description: Логин пользователя
+        example: ivanov
+        in: body
+        name: login
+        required: true
+        schema:
+          type: string
+      - description: ФИО пользователя
+        example: Иванов Иван Иванович
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: Пароль пользователя
+        example: ivanov123qwerty
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Создать пользователя
+      tags:
+      - Пользователи
+  /api/users/{user-id}:
+    delete:
+      consumes:
+      - text/plain
+      description: Удаляет пользователя из базы данных.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Удалить пользователя
+      tags:
+      - Пользователи
+    get:
+      consumes:
+      - text/plain
+      description: Получает информацию о пользователе.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Получить пользователя
+      tags:
+      - Пользователи
+    patch:
+      consumes:
+      - application/json
+      description: Изменяет информацию о существующем пользователе.
+      parameters:
+      - description: Электронная почта пользователя
+        example: ivanov@example.com
+        in: body
+        name: email
+        schema:
+          type: string
+      - description: Логин пользователя
+        example: ivanov
+        in: body
+        name: login
+        schema:
+          type: string
+      - description: ФИО пользователя
+        example: Иванов Иван Иванович
+        in: body
+        name: name
+        schema:
+          type: string
+      - description: Пароль пользователя
+        example: ivanov123qwerty
+        in: body
+        name: password
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Изменить пользователя
+      tags:
+      - Пользователи
+  /api/users/{user-id}/comments:
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает список всех отзывов, написанных пользователем.
+      parameters:
+      - description: Лимит количества возвращаемых элементов
+        example: 10
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение возвращаемых элементов
+        example: 5
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Comment'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Список отзывов пользователя
+      tags:
+      - Отзывы
+      - Пользователи
+  /api/users/{user-id}/image:
+    put:
+      consumes:
+      - multipart/form-data
+      description: Задаёт аватар пользователя.
+      parameters:
+      - description: Файл аватара (PNG или JPEG)
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Задать аватар
+      tags:
+      - Пользователи
+  /api/users/{user-id}/libraries:
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает список всех библиотек, принадлежащих пользователю.
+      parameters:
+      - description: Лимит количества возвращаемых элементов
+        example: 10
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение возвращаемых элементов
+        example: 5
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Library'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Список библиотек пользователя
+      tags:
+      - Библиотеки
+      - Пользователи
+swagger: "2.0"

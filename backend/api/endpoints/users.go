@@ -2,19 +2,24 @@ package endpoints
 
 import (
 	"housebook/api/handlers"
+	"housebook/api/middleware"
+	"housebook/consts"
 
 	"github.com/go-chi/chi/v5"
 )
 
-const (
-	UsersPattern = "/users"
-)
-
 func routeUsers(router chi.Router) {
-	router.Route(UsersPattern, func(r chi.Router) {
-		r.Post("/", handlers.CreateUser)
-		r.Get("/{id}", handlers.GetUser)
-		r.Patch("/{id}", handlers.UpdateUser)
-		r.Delete("/{id}", handlers.DeleteUser)
+	router.Route(consts.UsersEndpoint, func(r chi.Router) {
+		r.With(middleware.JSONResponse).Post("/", handlers.CreateUser)
+		r.Route(consts.UserIDPath, func(r chi.Router) {
+			r.With(middleware.JSONResponse).Get("/", handlers.GetUser)
+			r.With(middleware.JSONResponse).Patch("/", handlers.UpdateUser)
+			r.With(middleware.JSONResponse).Put("/image", handlers.SetProfileImage)
+			r.Delete("/", handlers.DeleteUser)
+
+			r.With(middleware.JSONResponse).Get(consts.CommentsEndpoint, handlers.ListUserComments)
+			r.With(middleware.JSONResponse).Get(consts.TradesEndpoint, handlers.ListUserTrades)
+			r.With(middleware.JSONResponse).Get(consts.LibrariesEndpoint, handlers.ListUserLibraries)
+		})
 	})
 }

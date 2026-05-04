@@ -5,16 +5,15 @@ import (
 	"housebook/api/handlers"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 )
 
 func Register(router chi.Router) {
-	router.Use(middleware.RequestID)
-	router.Use(middleware.Logger)
-	router.Use(middleware.Recoverer)
-
+	router.Mount("/api", router)
 	router.Get("/health", handlers.Health)
+	routeDocs(router)
 	routeUsers(router)
 	routeBooks(router)
 	routeTrades(router)
+	routeLibraries(router)
+	routeComments(router)
 }

@@ -13,6 +13,7 @@ services:
       - 5432:5432
     volumes:
       - db:/var/lib/postgresql
+    hostname: db
     networks:
       - back
 
@@ -23,8 +24,18 @@ services:
     build: storage
     volumes:
       - storage:/var/lib/storage
+    hostname: storage
     networks:
       - back
+      - front
+
+  scraper:
+    image: housebook-scraper
+    restart: on-failure
+    env_file: .env
+    build: scraper
+    hostname: scraper
+    networks:
       - front
 
   backend:
@@ -35,6 +46,7 @@ services:
       - db
       - storage
     build: backend
+    hostname: backend
     networks:
       - back
       - front
@@ -63,7 +75,7 @@ services:
       - storage
     configs:
       - source: caddy
-        target: /etc/caddy/Caddyfile      
+        target: /etc/caddy/Caddyfile
     ports:
       - 80:80
       - 443:443/tcp

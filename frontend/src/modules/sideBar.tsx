@@ -1,7 +1,9 @@
-import HomeIcon from "../assets/Home.png";
-import LogoIcon from "../assets/Logo.png";
-import FavoritesIcon from "../assets/Favorites.png";
-import ExitIcon from "../assets/Exit.png";
+import HomeIcon from "../assets/Home_Black.svg";
+import LogoIcon from "../assets/LogoWOText.svg";
+import FavoritesIcon from "../assets/Favourite_Black.svg";
+import LibraryIcon from "../assets/Library_Black.svg";
+import ExitIcon from "../assets/Exit_Black.svg";
+import "../styles/sideBar.css";
 
 const sideBar = () => {
   return (

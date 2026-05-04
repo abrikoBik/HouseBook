@@ -3,33 +3,54 @@ package database
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
-	"os"
 
-	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/dialect/pgdialect"
-	"github.com/uptrace/bun/driver/pgdriver"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/rs/zerolog"
 )
 
 var (
-	Context     context.Context
-	Database    *sql.DB
-	BunDatabase *bun.DB
+	Context context.Context
+	Logger  *zerolog.Logger
+	Pool    *pgxpool.Pool
+
+	connString string
+	err        error
 )
 
-func Start(hostname string, port uint16) error {
+type Conf struct {
+	Context                                context.Context
+	Username, Password, Hostname, Database string
+	Port                                   uint16
+}
+
+func Config(config Conf, callback func()) {
+	Context = config.Context
+	Logger = zerolog.Ctx(Context)
 	// TODO: remove sslmode=disable
-	url := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		os.Getenv("POSTGRES_USER"),
-		os.Getenv("POSTGRES_PASSWORD"),
-		hostname,
-		port,
-		os.Getenv("POSTGRES_DB"),
+	connString = fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
+		config.Username,
+		config.Password,
+		config.Hostname,
+		config.Port,
+		config.Database,
 	)
-	Database = sql.OpenDB(pgdriver.NewConnector(
-		pgdriver.WithDSN(url),
-	))
-	BunDatabase = bun.NewDB(Database, pgdialect.New())
-	return nil
+	callback()
+}
+
+func Start(hostname string, port uint16, callback func()) {
+	Logger.Info().Str("hostname", hostname).Uint16("port", port).Msg("starting DB")
+	if Pool, err = pgxpool.New(Context, connString); err != nil {
+		Logger.Panic().Err(err).Msg("panicking in DB (pool)")
+	}
+	if err = Pool.Ping(Context); err != nil {
+		Logger.Panic().Err(err).Msg("panicking in DB (ping)")
+	}
+	callback()
+}
+
+func Stop(callback func()) {
+	Logger.Info().Msg("closing DB pool")
+	Pool.Close()
+	callback()
 }
