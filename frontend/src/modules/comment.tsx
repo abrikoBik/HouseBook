@@ -1,20 +1,38 @@
-import "../styles/comment.css";
+import { useEffect, useState } from "react";
 
-const Comment = () => {
+const getUsername = async (id: string) => {
+  const response = await fetch(`/api/users/${id}`);
+  const userJSON = await response.json();
+  return userJSON.name;
+};
+
+const Comment = ({
+  userID,
+  commentBody,
+}: {
+  userID: string;
+  commentBody: string;
+}) => {
+  const [username, setUsername] = useState<string>("Unknown user");
+
+  useEffect(() => {
+    const fetchUsername = async () => {
+      try {
+        const name = await getUsername(userID);
+        setUsername(name);
+      } catch (err) {
+        setUsername("Unknown user");
+      }
+    };
+    fetchUsername();
+  }, [userID]);
+
   return (
     <div id="bodyComment">
       <div id="iconComment"></div>
       <section>
-        <h4>Шиловский Максим</h4>
-        <p>
-          Очень сильная книга с интересным сюжетом и непривычными событиями для
-          европейского, русского менталитета. Читая эту книгу, я пересказывал
-          почти каждую главу родственникам. Книга содержит в себе много
-          философский мыслей и индийской мудрости, но при этом не перегружает
-          читателя. Чтение «Тень горы» показалось более захватывающим, чем
-          «Шантарам» из-за меньшего содержания военных действий. Буду
-          рекомендовать книгу знакомым.
-        </p>
+        <h4>{username}</h4>
+        <p>{commentBody}</p>
       </section>
     </div>
   );

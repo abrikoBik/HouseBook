@@ -1,4 +1,4 @@
-export default interface Book {
+export default interface BookT {
   author: string;
   cover_type?: string;
   description?: string;
@@ -10,4 +10,11 @@ export default interface Book {
   publisher: string;
   title: string;
   year?: number;
+}
+
+export default interface CommentT {
+  id: string;
+  user_id: string;
+  book_id: string;
+  body: string;
 }
