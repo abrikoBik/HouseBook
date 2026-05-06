@@ -1,6 +1,7 @@
 create table sessions (
     id uuid primary key default uuidv7(),
-    jwt text not null,
+    name text not null,
+    jwt text unique not null,
     user_id uuid references users(id) on delete cascade,
 );
 
