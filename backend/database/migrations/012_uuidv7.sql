@@ -13,6 +13,7 @@ alter table libraries
 alter table comments
     alter column id drop default,
     alter column id set default uuidv7();
+
 ---- create above / drop below ----
 
 create extension if not exists "uuid-ossp";

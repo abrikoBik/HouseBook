@@ -74,3 +74,10 @@ create table comments (
     body text not null,
     primary key (user_id, book_id)
 );
+
+create table sessions (
+    id uuid primary key default uuidv7(),
+    name text not null,
+    jwt text not null,
+    user_id uuid references users(id) on delete cascade
+);

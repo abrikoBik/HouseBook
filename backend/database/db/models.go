@@ -43,6 +43,13 @@ type LibraryBook struct {
 	Quantity  pgtype.Numeric `db:"quantity" json:"quantity"`
 }
 
+type Session struct {
+	ID     pgtype.UUID `db:"id" json:"id"`
+	Name   string      `db:"name" json:"name"`
+	Jwt    string      `db:"jwt" json:"jwt"`
+	UserID pgtype.UUID `db:"user_id" json:"user_id"`
+}
+
 type Trade struct {
 	ID             pgtype.UUID      `db:"id" json:"id"`
 	OwnerID        pgtype.UUID      `db:"owner_id" json:"owner_id"`
