@@ -55,9 +55,12 @@ const Scraper = ({ url }: { url: string }) => {
     // TODO: try-catch
     try {
       const book = await scrape(url!);
+      console.log(book);
       alert("👍 (книжка есть)");
       const apiResponse = await postScrapedBook(book!);
-      alert(`👍 (книжка теперь на сервере, ${apiResponse.book_id})`);
+      console.log(apiResponse);
+      alert(`👍 (книжка теперь на сервере, ${apiResponse.id})`);
+      // TODO: retrieve book cover on the backend, then call PATCH here with the returned image id
     } catch (err: unknown) {
       alert(`👎 (${err})`);
       console.error(err as Error);
