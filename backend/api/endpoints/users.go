@@ -15,6 +15,7 @@ func routeUsers(router chi.Router) {
 			r.With(middleware.JSONResponse).Get("/", handlers.GetUser)
 			r.With(middleware.JSONResponse).Patch("/", handlers.UpdateUser)
 			r.With(middleware.JSONResponse).Put("/image", handlers.SetProfileImage)
+			r.With(middleware.JSONResponse).Get("/search", handlers.SearchUser)
 			r.Delete("/", handlers.DeleteUser)
 
 			r.With(middleware.JSONResponse).Get(consts.CommentsEndpoint, handlers.ListUserComments)
