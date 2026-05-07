@@ -7,6 +7,14 @@
   overflow: hidden;
 }
 
+.error-message,
+.success-message {
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
 #AuthSection {
   display: flex;
   flex-direction: column;

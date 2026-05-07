@@ -11,7 +11,7 @@ const Library = () => {
       <SideBar />
       <Header />
 
-      <section id="layout">
+      <section id="libraryLayout">
         <section id="info">
           <h4>Моя библиотека</h4>
           <nav>
