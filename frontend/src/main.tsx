@@ -27,6 +27,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/library" element={<Library />} />
           <Route path="/book/:uuid" element={<Book />} />
           <Route path="/book/catalog" element={<Catalog />} />
+          <Route path="/landing" element={<Landing />} />
           <Route path="/*" element={<NotFound />} />
         </Routes>
       </Router>

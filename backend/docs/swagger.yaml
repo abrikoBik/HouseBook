@@ -41,6 +41,15 @@ definitions:
       user_id:
         type: string
     type: object
+  db.GetSessionByIDRow:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      user_id:
+        type: string
+    type: object
   db.Library:
     properties:
       id:
@@ -58,6 +67,35 @@ definitions:
         type: string
       quantity:
         $ref: '#/definitions/pgtype.Numeric'
+    type: object
+  db.ListUserSessionsRow:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      user_id:
+        type: string
+    type: object
+  db.RenameSessionByIDRow:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      user_id:
+        type: string
+    type: object
+  db.Session:
+    properties:
+      id:
+        type: string
+      jwt:
+        type: string
+      name:
+        type: string
+      user_id:
+        type: string
     type: object
   db.Trade:
     properties:
@@ -577,13 +615,13 @@ paths:
         name: userid
         required: true
         schema:
-          type: integer
+          type: string
       - description: ID книги
         in: body
         name: bookid
         required: true
         schema:
-          type: integer
+          type: string
       - description: Текст отзыва
         in: body
         name: body
@@ -895,6 +933,85 @@ paths:
       tags:
       - Библиотеки
       - Книги
+  /api/sessions/{session-id}:
+    delete:
+      consumes:
+      - text/plain
+      description: Удаляет сессию из базы данных.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Удалить сессию
+      tags:
+      - Сессии
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает информацию о сессии.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.GetSessionByIDRow'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Получить сессию
+      tags:
+      - Сессии
+    patch:
+      consumes:
+      - application/json
+      description: Изменяет название сессии.
+      parameters:
+      - description: Название сессии
+        example: Браузер на ПК
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.RenameSessionByIDRow'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Переименовать сессию
+      tags:
+      - Сессии
   /api/trades:
     get:
       consumes:
@@ -1461,4 +1578,97 @@ paths:
       tags:
       - Библиотеки
       - Пользователи
+  /api/users/{user-id}/sessions:
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает список всех сессий пользователя.
+      parameters:
+      - description: Лимит количества возвращаемых элементов
+        example: 10
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение возвращаемых элементов
+        example: 5
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.ListUserSessionsRow'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Список сессий пользователя
+      tags:
+      - Сессии
+      - Пользователи
+    post:
+      consumes:
+      - application/json
+      description: Создаёт новую сессию (вход в аккаунт).
+      parameters:
+      - description: Название сессии
+        example: Браузер на ПК
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: Логин пользователя
+        example: ivanov
+        in: body
+        name: login
+        required: true
+        schema:
+          type: string
+      - description: Пароль пользователя
+        example: ivanov123qwerty
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.Session'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Создать сессию
+      tags:
+      - Сессии
 swagger: "2.0"

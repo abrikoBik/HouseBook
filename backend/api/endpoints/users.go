@@ -20,6 +20,7 @@ func routeUsers(router chi.Router) {
 			r.With(middleware.JSONResponse).Get(consts.CommentsEndpoint, handlers.ListUserComments)
 			r.With(middleware.JSONResponse).Get(consts.TradesEndpoint, handlers.ListUserTrades)
 			r.With(middleware.JSONResponse).Get(consts.LibrariesEndpoint, handlers.ListUserLibraries)
+			r.With(middleware.JSONResponse).Get(consts.SessionsEndpoint, handlers.ListUserSessions)
 		})
 	})
 }

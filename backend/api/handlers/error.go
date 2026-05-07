@@ -101,6 +101,14 @@ func ErrorImage(err string) ErrorResponse {
 	}
 }
 
+func ErrorWrongPassword(err error) ErrorResponse {
+	return ErrorResponse{
+		Status: http.StatusUnauthorized,
+		Error:  "wrong password",
+		err:    err,
+	}
+}
+
 func ErrorGeneric(err error) ErrorResponse {
 	return ErrorResponse{
 		Status: http.StatusInternalServerError,

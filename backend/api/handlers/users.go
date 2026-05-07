@@ -160,7 +160,7 @@ func GetUser(writer http.ResponseWriter, request *http.Request) {
 	if PingDB(r, writer) != nil {
 		return
 	}
-	user, err := q.GetUser(database.Context, id)
+	user, err := q.GetUserByID(database.Context, id)
 	if err != nil {
 		var toWrite ErrorResponse
 		if errors.Is(err, pgx.ErrNoRows) {

@@ -7,6 +7,7 @@ import (
 	"housebook_scraper/util"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/gsiems/go-isbn/pkg/isbn"
@@ -15,7 +16,7 @@ import (
 // Site contains the domain and all Colly scraper strings for a specific site.
 type Site struct {
 	Title, Author, ISBN, Genre, Publisher, // required fields
-	Year, Language, CoverType, PageCount, Description, // non-required fields
+	Year, Language, CoverType, PageCount, Description, CoverImage, // non-required fields
 	Domain, Root string
 }
 
@@ -62,6 +63,17 @@ func (site *Site) Scrape(collector *colly.Collector, requestURL *url.URL) (resul
 			}
 		}
 		result.Description = element.ChildText(site.Description)
+		imageLink := element.ChildAttr(site.CoverImage, "srcset")
+		u, err := url.Parse(strings.Split(imageLink, " ")[0])
+		if err != nil {
+			return
+		}
+		if u.String() != "" {
+			if u.Scheme == "" {
+				u.Scheme = "http"
+			}
+			result.CoverImage = u.String()
+		}
 	})
 	err = collector.Visit(requestURL.String())
 	collector.Wait()

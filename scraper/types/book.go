@@ -13,4 +13,5 @@ type Book struct {
 	CoverType   string `json:"cover_type,omitempty"`
 	PageCount   int    `json:"page_count,omitempty"`
 	Description string `json:"description,omitempty"`
+	CoverImage  string `json:"coverImage,omitempty"`
 }
