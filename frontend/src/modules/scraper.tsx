@@ -33,7 +33,18 @@ const scrape = async (link: string) => {
   if (!response.ok) {
     throw new Error((result as Error).error);
   }
-  console.log(result);
+  return result as BookT;
+};
+
+const postScrapedBook = async (book: BookT) => {
+  const response = await fetch(`/api/books`, {
+    method: "POST",
+    body: JSON.stringify(book),
+  });
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error((result as Error).error);
+  }
   return result as BookT;
 };
 
@@ -43,8 +54,10 @@ const Scraper = ({ url }: { url: string }) => {
     const url = textareaRef.current?.value;
     // TODO: try-catch
     try {
-      await scrape(url!);
-      alert("👍");
+      const book = await scrape(url!);
+      alert("👍 (книжка есть)");
+      const apiResponse = await postScrapedBook(book!);
+      alert(`👍 (книжка теперь на сервере, ${apiResponse.book_id})`);
     } catch (err: unknown) {
       alert(`👎 (${err})`);
       console.error(err as Error);
@@ -52,11 +65,11 @@ const Scraper = ({ url }: { url: string }) => {
   };
 
   const [book, setBook] = useState<BookT>();
-  console.log(book);
+  console.log(book, setBook);
   useEffect(() => {
     const scrapeBook = async () => {
-      const name = await scrape(url);
-      setBook(name);
+      // const name = await scrape(url);
+      // setBook(name);
     };
     scrapeBook();
   }, [url]);
