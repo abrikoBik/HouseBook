@@ -12,4 +12,5 @@ var MyBook = Site{
 	Year:        ".iSnZQd div:nth-child(1)>dl:nth-child(3)>dd",
 	PageCount:   ".eSjGMZ p:nth-child(1)",
 	Description: ".gAFRve>p",
+	CoverImage:  ".idoTYd>.kkiIwl>picture", // TODO: fix
 }
