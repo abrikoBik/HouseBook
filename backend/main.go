@@ -5,6 +5,7 @@ import (
 	"housebook/api"
 	"housebook/consts"
 	"housebook/database"
+	"housebook/util"
 	"os"
 	"os/signal"
 	"sync"
@@ -25,17 +26,16 @@ func main() {
 
 	wg.Add(consts.ServiceCount)
 	dbConf := database.Conf{
-		Context: logger.WithContext(ctx),
-		// TODO: implement env module
-		Username: os.Getenv("POSTGRES_USER"),
-		Password: os.Getenv("POSTGRES_PASSWORD"),
-		Database: os.Getenv("POSTGRES_DB"),
+		Context:  logger.WithContext(ctx),
+		Username: util.Getenv("POSTGRES_USER"),
+		Password: util.Getenv("POSTGRES_PASSWORD"),
+		Database: util.Getenv("POSTGRES_DB"),
 		Hostname: "db",
 		Port:     5432,
 	}
 	apiConf := api.Conf{
 		Context:  logger.WithContext(ctx),
-		JWTKey:   []byte(os.Getenv("JWT_KEY")),
+		JWTKey:   []byte(util.Getenv("JWT_KEY")),
 		Hostname: "0.0.0.0",
 		Port:     3000,
 	}

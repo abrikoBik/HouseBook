@@ -91,7 +91,7 @@ func CreateSession(writer http.ResponseWriter, request *http.Request) {
 	})
 	data.Login = user.Login
 	data.Userid = user.ID
-	data.Jwt, err = token.SignedString([]byte(os.Getenv("JWT_KEY")))
+	data.Jwt, err = token.SignedString([]byte(util.Getenv("JWT_KEY")))
 	if err != nil {
 		RenderError(r, writer, ErrorGeneric(err))
 		return
