@@ -1,7 +1,8 @@
 #landing-hero {
   text-align: center;
-  padding-top: 240px;
+  padding-top: 130px;
   padding-bottom: 60px;
+  user-select: none;
 }
 
 #landing-hero img {
@@ -16,8 +17,9 @@
 #hero-title {
   font-size: 2.8rem;
   font-weight: 700;
-  margin-bottom: 10px;
+  margin-bottom: 30px;
   line-height: 1.2;
+  user-select: none;
 }
 
 #hero-subtitle {
@@ -26,18 +28,20 @@
   font-weight: 400;
   max-width: 600px;
   margin: 0 auto;
+  user-select: none;
 }
 
 #features-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 30px;
-  padding: 0 40px 80px;
+  padding: 0 0 80px;
   max-width: 1200px;
   margin: 0 auto;
+  user-select: none;
 }
 
-.feature-card {
+.feature-card-link {
   background-color: #ffffff;
   border-radius: 16px;
   padding: 30px 20px;
@@ -49,9 +53,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  user-select: none;
 }
 
-.feature-card:hover {
+.feature-card-link:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
@@ -72,14 +80,20 @@
   transition: opacity 0.3s ease;
 }
 
-.feature-card:hover .card-icon-inline {
+.feature-card-link:hover .card-icon-inline {
   opacity: 1;
 }
 
-.feature-card p {
+.feature-card-link p {
   font-size: 0.95rem;
   color: #7f8c8d;
   line-height: 1.5;
   margin: 0;
   max-width: 250px;
+}
+
+.feature-card-link h3,
+.feature-card-link p {
+  color: inherit;
+  margin: 0;
 }
