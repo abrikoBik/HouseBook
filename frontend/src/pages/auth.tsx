@@ -9,13 +9,13 @@ interface RegisterForm {
   login: string;
   name: string;
   password: string;
-};
+}
 
 interface LoginForm {
   name: string;
   login: string;
   password: string;
-};
+}
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -31,38 +31,38 @@ const Auth = () => {
     email: "",
     login: "",
     name: "",
-    password: ""
-  }); 
+    password: "",
+  });
 
   const [loginForm, setLoginForm] = useState<LoginForm>({
     name: window.navigator.userAgent,
     login: "",
-    password: ""
+    password: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if(active) {
+    if (active) {
       setRegisterForm({
         ...registerForm,
-        [e.target.id]: e.target.value
+        [e.target.id]: e.target.value,
       });
     } else {
       setLoginForm({
         ...loginForm,
-        [e.target.id]: e.target.value
+        [e.target.id]: e.target.value,
       });
     }
-  }
+  };
 
   const sendRegister = async () => {
-    if(registerForm.password == checkPass) {
+    if (registerForm.password == checkPass) {
       const response = await fetch("api/users", {
         method: "POST",
-        body: JSON.stringify(registerForm)
+        body: JSON.stringify(registerForm),
       });
-      
+
       // TODO: error handler
-      if(!response.ok) {
+      if (!response.ok) {
         switch (response.status) {
           case 409:
             setMessage("Такой аккаунт уже существует!");
@@ -79,16 +79,16 @@ const Auth = () => {
       setErrorMessage(true);
       setMessage("Пароли не совпадают!");
     }
-  }
+  };
 
   const sendLogin = async () => {
     const sessionResponse = await fetch(`/api/sessions`, {
       method: "POST",
-      body: JSON.stringify(loginForm)
-    }); 
-    
+      body: JSON.stringify(loginForm),
+    });
+
     // TODO: error handler
-    if(!sessionResponse.ok) {
+    if (!sessionResponse.ok) {
       switch (sessionResponse.status) {
         case 401:
           setErrorMessage(true);
@@ -106,7 +106,7 @@ const Auth = () => {
     // TODO: install JWT unhash library to get user id
     localStorage.setItem("token", responseJSON["jwt"]);
     navigate("/profile");
-  }
+  };
 
   return (
     <section id="bodyAuth">
@@ -122,13 +122,19 @@ const Auth = () => {
         <div id="SliderButton">
           <button
             className={`AuthButtons ${active == false ? "active" : "normal"}`}
-            onClick={() => {setActive(false); setMessage("");}}
+            onClick={() => {
+              setActive(false);
+              setMessage("");
+            }}
           >
             Авторизация
           </button>
           <button
             className={`AuthButtons ${active == true ? "active" : "normal"}`}
-            onClick={() => {setActive(true); setMessage("");}}
+            onClick={() => {
+              setActive(true);
+              setMessage("");
+            }}
           >
             Регистрация
           </button>
@@ -138,8 +144,15 @@ const Auth = () => {
         </div>
 
         <div id={`${message == "" ? "HideMessage" : "ShowMessage"}`}>
-          <div id="MessageWindow" className={`${errorMessage ? "ErrorMessage" : ""}`}>
-            <span className="material-symbols-outlined" id={`${errorMessage ? "" : "Hidden"}`} style={{marginRight: "0.25rem"}}>
+          <div
+            id="MessageWindow"
+            className={`${errorMessage ? "ErrorMessage" : ""}`}
+          >
+            <span
+              className="material-symbols-outlined"
+              id={`${errorMessage ? "" : "Hidden"}`}
+              style={{ marginRight: "0.25rem" }}
+            >
               error
             </span>
             {message}
@@ -153,7 +166,13 @@ const Auth = () => {
           {!active ? (
             <>
               <div className="AuthInput">
-                <input key="auth-login" id="login" type="text" placeholder="Введите ваш логин" onChange={handleChange}/>
+                <input
+                  key="auth-login"
+                  id="login"
+                  type="text"
+                  placeholder="Введите ваш логин"
+                  onChange={handleChange}
+                />
                 <span className="material-symbols-outlined NoSelection PersonIcon">
                   person
                 </span>
@@ -199,19 +218,36 @@ const Auth = () => {
           ) : (
             <>
               <div className="AuthInput">
-                <input key="register-email" id="email" type="text" placeholder="Введите email" onChange={handleChange} />
+                <input
+                  key="register-email"
+                  id="email"
+                  type="text"
+                  placeholder="Введите email"
+                  onChange={handleChange}
+                />
                 <span className="material-symbols-outlined NoSelection PersonIcon">
                   mail
                 </span>
               </div>
               <div className="AuthInput">
-                <input key="register-login" id="login" type="text" placeholder="Введите логин" onChange={handleChange} />
+                <input
+                  key="register-login"
+                  id="login"
+                  type="text"
+                  placeholder="Введите логин"
+                  onChange={handleChange}
+                />
                 <span className="material-symbols-outlined NoSelection PersonIcon">
                   person
                 </span>
               </div>
               <div className="AuthInput">
-                <input id="name" type="text" placeholder="Введите ФИО" onChange={handleChange} />
+                <input
+                  id="name"
+                  type="text"
+                  placeholder="Введите ФИО"
+                  onChange={handleChange}
+                />
                 <span className="material-symbols-outlined NoSelection PersonIcon">
                   badge
                 </span>

@@ -16,9 +16,9 @@
 }
 
 .ErrorMessage {
-  border: solid 2px #ae4242!important;
+  border: solid 2px #ae4242 !important;
   background-color: #e25b5ba0;
-  color: white!important;
+  color: white !important;
 }
 
 #MessageWindow {

@@ -7,16 +7,13 @@ const getUsername = async (id: string) => {
 };
 
 const parseMarkdown = (text: string): string => {
+  let safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-  let safeText = text
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-  
   safeText = safeText
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>');
-  
-  safeText = safeText.replace(/&lt;u&gt;(.*?)&lt;\/u&gt;/g, '<u>$1</u>');
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.*?)\*/g, "<em>$1</em>");
+
+  safeText = safeText.replace(/&lt;u&gt;(.*?)&lt;\/u&gt;/g, "<u>$1</u>");
 
   return safeText;
 };
