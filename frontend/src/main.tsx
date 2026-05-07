@@ -13,6 +13,7 @@ import Profile from "./pages/profile.tsx";
 import Catalog from "./pages/catalog.tsx";
 import NotFound from "./pages/notfound.tsx";
 import Library from "./pages/library.tsx";
+import Scrape from "./pages/scrape.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -27,6 +28,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/library" element={<Library />} />
           <Route path="/book/:uuid" element={<Book />} />
           <Route path="/book/catalog" element={<Catalog />} />
+          <Route path="/book/scrape" element={<Scrape />} />
           <Route path="/*" element={<NotFound />} />
         </Routes>
       </Router>
