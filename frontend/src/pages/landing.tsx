@@ -1,5 +1,5 @@
 import React from "react";
-import Header from "../modules/header";
+import { Link } from "react-router-dom";
 import LogoWText from "../assets/LogoWText.svg";
 import Lupa from "../assets/Lupa.svg";
 import HomeBlack from "../assets/Home_Black.svg";
@@ -11,7 +11,6 @@ import "../styles/landing.css";
 const Landing: React.FC = () => {
   return (
     <section id="header">
-      <Header />
       <section id="landing-hero">
         <img src={LogoWText} alt="HouseBook Main Logo" />
         <h1 id="hero-title">Добро пожаловать в HouseBook</h1>
@@ -19,15 +18,15 @@ const Landing: React.FC = () => {
       </section>
 
       <section id="features-grid">
-        <div className="feature-card">
+        <Link to="/book/catalog" className="feature-card-link">
           <div className="card-header">
             <img src={Lupa} alt="Иконка поиска" className="card-icon-inline" />
             <h3>Каталог Книг</h3>
           </div>
           <p>Огромная база данных книг всех жанров и авторов.</p>
-        </div>
+        </Link>
 
-        <div className="feature-card">
+        <Link to="/library" className="feature-card-link">
           <div className="card-header">
             <img
               src={HomeBlack}
@@ -37,9 +36,9 @@ const Landing: React.FC = () => {
             <h3>Своя библиотека</h3>
           </div>
           <p>Отслеживайте прочитанное, ставьте оценки и пишите рецензии.</p>
-        </div>
+        </Link>
 
-        <div className="feature-card">
+        <Link to="/profile/trade" className="feature-card-link">
           <div className="card-header">
             <img
               src={LibraryBlack}
@@ -48,10 +47,10 @@ const Landing: React.FC = () => {
             />
             <h3>Меняйся!</h3>
           </div>
-          <p>Нету книги, которую хочешь прочитать? Поменяйся!</p>
-        </div>
+          <p>Нету книги, которую хочешь прочитать? Обменяйся!</p>
+        </Link>
 
-        <div className="feature-card">
+        <Link to="/profile" className="feature-card-link">
           <div className="card-header">
             <img
               src={Natification}
@@ -61,7 +60,7 @@ const Landing: React.FC = () => {
             <h3>Личный профиль</h3>
           </div>
           <p>Следи за статистикой, отслеживай сделки и делись впечатлениями!</p>
-        </div>
+        </Link>
       </section>
     </section>
   );
