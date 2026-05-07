@@ -63,69 +63,72 @@ func (q *Queries) DeleteSessionByToken(ctx context.Context, jwt string) error {
 }
 
 const getSessionByID = `-- name: GetSessionByID :one
-select id, name, jwt, user_id from sessions
+select id, name, user_id from sessions
 where id = $1
 limit 1
 `
 
-func (q *Queries) GetSessionByID(ctx context.Context, id pgtype.UUID) (Session, error) {
+type GetSessionByIDRow struct {
+	ID     pgtype.UUID `db:"id" json:"id"`
+	Name   string      `db:"name" json:"name"`
+	UserID pgtype.UUID `db:"user_id" json:"user_id"`
+}
+
+func (q *Queries) GetSessionByID(ctx context.Context, id pgtype.UUID) (GetSessionByIDRow, error) {
 	row := q.db.QueryRow(ctx, getSessionByID, id)
-	var i Session
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Jwt,
-		&i.UserID,
-	)
+	var i GetSessionByIDRow
+	err := row.Scan(&i.ID, &i.Name, &i.UserID)
 	return i, err
 }
 
 const getSessionByToken = `-- name: GetSessionByToken :one
-select id, name, jwt, user_id from sessions
+select id, name, user_id from sessions
 where jwt = $1
 limit 1
 `
 
-func (q *Queries) GetSessionByToken(ctx context.Context, jwt string) (Session, error) {
+type GetSessionByTokenRow struct {
+	ID     pgtype.UUID `db:"id" json:"id"`
+	Name   string      `db:"name" json:"name"`
+	UserID pgtype.UUID `db:"user_id" json:"user_id"`
+}
+
+func (q *Queries) GetSessionByToken(ctx context.Context, jwt string) (GetSessionByTokenRow, error) {
 	row := q.db.QueryRow(ctx, getSessionByToken, jwt)
-	var i Session
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Jwt,
-		&i.UserID,
-	)
+	var i GetSessionByTokenRow
+	err := row.Scan(&i.ID, &i.Name, &i.UserID)
 	return i, err
 }
 
-const getUserSessions = `-- name: GetUserSessions :many
-select id, name, jwt, user_id from sessions
+const listUserSessions = `-- name: ListUserSessions :many
+select id, name, user_id from sessions
 where user_id = $3
 limit $1
 offset $2
 `
 
-type GetUserSessionsParams struct {
+type ListUserSessionsParams struct {
 	Limit  int32       `db:"limit" json:"limit"`
 	Offset int32       `db:"offset" json:"offset"`
 	Userid pgtype.UUID `db:"userid" json:"userid"`
 }
 
-func (q *Queries) GetUserSessions(ctx context.Context, arg GetUserSessionsParams) ([]Session, error) {
-	rows, err := q.db.Query(ctx, getUserSessions, arg.Limit, arg.Offset, arg.Userid)
+type ListUserSessionsRow struct {
+	ID     pgtype.UUID `db:"id" json:"id"`
+	Name   string      `db:"name" json:"name"`
+	UserID pgtype.UUID `db:"user_id" json:"user_id"`
+}
+
+func (q *Queries) ListUserSessions(ctx context.Context, arg ListUserSessionsParams) ([]ListUserSessionsRow, error) {
+	rows, err := q.db.Query(ctx, listUserSessions, arg.Limit, arg.Offset, arg.Userid)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Session
+	var items []ListUserSessionsRow
 	for rows.Next() {
-		var i Session
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Jwt,
-			&i.UserID,
-		); err != nil {
+		var i ListUserSessionsRow
+		if err := rows.Scan(&i.ID, &i.Name, &i.UserID); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -140,7 +143,7 @@ const renameSessionByID = `-- name: RenameSessionByID :one
 update sessions
 set name = $1
 where id = $2
-returning id, name, jwt, user_id
+returning id, name, user_id
 `
 
 type RenameSessionByIDParams struct {
@@ -148,15 +151,16 @@ type RenameSessionByIDParams struct {
 	ID   pgtype.UUID `db:"id" json:"id"`
 }
 
-func (q *Queries) RenameSessionByID(ctx context.Context, arg RenameSessionByIDParams) (Session, error) {
+type RenameSessionByIDRow struct {
+	ID     pgtype.UUID `db:"id" json:"id"`
+	Name   string      `db:"name" json:"name"`
+	UserID pgtype.UUID `db:"user_id" json:"user_id"`
+}
+
+func (q *Queries) RenameSessionByID(ctx context.Context, arg RenameSessionByIDParams) (RenameSessionByIDRow, error) {
 	row := q.db.QueryRow(ctx, renameSessionByID, arg.Name, arg.ID)
-	var i Session
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Jwt,
-		&i.UserID,
-	)
+	var i RenameSessionByIDRow
+	err := row.Scan(&i.ID, &i.Name, &i.UserID)
 	return i, err
 }
 

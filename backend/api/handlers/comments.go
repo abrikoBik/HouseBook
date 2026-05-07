@@ -23,9 +23,9 @@ import (
 //
 //	@tags			Отзывы
 //
-//	@param			userid	body		pgtype.UUID		true	"ID автора отзыва"
-//	@param			bookid	body		pgtype.UUID		true	"ID книги"
-//	@param			body	body		string	true	"Текст отзыва"
+//	@param			userid	body		pgtype.UUID	true	"ID автора отзыва"
+//	@param			bookid	body		pgtype.UUID	true	"ID книги"
+//	@param			body	body		string		true	"Текст отзыва"
 //
 //	@success		201		{object}	db.Comment
 //	@failure		400		{object}	ErrorResponse

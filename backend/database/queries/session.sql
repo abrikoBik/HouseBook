@@ -1,15 +1,15 @@
 -- name: GetSessionByID :one
-select * from sessions
+select id, name, user_id from sessions
 where id = @id
 limit 1;
 
 -- name: GetSessionByToken :one
-select * from sessions
+select id, name, user_id from sessions
 where jwt = @jwt
 limit 1;
 
--- name: GetUserSessions :many
-select * from sessions
+-- name: ListUserSessions :many
+select id, name, user_id from sessions
 where user_id = @userID
 limit $1
 offset $2;
@@ -30,7 +30,7 @@ returning *;
 update sessions
 set name = @name
 where id = @id
-returning *;
+returning id, name, user_id;
 
 -- name: RenameSessionByToken :one
 update sessions
