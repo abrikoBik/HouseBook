@@ -87,6 +87,7 @@ func CreateSession(writer http.ResponseWriter, request *http.Request) {
 		"exp":  jwt.NewNumericDate(now.Add(time.Hour * 24 * 7 * 5)),
 		"hash": hash,
 		"name": data.Name,
+		"id":   user.ID,
 	})
 	data.Login = user.Login
 	data.Userid = user.ID
