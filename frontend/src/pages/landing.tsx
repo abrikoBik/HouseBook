@@ -1,12 +1,12 @@
-import React from 'react';
-import Header from '../modules/header';
-import LogoWText from '../assets/LogoWText.svg';
-import Lupa from '../assets/Lupa.svg';
-import HomeBlack from '../assets/Home_Black.svg';
-import LibraryBlack from '../assets/Library_Black.svg';
-import Natification from '../assets/Notification.svg'; 
+import React from "react";
+import Header from "../modules/header";
+import LogoWText from "../assets/LogoWText.svg";
+import Lupa from "../assets/Lupa.svg";
+import HomeBlack from "../assets/Home_Black.svg";
+import LibraryBlack from "../assets/Library_Black.svg";
+import Natification from "../assets/Notification.svg";
 
-import '../styles/landing.css';
+import "../styles/landing.css";
 
 const Landing: React.FC = () => {
   return (
@@ -29,7 +29,11 @@ const Landing: React.FC = () => {
 
         <div className="feature-card">
           <div className="card-header">
-            <img src={HomeBlack} alt="Иконка дома" className="card-icon-inline" />
+            <img
+              src={HomeBlack}
+              alt="Иконка дома"
+              className="card-icon-inline"
+            />
             <h3>Своя библиотека</h3>
           </div>
           <p>Отслеживайте прочитанное, ставьте оценки и пишите рецензии.</p>
@@ -37,7 +41,11 @@ const Landing: React.FC = () => {
 
         <div className="feature-card">
           <div className="card-header">
-            <img src={LibraryBlack} alt="Иконка библиотеки" className="card-icon-inline" />
+            <img
+              src={LibraryBlack}
+              alt="Иконка библиотеки"
+              className="card-icon-inline"
+            />
             <h3>Меняйся!</h3>
           </div>
           <p>Нету книги, которую хочешь прочитать? Поменяйся!</p>
@@ -45,7 +53,11 @@ const Landing: React.FC = () => {
 
         <div className="feature-card">
           <div className="card-header">
-            <img src={Natification} alt="Иконка уведомлений" className="card-icon-inline" />
+            <img
+              src={Natification}
+              alt="Иконка уведомлений"
+              className="card-icon-inline"
+            />
             <h3>Личный профиль</h3>
           </div>
           <p>Следи за статистикой, отслеживай сделки и делись впечатлениями!</p>
