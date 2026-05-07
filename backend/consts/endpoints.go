@@ -9,6 +9,7 @@ const (
 	TradesEndpoint    = "/trades"
 	LibrariesEndpoint = "/libraries"
 	CommentsEndpoint  = "/comments"
+	SessionsEndpoint  = "/sessions"
 
 	GenericIDPathValue = "id"
 	BookIDPathValue    = "book-id"
@@ -16,6 +17,7 @@ const (
 	LibraryIDPathValue = "library-id"
 	TradeIDPathValue   = "trade-id"
 	UserIDPathValue    = "user-id"
+	SessionIDPathValue = "session-id"
 )
 
 var (
@@ -25,4 +27,5 @@ var (
 	LibraryIDPath = fmt.Sprintf("/{%s}", LibraryIDPathValue)
 	TradeIDPath   = fmt.Sprintf("/{%s}", TradeIDPathValue)
 	UserIDPath    = fmt.Sprintf("/{%s}", UserIDPathValue)
+	SessionIDPath = fmt.Sprintf("/{%s}", SessionIDPathValue)
 )

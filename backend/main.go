@@ -25,7 +25,8 @@ func main() {
 
 	wg.Add(consts.ServiceCount)
 	dbConf := database.Conf{
-		Context:  logger.WithContext(ctx),
+		Context: logger.WithContext(ctx),
+		// TODO: implement env module
 		Username: os.Getenv("POSTGRES_USER"),
 		Password: os.Getenv("POSTGRES_PASSWORD"),
 		Database: os.Getenv("POSTGRES_DB"),
@@ -34,6 +35,7 @@ func main() {
 	}
 	apiConf := api.Conf{
 		Context:  logger.WithContext(ctx),
+		JWTKey:   []byte(os.Getenv("JWT_KEY")),
 		Hostname: "0.0.0.0",
 		Port:     3000,
 	}

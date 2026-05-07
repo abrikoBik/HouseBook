@@ -17,6 +17,7 @@ import (
 
 var (
 	Context context.Context
+	JWTKey  []byte
 	Logger  *zerolog.Logger
 
 	addr     string
@@ -28,12 +29,14 @@ var (
 
 type Conf struct {
 	Context  context.Context
+	JWTKey   []byte // unfortunately, this can't be used due to a nasty import cycle =(
 	Hostname string
 	Port     uint16
 }
 
 func Config(config Conf, callback func()) {
 	Context = config.Context
+	JWTKey = config.JWTKey
 	Logger = zerolog.Ctx(Context)
 	handlers.Config(Context)
 	addr = fmt.Sprintf("%s:%d", config.Hostname, config.Port)

@@ -71,14 +71,39 @@ func (q *Queries) DeleteUser(ctx context.Context, id pgtype.UUID) error {
 	return err
 }
 
-const getUser = `-- name: GetUser :one
+const getUserByID = `-- name: GetUserByID :one
 select id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id from users
 where id = $1
 limit 1
 `
 
-func (q *Queries) GetUser(ctx context.Context, id pgtype.UUID) (User, error) {
-	row := q.db.QueryRow(ctx, getUser, id)
+func (q *Queries) GetUserByID(ctx context.Context, id pgtype.UUID) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByID, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Login,
+		&i.Name,
+		&i.Salt,
+		&i.Hash,
+		&i.ImageUuid,
+		&i.Rating,
+		&i.NowReadingID,
+		&i.FinishedReadingID,
+		&i.TradeReadyID,
+	)
+	return i, err
+}
+
+const getUserByLogin = `-- name: GetUserByLogin :one
+select id, email, login, name, salt, hash, image_uuid, rating, now_reading_id, finished_reading_id, trade_ready_id from users
+where login = $1
+limit 1
+`
+
+func (q *Queries) GetUserByLogin(ctx context.Context, login string) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByLogin, login)
 	var i User
 	err := row.Scan(
 		&i.ID,

@@ -10,6 +10,7 @@
 POSTGRES_DB=database
 POSTGRES_USER=username
 POSTGRES_PASSWORD=password
+JWT_KEY=key
 ```
 Также перед первым запуском необходимо запустить миграции.
 

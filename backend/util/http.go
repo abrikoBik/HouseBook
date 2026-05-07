@@ -15,10 +15,20 @@ import (
 func PathUUID(name string, request *http.Request) (result pgtype.UUID, err error) {
 	s := chi.URLParam(request, name)
 	if s == "" {
-		err = errors.New("uuid not provided")
+		err = errors.New("uuid not provided in path")
 		return
 	}
 	err = result.Scan(s)
+	return
+}
+
+// PathString adds basic error checking for the respective URL parameter.
+func PathString(name string, request *http.Request) (result string, err error) {
+	result = chi.URLParam(request, name)
+	if result == "" {
+		err = errors.New("string not provided in path")
+		return
+	}
 	return
 }
 
