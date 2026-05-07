@@ -19,7 +19,6 @@ const Landing: React.FC = () => {
       </section>
 
       <section id="features-grid">
-        {/* Карточка 1 — Каталог Книг */}
         <div className="feature-card">
           <div className="card-header">
             <img src={Lupa} alt="Иконка поиска" className="card-icon-inline" />
@@ -28,7 +27,6 @@ const Landing: React.FC = () => {
           <p>Огромная база данных книг всех жанров и авторов.</p>
         </div>
 
-        {/* Карточка 2 — Своя библиотека */}
         <div className="feature-card">
           <div className="card-header">
             <img src={HomeBlack} alt="Иконка дома" className="card-icon-inline" />
@@ -37,7 +35,6 @@ const Landing: React.FC = () => {
           <p>Отслеживайте прочитанное, ставьте оценки и пишите рецензии.</p>
         </div>
 
-        {/* Карточка 3 — Меняйся! */}
         <div className="feature-card">
           <div className="card-header">
             <img src={LibraryBlack} alt="Иконка библиотеки" className="card-icon-inline" />
@@ -46,7 +43,6 @@ const Landing: React.FC = () => {
           <p>Нету книги, которую хочешь прочитать? Поменяйся!</p>
         </div>
 
-        {/* Карточка 4 — Личный профиль */}
         <div className="feature-card">
           <div className="card-header">
             <img src={Natification} alt="Иконка уведомлений" className="card-icon-inline" />

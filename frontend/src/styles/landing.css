@@ -28,17 +28,17 @@
     margin: 0 auto;
 }
 
-/* Сетка из 4 карточек */
+
 #features-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* Жёстко 4 колонки */
+    grid-template-columns: repeat(4, 1fr); 
     gap: 30px;
     padding: 0 40px 80px;
     max-width: 1200px;
     margin: 0 auto;
 }
 
-/* Карточка */
+
 .feature-card {
     background-color: #ffffff;
     border-radius: 16px;
@@ -56,12 +56,12 @@
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* Заголовок с иконкой внутри карточки */
+
 .card-header {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px; /* Расстояние между иконкой и текстом */
+    gap: 10px; 
     margin-bottom: 10px;
 }
 
@@ -77,11 +77,11 @@
     opacity: 1;
 }
 
-/* Текст описания под заголовком */
+
 .feature-card p {
     font-size: 0.95rem;
     color: #7f8c8d;
     line-height: 1.5;
     margin: 0;
-    max-width: 250px; /* Ограничиваем ширину текста для красоты */
+    max-width: 250px; 
 }
