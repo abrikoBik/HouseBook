@@ -1,6 +1,11 @@
--- name: GetUser :one
+-- name: GetUserByID :one
 select * from users
 where id = @id
+limit 1;
+
+-- name: GetUserByLogin :one
+select * from users
+where login = @login
 limit 1;
 
 -- name: CreateUser :one
