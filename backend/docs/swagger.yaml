@@ -1671,4 +1671,38 @@ paths:
       summary: Создать сессию
       tags:
       - Сессии
+  /api/users/search:
+    get:
+      consumes:
+      - application/json
+      description: Находит пользователя по логину.
+      parameters:
+      - description: Логин пользователя
+        example: ivanov
+        in: query
+        name: login
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Найти пользователя
+      tags:
+      - Пользователи
 swagger: "2.0"
