@@ -66,6 +66,7 @@ const Auth = () => {
         switch (response.status) {
           case 409:
             setMessage("Такой аккаунт уже существует!");
+            break;
           default:
             console.log(response.status);
             return;
@@ -93,9 +94,11 @@ const Auth = () => {
         case 401:
           setErrorMessage(true);
           setMessage("Неверный пароль!");
+          break;
         case 404:
           setErrorMessage(true);
           setMessage("Пользователь не найден!");
+          break;
         default:
           console.log(sessionResponse.status);
           return;
