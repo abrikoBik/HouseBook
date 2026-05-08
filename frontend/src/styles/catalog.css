@@ -233,3 +233,13 @@
     gap: 16px;
   }
 }
+
+#book-grid a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+#book-grid a:hover {
+  color: inherit;
+}
