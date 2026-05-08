@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import LogoWText from "../assets/LogoWText.svg";
 import Lupa from "../assets/Lupa.svg";
 import HomeBlack from "../assets/Home_Black.svg";
@@ -18,15 +17,15 @@ const Landing: React.FC = () => {
       </section>
 
       <section id="features-grid">
-        <Link to="/book/catalog" className="feature-card-link">
+        <a href="/book/catalog" className="feature-card-link">
           <div className="card-header">
             <img src={Lupa} alt="Иконка поиска" className="card-icon-inline" />
             <h3>Каталог Книг</h3>
           </div>
           <p>Огромная база данных книг всех жанров и авторов.</p>
-        </Link>
+        </a>
 
-        <Link to="/library" className="feature-card-link">
+        <a href="/library" className="feature-card-link">
           <div className="card-header">
             <img
               src={HomeBlack}
@@ -36,9 +35,9 @@ const Landing: React.FC = () => {
             <h3>Своя библиотека</h3>
           </div>
           <p>Отслеживайте прочитанное, ставьте оценки и пишите рецензии.</p>
-        </Link>
+        </a>
 
-        <Link to="/profile/trade" className="feature-card-link">
+        <a href="/profile/trade" className="feature-card-link">
           <div className="card-header">
             <img
               src={LibraryBlack}
@@ -48,9 +47,9 @@ const Landing: React.FC = () => {
             <h3>Меняйся!</h3>
           </div>
           <p>Нету книги, которую хочешь прочитать? Обменяйся!</p>
-        </Link>
+        </a>
 
-        <Link to="/profile" className="feature-card-link">
+        <a href="/profile" className="feature-card-link">
           <div className="card-header">
             <img
               src={Natification}
@@ -60,7 +59,7 @@ const Landing: React.FC = () => {
             <h3>Личный профиль</h3>
           </div>
           <p>Следи за статистикой, отслеживай сделки и делись впечатлениями!</p>
-        </Link>
+        </a>
       </section>
     </section>
   );

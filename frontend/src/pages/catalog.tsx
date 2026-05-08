@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import SideBar from "../modules/sideBar";
 import Header from "../modules/header";
 import "../styles/catalog.css";
@@ -141,8 +140,8 @@ const Catalog = () => {
           <section id="book-grid">
             {filteredBooks.length > 0 ? (
               filteredBooks.map((book) => (
-                <Link to={`/book/${book.id}`}>
-                  <div key={book.id} className="book-card">
+                <a href={`/book/${book.id}`} key={book.id}>
+                  <div className="book-card">
                     <div className="book-cover">
                       <img src={book.cover_url} alt={book.title} />
                     </div>
@@ -151,7 +150,7 @@ const Catalog = () => {
                       <p className="book-author">{book.author}</p>
                     </div>
                   </div>
-                </Link>
+                </a>
               ))
             ) : (
               <div className="no-books">
