@@ -370,3 +370,50 @@ func DeleteUser(writer http.ResponseWriter, request *http.Request) {
 
 	writer.WriteHeader(http.StatusOK)
 }
+
+// SearchUser godoc
+//
+//	@summary		Найти пользователя
+//	@description	Находит пользователя по логину.
+//	@accept			json
+//	@produce		json
+//
+//	@tags			Пользователи
+//
+//	@param			login	query		string	true	"Логин пользователя"	Example(ivanov)
+//
+//	@success		200		{object}	db.User
+//	@failure		400		{object}	ErrorResponse
+//	@failure		404		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
+//	@router			/api/users/search [get]
+func SearchUser(writer http.ResponseWriter, request *http.Request) {
+	var (
+		err   error
+		query = request.URL.Query()
+		r     = render.New()
+		q     = db.New(database.Pool)
+	)
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	user, err := q.GetUserByLogin(database.Context, query.Get("login"))
+	if err != nil {
+		var toWrite ErrorResponse
+		if errors.Is(err, pgx.ErrNoRows) {
+			toWrite = ErrorNotFound(err)
+		} else {
+			toWrite = ErrorGeneric(err)
+		}
+		RenderError(r, writer, toWrite)
+		return
+	}
+	Logger.Info().Interface("id", user.ID).Msg("user found")
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(user); err != nil {
+		RenderError(r, writer, ErrorRender(err))
+		return
+	}
+}

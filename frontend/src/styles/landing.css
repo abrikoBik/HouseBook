@@ -1,0 +1,143 @@
+#landing-hero {
+  text-align: center;
+  padding-top: 130px;
+  padding-bottom: 60px;
+  user-select: none;
+  width: 100%;
+}
+
+#landing-hero img {
+  width: 400px;
+  height: 140px;
+  margin-bottom: 25px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#hero-title {
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin-bottom: 30px;
+  line-height: 1.2;
+  user-select: none;
+}
+
+#hero-subtitle {
+  font-size: 1.1rem;
+  color: #7f8c8d;
+  font-weight: 400;
+  max-width: 600px;
+  margin: 0 auto;
+  user-select: none;
+}
+
+#features-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  width: 95%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 0 80px;
+  user-select: none;
+}
+
+.feature-card-link {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 30px 20px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  user-select: none;
+}
+
+.feature-card-link:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  margin-bottom: 15px;
+}
+
+.card-icon-inline {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.feature-card-link:hover .card-icon-inline {
+  opacity: 1;
+}
+
+.feature-card-link p {
+  font-size: 0.95rem;
+  color: #7f8c8d;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 250px;
+  margin-top: 5px;
+}
+
+.feature-card-link h3 {
+  margin: 0;
+}
+
+@media (max-width: 1024px) {
+  #features-grid {
+    grid-template-columns: repeat(2, 1fr);
+    width: 90%;
+    gap: 40px;
+    padding-bottom: 50px;
+  }
+
+  #landing-hero img {
+    width: 300px;
+    height: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  #features-grid {
+    grid-template-columns: 1fr;
+    width: 95%;
+    gap: 25px;
+    padding-bottom: 40px;
+  }
+
+  #hero-title {
+    font-size: 1.8rem;
+  }
+
+  #hero-subtitle {
+    font-size: 1rem;
+    padding: 0 10px;
+  }
+
+  #landing-hero img {
+    width: 200px;
+  }
+
+  .feature-card-link {
+    padding: 25px 15px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+}

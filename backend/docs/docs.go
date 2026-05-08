@@ -1769,6 +1769,57 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/users/search": {
+            "get": {
+                "description": "Находит пользователя по логину.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Пользователи"
+                ],
+                "summary": "Найти пользователя",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "ivanov",
+                        "description": "Логин пользователя",
+                        "name": "login",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/users/{user-id}": {
             "get": {
                 "description": "Получает информацию о пользователе.",

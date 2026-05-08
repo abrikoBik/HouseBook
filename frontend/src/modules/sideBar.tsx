@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import HomeIcon from "../assets/Home_Black.svg";
 import LogoIcon from "../assets/LogoWOText.svg";
 import FavoritesIcon from "../assets/Favourite_Black.svg";
@@ -6,10 +7,12 @@ import ExitIcon from "../assets/Exit_Black.svg";
 import "../styles/sideBar.css";
 
 const SideBar = () => {
+  const navigate = useNavigate();
+
   return (
     <aside id="side_menu">
       <nav id="side_nav">
-        <div className="logo">
+        <div className="logo" onClick={() => navigate("/landing")}>
           <img src={LogoIcon} alt="logo" />
         </div>
 

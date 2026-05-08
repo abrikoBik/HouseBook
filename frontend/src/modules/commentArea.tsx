@@ -19,7 +19,7 @@ const CommentArea = () => {
 
   const sendComment = async () => {
     const book = "019df3c0-2bd4-789f-8e57-c220660e4ff9";
-    const user = "019df3c2-50ee-797c-bcce-4c40bf2a00bc";
+    const user = "019e0368-1df1-7ecd-9950-4e2a579d47ac";
     const textareaBody = textareaRef.current?.value;
 
     await fetch("/api/comments/", {

@@ -11,6 +11,7 @@ import (
 func routeUsers(router chi.Router) {
 	router.Route(consts.UsersEndpoint, func(r chi.Router) {
 		r.With(middleware.JSONResponse).Post("/", handlers.CreateUser)
+		r.With(middleware.JSONResponse).Get("/search", handlers.SearchUser)
 		r.Route(consts.UserIDPath, func(r chi.Router) {
 			r.With(middleware.JSONResponse).Get("/", handlers.GetUser)
 			r.With(middleware.JSONResponse).Patch("/", handlers.UpdateUser)

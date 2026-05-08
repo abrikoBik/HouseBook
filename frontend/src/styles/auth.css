@@ -7,6 +7,46 @@
   overflow: hidden;
 }
 
+#ShowMessage {
+  width: 100%;
+}
+
+#Hidden {
+  display: none;
+}
+
+.ErrorMessage {
+  border: solid 2px #ae4242 !important;
+  background-color: #e25b5ba0;
+  color: white !important;
+}
+
+#MessageWindow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 1rem;
+  padding: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+
+  border: solid 2px #b1b1b1;
+  border-radius: 1rem;
+
+  color: #2f2f2f;
+
+  font-weight: 600;
+}
+
+#HideMessage {
+  display: none;
+}
+
+#ShowMessage {
+  visibility: visible;
+}
+
 #AuthSection {
   display: flex;
   flex-direction: column;
