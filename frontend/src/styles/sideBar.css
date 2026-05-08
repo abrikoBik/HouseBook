@@ -1,20 +1,19 @@
 #side_menu {
   position: fixed;
+  top: 20px;
+  bottom: 20px;
+  left: 0;
   padding-left: 30px;
   padding-right: 25px;
-
-  height: 92.5%;
-
-  margin-top: 2%;
-
   box-shadow: 4px 0px #d9d7cc;
+  z-index: 1000;
+}
 
-  & > nav {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
+#side_menu > nav {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 #menu_items {
@@ -33,8 +32,11 @@
 }
 
 .logo {
+  position: relative;
+  z-index: 101;
   cursor: pointer;
   transition: opacity 0.3s ease;
+  pointer-events: auto;
 }
 
 .logo:hover {

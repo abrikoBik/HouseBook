@@ -3,6 +3,7 @@
   padding-top: 130px;
   padding-bottom: 60px;
   user-select: none;
+  width: 100%;
 }
 
 #landing-hero img {
@@ -35,9 +36,10 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 30px;
-  padding: 0 0 80px;
-  max-width: 1200px;
+  width: 95%;
+  max-width: 1600px;
   margin: 0 auto;
+  padding: 0 0 80px;
   user-select: none;
 }
 
@@ -69,7 +71,8 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin-bottom: 10px;
+
+  margin-bottom: 15px;
 }
 
 .card-icon-inline {
@@ -90,10 +93,51 @@
   line-height: 1.5;
   margin: 0;
   max-width: 250px;
+  margin-top: 5px;
 }
 
-.feature-card-link h3,
-.feature-card-link p {
-  color: inherit;
+.feature-card-link h3 {
   margin: 0;
+}
+
+@media (max-width: 1024px) {
+  #features-grid {
+    grid-template-columns: repeat(2, 1fr);
+    width: 90%;
+    gap: 40px;
+    padding-bottom: 50px;
+  }
+
+  #landing-hero img {
+    width: 300px;
+    height: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  #features-grid {
+    grid-template-columns: 1fr;
+    width: 95%;
+    gap: 25px;
+    padding-bottom: 40px;
+  }
+
+  #hero-title {
+    font-size: 1.8rem;
+  }
+
+  #hero-subtitle {
+    font-size: 1rem;
+    padding: 0 10px;
+  }
+
+  #landing-hero img {
+    width: 200px;
+  }
+
+  .feature-card-link {
+    padding: 25px 15px;
+    width: 100%;
+    box-sizing: border-box;
+  }
 }
