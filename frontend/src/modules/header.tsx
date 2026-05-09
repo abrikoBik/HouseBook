@@ -16,12 +16,15 @@ const Header = () => {
             placeholder="Поиск по названия книги, автору, изданию"
           />
         </div>
-        <div id="profile">
-          <div id="icon"></div>
-          <div id="name">Шиловский Максим</div>
+        <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+          <a href="/profile" className="profile-link">
+            <div id="icon"></div>
+            <div id="name">Шиловский Максим</div>
+          </a>
           <div id="notifications">
             <img src={NotificationsIcon} alt="notifications" />
           </div>
+          
         </div>
       </div>
     </header>

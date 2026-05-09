@@ -1,8 +1,10 @@
+import SideBar from "../modules/sideBar";
 import "../styles/profile.css";
 
 const Profile = () => {
   return (
     <section className="user">
+      <SideBar />
       <div id="aboutUser">
         <h4>Профиль</h4>
         <div>Шиловский Максим</div>
