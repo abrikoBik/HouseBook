@@ -12,9 +12,13 @@ import "../styles/sideBar.css";
 const SideBar = () => {
   const location = useLocation();
   const currentPath = location.pathname;
-  const isMainActive = currentPath === "/main" || currentPath.startsWith("/main/");
-  const isLibraryActive = currentPath === "/library" || currentPath.startsWith("/library/");
-  const isExchangeActive = currentPath === "/profile/exchange" || currentPath.startsWith("/profile/exchange/");
+  const isMainActive =
+    currentPath === "/main" || currentPath.startsWith("/main/");
+  const isLibraryActive =
+    currentPath === "/library" || currentPath.startsWith("/library/");
+  const isExchangeActive =
+    currentPath === "/profile/exchange" ||
+    currentPath.startsWith("/profile/exchange/");
 
   return (
     <aside id="side_menu">
@@ -26,25 +30,22 @@ const SideBar = () => {
         <section id="menu_items">
           <div className={`menu-item ${isMainActive ? "active" : ""}`}>
             <Link to="/main">
-              <img 
-                src={isMainActive ? HomeWhite : HomeBlack} 
-                alt="home" 
-              />
+              <img src={isMainActive ? HomeWhite : HomeBlack} alt="home" />
             </Link>
           </div>
           <div className={`menu-item ${isLibraryActive ? "active" : ""}`}>
             <Link to="/library">
-              <img 
-                src={isLibraryActive ? FavoritesWhite : FavoritesBlack} 
-                alt="favorites" 
+              <img
+                src={isLibraryActive ? FavoritesWhite : FavoritesBlack}
+                alt="favorites"
               />
             </Link>
           </div>
           <div className={`menu-item ${isExchangeActive ? "active" : ""}`}>
             <Link to="/profile/exchange">
-              <img 
-                src={isExchangeActive ? LibraryWhite : LibraryBlack} 
-                alt="exchange" 
+              <img
+                src={isExchangeActive ? LibraryWhite : LibraryBlack}
+                alt="exchange"
               />
             </Link>
           </div>

@@ -1,9 +1,9 @@
 import Header from "../modules/header";
 import SideBar from "../modules/sideBar";
-import "../styles/main.css"
+import "../styles/main.css";
 
 const Main = () => {
-   return (
+  return (
     <section id="layout">
       <Header />
       <SideBar />

@@ -24,7 +24,6 @@ const Header = () => {
           <div id="notifications">
             <img src={NotificationsIcon} alt="notifications" />
           </div>
-          
         </div>
       </div>
     </header>
