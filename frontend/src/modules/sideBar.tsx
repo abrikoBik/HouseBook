@@ -12,8 +12,8 @@ import "../styles/sideBar.css";
 const SideBar = () => {
   const location = useLocation();
   const currentPath = location.pathname;
-  const isMainActive =
-    currentPath === "/main" || currentPath.startsWith("/main/");
+  const isCentralActive =
+    currentPath === "/central" || currentPath.startsWith("/main/");
   const isLibraryActive =
     currentPath === "/library" || currentPath.startsWith("/library/");
   const isExchangeActive =
@@ -28,9 +28,9 @@ const SideBar = () => {
         </a>
 
         <section id="menu_items">
-          <div className={`menu-item ${isMainActive ? "active" : ""}`}>
-            <Link to="/main">
-              <img src={isMainActive ? HomeWhite : HomeBlack} alt="home" />
+          <div className={`menu-item ${isCentralActive ? "active" : ""}`}>
+            <Link to="/central">
+              <img src={isCentralActive ? HomeWhite : HomeBlack} alt="home" />
             </Link>
           </div>
           <div className={`menu-item ${isLibraryActive ? "active" : ""}`}>

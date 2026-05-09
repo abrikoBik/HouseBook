@@ -1,0 +1,283 @@
+.central-page {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f1eee3;
+}
+
+.central-content {
+  flex-grow: 1;
+  margin-left: clamp(120px, 8vw, 120px);
+  padding-top: 80px;
+  width: calc(100% - clamp(120px, 8vw, 120px));
+  box-sizing: border-box;
+}
+
+.central-container {
+  padding: 20px clamp(30px, 4vw, 60px) 40px clamp(40px, 5vw, 70px);
+  max-width: 1800px;
+  margin: 0;
+  width: 98%;
+  box-sizing: border-box;
+}
+
+/* =========================================
+   БЛОК РЕКОМЕНДАЦИЙ
+   ========================================= */
+
+.recommendations-section {
+  margin-bottom: 80px;
+}
+
+.recommendations-section h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 16px 0;
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  color: #666;
+  line-height: 1.6;
+  margin: 0 0 24px 0;
+  max-width: 700px;
+}
+
+.expand-btn {
+  background: #2d2d2d;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 24px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 32px;
+}
+
+.expand-btn:hover {
+  background: #1a1a1a;
+  transform: translateY(-2px);
+}
+
+.books-carousel {
+  display: flex;
+  gap: 32px;
+  overflow-x: auto;
+  padding-bottom: 20px;
+  padding-top: 40px;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+}
+
+.books-carousel::-webkit-scrollbar {
+  height: 8px;
+}
+
+.books-carousel::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+.book-card-link {
+  text-decoration: none;
+  color: inherit;
+  flex-shrink: 0;
+  width: 220px;
+  margin-top: 20px;
+}
+
+.book-card {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  width: 100%;
+}
+
+.book-card:hover {
+  transform: translateY(-8px);
+}
+
+.book-cover {
+  width: 100%;
+  aspect-ratio: 2/3;
+  overflow: visible;
+  background: #f0f0f0;
+  border-radius: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
+  transition: transform 0.3s ease;
+  transform-origin: bottom center;
+  position: relative;
+  z-index: 1;
+}
+
+.book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.book-card:hover .book-cover {
+  transform: scale(1.2);
+  z-index: 10;
+}
+
+.book-info {
+  padding: 0;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.book-info h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.book-info p {
+  font-size: 14px;
+  color: #7f8c8d;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.loading-books {
+  color: #999;
+  font-size: 16px;
+  padding: 40px 0;
+}
+
+/* =========================================
+   БЛОК КАТЕГОРИЙ (Сетка 4-3-2-1)
+   ========================================= */
+
+/* --- Стили для блока Категорий (с увеличенными отступами) --- */
+
+.categories-section {
+  margin-top: -40px; /* <-- Подтягиваем весь блок вверх, ближе к рекомендациям */
+  padding-bottom: 60px;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 100px 0; /* <-- Увеличили отступ снизу до 50px, чтобы отодвинуть карточки */
+  font-family: inherit;
+}
+
+/* Десктоп: 4 колонки */
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 50px 40px; /* Отступы между карточками остались большими */
+}
+
+.category-card {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+}
+
+.category-icon {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 12px;
+  transition:
+    transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    filter 0.3s ease;
+  z-index: 2;
+}
+
+/* Анимация только иконки */
+.category-card:hover .category-icon {
+  transform: scale(1.2);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+.category-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  font-family: inherit;
+  line-height: 1.3;
+  margin: 0;
+  padding: 0 8px;
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================================
+   АДАПТИВНОСТЬ (также увеличиваем отступы)
+   ========================================= */
+
+/* Планшет: 3 колонки */
+@media (max-width: 1024px) {
+  .categories-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px 30px; /* Чуть меньше, но всё равно просторно */
+  }
+
+  .category-icon {
+    width: 70px;
+    height: 70px;
+  }
+
+  .category-name {
+    font-size: 13px;
+  }
+}
+
+/* Мобильный средний: 2 колонки */
+@media (max-width: 768px) {
+  .categories-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px 20px;
+  }
+
+  .category-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .category-name {
+    font-size: 12px;
+  }
+}
+
+/* Мобильный маленький: 1 колонка */
+@media (max-width: 480px) {
+  .categories-grid {
+    grid-template-columns: repeat(1, 1fr);
+    gap: 20px;
+  }
+
+  .category-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .category-name {
+    font-size: 12px;
+  }
+}
