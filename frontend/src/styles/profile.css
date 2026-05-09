@@ -2,14 +2,14 @@
   display: flex;
   min-height: 100vh;
   /* 2. Инверсия цветов: Фон страницы теперь бежевый */
-  background-color: #f1eee3; 
+  background-color: #f1eee3;
 }
 
 .profile-content {
   flex-grow: 1;
   margin-left: 100px;
   /* 1. Исправление наложения на хедер: Отступ сверху больше высоты хедера (60px) */
-  padding-top: 80px; 
+  padding-top: 80px;
 }
 
 .profile-container {
@@ -35,7 +35,7 @@
   width: 150px;
   height: 150px;
   /* Аватар остается нейтральным или белым */
-  background-color: #ffffff; 
+  background-color: #ffffff;
   border-radius: 8px;
   display: flex;
   align-items: center;

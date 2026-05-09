@@ -169,7 +169,9 @@ const Profile = () => {
               </div>
               <div className="stat-item">
                 <span className="stat-icon">🔄</span>
-                <span>Доступны для обмена: {user.stats.available_for_exchange}</span>
+                <span>
+                  Доступны для обмена: {user.stats.available_for_exchange}
+                </span>
               </div>
               <div className="stat-item">
                 <span className="stat-icon">⭐</span>
@@ -187,7 +189,9 @@ const Profile = () => {
                     <div className="book-cover-placeholder"></div>
                     <div className="trade-info">
                       <h3>{trade.book_title}</h3>
-                      <p>⇄ Обмен с – <strong>{trade.partner_username}</strong></p>
+                      <p>
+                        ⇄ Обмен с – <strong>{trade.partner_username}</strong>
+                      </p>
                       <p className="status">◷ {trade.status}</p>
                     </div>
                     <button className="cancel-btn">✕ Отменить</button>
@@ -208,7 +212,12 @@ const Profile = () => {
                     <div className="review-header">
                       <div className="stars">
                         {[...Array(5)].map((_, i) => (
-                          <span key={i} className={i < review.rating ? "star filled" : "star"}>
+                          <span
+                            key={i}
+                            className={
+                              i < review.rating ? "star filled" : "star"
+                            }
+                          >
                             ☆
                           </span>
                         ))}
