@@ -1,11 +1,25 @@
-import HomeIcon from "../assets/Home_Black.svg";
+import { Link, useLocation } from "react-router-dom";
+import HomeBlack from "../assets/Home_Black.svg";
+import HomeWhite from "../assets/Home_White.svg";
 import LogoIcon from "../assets/LogoWOText.svg";
-import FavoritesIcon from "../assets/Favourite_Black.svg";
-import LibraryIcon from "../assets/Library_Black.svg";
+import FavoritesBlack from "../assets/Favourite_Black.svg";
+import FavoritesWhite from "../assets/Favourite_White.svg";
+import LibraryBlack from "../assets/Library_Black.svg";
+import LibraryWhite from "../assets/Library_White.svg";
 import ExitIcon from "../assets/Exit_Black.svg";
 import "../styles/sideBar.css";
 
 const SideBar = () => {
+  const location = useLocation();
+  const currentPath = location.pathname;
+  const isMainActive =
+    currentPath === "/main" || currentPath.startsWith("/main/");
+  const isLibraryActive =
+    currentPath === "/library" || currentPath.startsWith("/library/");
+  const isExchangeActive =
+    currentPath === "/profile/exchange" ||
+    currentPath.startsWith("/profile/exchange/");
+
   return (
     <aside id="side_menu">
       <nav id="side_nav">
@@ -14,19 +28,28 @@ const SideBar = () => {
         </a>
 
         <section id="menu_items">
-          <div>
-            <img src={HomeIcon} alt="home" />
+          <div className={`menu-item ${isMainActive ? "active" : ""}`}>
+            <Link to="/main">
+              <img src={isMainActive ? HomeWhite : HomeBlack} alt="home" />
+            </Link>
           </div>
-
-          <div>
-            <img src={FavoritesIcon} alt="favorites" />
+          <div className={`menu-item ${isLibraryActive ? "active" : ""}`}>
+            <Link to="/library">
+              <img
+                src={isLibraryActive ? FavoritesWhite : FavoritesBlack}
+                alt="favorites"
+              />
+            </Link>
           </div>
-
-          <div>
-            <img src={LibraryIcon} alt="favorites" />
+          <div className={`menu-item ${isExchangeActive ? "active" : ""}`}>
+            <Link to="/profile/exchange">
+              <img
+                src={isExchangeActive ? LibraryWhite : LibraryBlack}
+                alt="exchange"
+              />
+            </Link>
           </div>
         </section>
-
         <div id="exit_button">
           <img src={ExitIcon} alt="exit" />
         </div>

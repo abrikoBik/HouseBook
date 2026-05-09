@@ -37,7 +37,7 @@ const Landing: React.FC = () => {
           <p>Отслеживайте прочитанное, ставьте оценки и пишите рецензии.</p>
         </a>
 
-        <a href="/profile/trade" className="feature-card-link">
+        <a href="/profile/exchange" className="feature-card-link">
           <div className="card-header">
             <img
               src={LibraryBlack}
