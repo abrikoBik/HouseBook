@@ -74,7 +74,7 @@ const Central = () => {
           author: book.author?.trim() || "Неизвестный автор",
           // Единая логика: image_uuid -> URL, иначе cover_url, иначе undefined
           cover_url: book.image_uuid
-            ? `/api/images/${book.image_uuid}`
+            ? `/cdn/${book.image_uuid}`
             : book.cover_url || undefined,
         }));
 

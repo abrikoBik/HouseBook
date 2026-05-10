@@ -199,13 +199,13 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 //
 //	@summary		Задать обложку
 //	@description	Задаёт обложку для книги.
-//	@accept			mpfd
+//	@accept			json
 //	@produce		json
 //
 //	@tags			Книги
 //
 //	@param			book-id	path		pgtype.UUID	true	"UUID книги"
-//	@param			image	formData	file		true	"Файл обложки (PNG или JPEG)"
+//	@param			imageuuid	body string		true	"ID обложки с сервера хранилища"
 //
 //	@success		200		{object}	db.Book
 //	@failure		400		{object}	ErrorResponse
@@ -218,51 +218,9 @@ func SetBookCover(writer http.ResponseWriter, request *http.Request) {
 		r    = render.New()
 		q    = db.New(database.Pool)
 	)
-
-	if data.ID, err = util.PathUUID(consts.BookIDPathValue, request); err != nil {
+	data.ID, err = util.PathUUID(consts.BookIDPathValue, request)
+	if err = errors.Join(err, json.NewDecoder(request.Body).Decode(&data)); err != nil {
 		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
-		return
-	}
-
-	var client http.Client
-	req, err := http.NewRequest("POST", consts.StorageURL, nil)
-	if err != nil {
-		RenderError(r, writer, ErrorGeneric(err))
-		return
-	}
-	req.Body = request.Body
-	req.Header.Set("Content-Type", request.Header.Get("Content-Type"))
-	response, err := client.Do(req)
-	if err != nil {
-		RenderError(r, writer, ErrorGeneric(err))
-		return
-	}
-	defer response.Body.Close()
-
-	var errored bool
-	switch response.StatusCode {
-	case http.StatusCreated:
-		idJSON := StorageIDResponse{}
-		if err := json.NewDecoder(response.Body).Decode(&idJSON); err != nil {
-			RenderError(r, writer, ErrorGeneric(err))
-			errored = true
-			return
-		}
-		if err := data.Imageuuid.Scan(idJSON.ID); err != nil {
-			RenderError(r, writer, ErrorGeneric(err))
-			errored = true
-		}
-	default:
-		errorJSON := StorageErrorResponse{}
-		if err := json.NewDecoder(response.Body).Decode(&errorJSON); err != nil {
-			RenderError(r, writer, ErrorGeneric(err))
-			errored = true
-			return
-		}
-		RenderError(r, writer, ErrorImage(errorJSON.Error))
-		errored = true
-	}
-	if errored {
 		return
 	}
 

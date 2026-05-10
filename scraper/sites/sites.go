@@ -24,6 +24,7 @@ type Site struct {
 func (site *Site) Scrape(collector *colly.Collector, requestURL *url.URL) (result types.Book, err error) {
 	// TODO: eliminate doubled code
 	collector.OnHTML(site.Root, func(element *colly.HTMLElement) {
+		result.StoreLink = requestURL.String()
 		result.Title = element.ChildText(site.Title)
 		result.Author = element.ChildText(site.Author)
 		// remove all foreign characters from an ISBN
@@ -72,7 +73,7 @@ func (site *Site) Scrape(collector *colly.Collector, requestURL *url.URL) (resul
 			if u.Scheme == "" {
 				u.Scheme = "http"
 			}
-			result.CoverImage = u.String()
+			result.ImageLink = u.String()
 		}
 	})
 	err = collector.Visit(requestURL.String())
