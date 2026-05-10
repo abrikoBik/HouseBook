@@ -1,4 +1,3 @@
-import BookCover from "../assets/Book.png";
 import FavoritesIcon from "../assets/Favourite_Black.svg";
 import "../styles/book.css";
 import SideBar from "../modules/sideBar";
@@ -16,7 +15,19 @@ const Book = () => {
   const navigate = useNavigate();
   const { uuid } = useParams();
   const [book, setBook] = useState<BookT>();
+  const [coverImage, setCoverImage] = useState<string>();
   const [bookComments, setBookComments] = useState<CommentT[]>();
+
+  const getCoverImage = async (id: string) => {
+    const response = await fetch(`/cdn/${id}?base64=1`);
+    if (!response.ok) {
+      const result = await response.json();
+      throw new Error((result as Error).error);
+    }
+    const b64 = await response.text();
+    console.log(b64);
+    setCoverImage(b64);
+  };
 
   const getBook = async (id: string) => {
     const response = await fetch(`/api/books/${id}`);
@@ -31,21 +42,16 @@ const Book = () => {
           throw new Error((result as Error).error);
       }
     }
-    setBook(result as BookT);
+    const book = result as BookT;
+    setBook(book);
+    getCoverImage((book).image_uuid!);
   };
 
   const getComments = async (id: string) => {
     const response = await fetch(`/api/books/${id}/comments`);
     const result = await response.json();
     if (!response.ok) {
-      switch (response.status) {
-        case 400:
-        case 404:
-          navigate("/404", { replace: true });
-          break;
-        default:
-          throw new Error((result as Error).error);
-      }
+      throw new Error((result as Error).error);
     }
     setBookComments(result);
   };
@@ -61,7 +67,7 @@ const Book = () => {
       <SideBar />
       <section id="bookBody">
         <div id="cover">
-          <img src={BookCover} alt="book" />
+          <img src={`data:image/png;base64,${coverImage}`} alt="book" />
           <div>
             <div>
               <h1 className={"desc"}>{book?.title}</h1>
