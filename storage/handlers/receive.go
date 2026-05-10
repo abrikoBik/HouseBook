@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 
 	"github.com/google/uuid"
+	_ "golang.org/x/image/webp"
 )
 
 type IDResponse struct {
@@ -52,6 +53,8 @@ func ReceiveFile(writer http.ResponseWriter, request *http.Request) {
 		err = png.Encode(file, img)
 	case "jpeg":
 		err = jpeg.Encode(file, img, nil)
+	case "webp":
+		err = png.Encode(file, img)
 	}
 	if err != nil {
 		RenderError(writer, Error{http.StatusInternalServerError, err, ""})
