@@ -7,11 +7,14 @@ type Book struct {
 	ISBN      string `json:"isbn"`
 	Genre     string `json:"genre"`
 	Publisher string `json:"publisher"`
+	StoreLink string `json:"store_link"`
 
 	Year        int    `json:"year,omitempty"`
 	Language    string `json:"language,omitempty"`
 	CoverType   string `json:"cover_type,omitempty"`
 	PageCount   int    `json:"page_count,omitempty"`
 	Description string `json:"description,omitempty"`
-	CoverImage  string `json:"coverImage,omitempty"`
+	ImageUUID   string `json:"image_uuid,omitempty"`
+
+	ImageLink string `json:"-"`
 }
