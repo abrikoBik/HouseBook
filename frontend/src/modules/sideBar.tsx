@@ -1,10 +1,11 @@
-import { useNavigate } from "react-router-dom";
+
 import HomeIcon from "../assets/Home_Black.svg";
 import LogoIcon from "../assets/LogoWOText.svg";
 import FavoritesIcon from "../assets/Favourite_Black.svg";
 import LibraryIcon from "../assets/Library_Black.svg";
 import ExitIcon from "../assets/Exit_Black.svg";
 import "../styles/sideBar.css";
+import { useNavigate } from "react-router";
 
 const SideBar = () => {
   const navigate = useNavigate();
