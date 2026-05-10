@@ -17,36 +17,34 @@ const Book = () => {
   const [book, setBook] = useState<BookT>();
   const [bookComments, setBookComments] = useState<CommentT[]>();
 
-  const getBook = async (id: string) => {
-    const response = await fetch(`/api/books/${id}`);
-    const result = await response.json();
-    if (!response.ok) {
-      switch (response.status) {
-        case 400:
-        case 404:
-          navigate("/404", { replace: true });
-          break;
-        default:
-          throw new Error((result as Error).error);
-      }
-    }
-    const book = result as BookT;
-    setBook(book);
-  };
-
-  const getComments = async (id: string) => {
-    const response = await fetch(`/api/books/${id}/comments`);
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error((result as Error).error);
-    }
-    setBookComments(result);
-  };
-
   useEffect(() => {
+    const getBook = async (id: string) => {
+      const response = await fetch(`/api/books/${id}`);
+      const result = await response.json();
+      if (!response.ok) {
+        switch (response.status) {
+          case 400:
+          case 404:
+            navigate("/404", { replace: true });
+            break;
+          default:
+            throw new Error((result as Error).error);
+        }
+      }
+      const book = result as BookT;
+      setBook(book);
+    };
+    const getComments = async (id: string) => {
+      const response = await fetch(`/api/books/${id}/comments`);
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error((result as Error).error);
+      }
+      setBookComments(result);
+    };
     getBook(uuid!);
     getComments(uuid!);
-  }, [uuid]);
+  }, [uuid, navigate]);
 
   return (
     <section id="layout">
