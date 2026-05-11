@@ -168,12 +168,12 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, e
 const searchBooks = `-- name: SearchBooks :many
 select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link from books
 where
-    (lower(title) = lower($3) or $3 = '') and
-    (lower(author) = lower($4) or $4 = '') and
-    (lower(genre) = lower($5) or $5 = '') and
-    (lower(publisher) = lower($6) or $6 = '') and
+    (title = $3 or $3 = '') and
+    (author = $4 or $4 = '') and
+    (genre = $5 or $5 = '') and
+    (publisher = $6 or $6 = '') and
     (year = $7 or $7 = 0) and
-    (lower(language) = lower($8) or $8 = '')
+    (language = $8 or $8 = '')
 limit $1
 offset $2
 `
@@ -200,57 +200,6 @@ func (q *Queries) SearchBooks(ctx context.Context, arg SearchBooksParams) ([]Boo
 		arg.Year,
 		arg.Language,
 	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Book
-	for rows.Next() {
-		var i Book
-		if err := rows.Scan(
-			&i.ID,
-			&i.Title,
-			&i.Author,
-			&i.Isbn,
-			&i.Genre,
-			&i.Publisher,
-			&i.Year,
-			&i.Language,
-			&i.CoverType,
-			&i.PageCount,
-			&i.Description,
-			&i.ImageUuid,
-			&i.Link,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const searchBooksCombined = `-- name: SearchBooksCombined :many
-select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link from books
-where
-    (lower(title) like lower('%' || $3 || '%')) or
-    (lower(author) like lower('%' || $3 || '%')) or
-    (lower(publisher) like lower('%' || $3 || '%'))
-    -- (to_tsvector(publisher) @@ to_tsquery(@query))
-limit $1
-offset $2
-`
-
-type SearchBooksCombinedParams struct {
-	Limit  int32       `db:"limit" json:"limit"`
-	Offset int32       `db:"offset" json:"offset"`
-	Query  pgtype.Text `db:"query" json:"query"`
-}
-
-func (q *Queries) SearchBooksCombined(ctx context.Context, arg SearchBooksCombinedParams) ([]Book, error) {
-	rows, err := q.db.Query(ctx, searchBooksCombined, arg.Limit, arg.Offset, arg.Query)
 	if err != nil {
 		return nil, err
 	}

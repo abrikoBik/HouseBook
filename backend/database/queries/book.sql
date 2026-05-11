@@ -57,12 +57,12 @@ where id = @id;
 -- name: SearchBooks :many
 select * from books
 where
-    (lower(title) = lower(sqlc.narg('title')) or sqlc.narg('title') = '') and
-    (lower(author) = lower(sqlc.narg('author')) or sqlc.narg('author') = '') and
-    (lower(genre) = lower(sqlc.narg('genre')) or sqlc.narg('genre') = '') and
-    (lower(publisher) = lower(sqlc.narg('publisher')) or sqlc.narg('publisher') = '') and
+    (title = sqlc.narg('title') or sqlc.narg('title') = '') and
+    (author = sqlc.narg('author') or sqlc.narg('author') = '') and
+    (genre = sqlc.narg('genre') or sqlc.narg('genre') = '') and
+    (publisher = sqlc.narg('publisher') or sqlc.narg('publisher') = '') and
     (year = sqlc.narg('year') or sqlc.narg('year') = 0) and
-    (lower(language) = lower(sqlc.narg('language')) or sqlc.narg('language') = '')
+    (language = sqlc.narg('language') or sqlc.narg('language') = '')
 limit $1
 offset $2;
 
@@ -71,13 +71,3 @@ update books
 set image_uuid = @imageUUID
 where id = @id
 returning *;
-
--- name: SearchBooksCombined :many
-select * from books
-where
-    (lower(title) like lower('%' || @query || '%')) or
-    (lower(author) like lower('%' || @query || '%')) or
-    (lower(publisher) like lower('%' || @query || '%'))
-    -- (to_tsvector(publisher) @@ to_tsquery(@query))
-limit $1
-offset $2;

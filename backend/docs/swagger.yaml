@@ -508,15 +508,14 @@ paths:
   /api/books/{book-id}/cover:
     put:
       consumes:
-      - application/json
+      - multipart/form-data
       description: Задаёт обложку для книги.
       parameters:
-      - description: ID обложки с сервера хранилища
-        in: body
-        name: imageuuid
+      - description: Файл обложки (PNG или JPEG)
+        in: formData
+        name: image
         required: true
-        schema:
-          type: string
+        type: file
       produces:
       - application/json
       responses:
@@ -535,57 +534,11 @@ paths:
       summary: Задать обложку
       tags:
       - Книги
-  /api/books/combinedSearch:
-    get:
-      consumes:
-      - application/json
-      description: Возвращает список книг, соответствующих поисковому параметру. Ведётся
-        поиск сразу по названию, автору и издательству.
-      parameters:
-      - description: Лимит количества возвращаемых элементов
-        example: 10
-        in: query
-        name: limit
-        type: integer
-      - description: Смещение возвращаемых элементов
-        example: 5
-        in: query
-        name: offset
-        type: integer
-      - description: Поисковой запрос
-        example: книг
-        in: query
-        name: query
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/db.Book'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
-      summary: Найти книги
-      tags:
-      - Книги
   /api/books/search:
     get:
       consumes:
       - application/json
-      description: Возвращает список книг, конкретно соответствующих поисковым параметрам.
+      description: Возвращает список книг, соответствующих поисковым параметрам.
       parameters:
       - description: Лимит количества возвращаемых элементов
         example: 10

@@ -3,6 +3,7 @@ import SideBar from "../modules/sideBar";
 import Header from "../modules/header";
 import "../styles/central.css";
 
+// Импортируем иконки категорий
 import ComedyIcon from "../assets/Comedy.png";
 import DocumentaryIcon from "../assets/Documentary.png";
 import NovelIcon from "../assets/Novel.png";
@@ -29,14 +30,6 @@ interface Category {
   icon_url: string;
 }
 
-interface ApiBook {
-  id: string;
-  title?: string | null;
-  author?: string | null;
-  cover_url?: string | null;
-  image_uuid?: string | null;
-}
-
 const Central = () => {
   const [recommendedBooks, setRecommendedBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,8 +49,6 @@ const Central = () => {
     { id: "Драма", name: "Драма", icon_url: DramaIcon },
   ];
 
-  // ... (импорты и интерфейсы без изменений) ...
-
   useEffect(() => {
     const fetchRandomBooks = async () => {
       try {
@@ -65,17 +56,14 @@ const Central = () => {
         const res = await fetch("http://localhost/api/books");
         if (!res.ok) throw new Error("Failed to fetch books");
 
-        const allBooks: ApiBook[] = await res.json();
+        const allBooks: Book[] = await res.json();
 
         const shuffled = [...allBooks].sort(() => 0.5 - Math.random());
-        const randomFive: Book[] = shuffled.slice(0, 5).map((book) => ({
+        const randomFive = shuffled.slice(0, 5).map((book) => ({
           id: book.id,
-          title: book.title?.trim() || "Без названия",
-          author: book.author?.trim() || "Неизвестный автор",
-          // Единая логика: image_uuid -> URL, иначе cover_url, иначе undefined
-          cover_url: book.image_uuid
-            ? `/cdn/${book.image_uuid}`
-            : book.cover_url || undefined,
+          title: book.title || "Без названия",
+          author: book.author || "Неизвестный автор",
+          cover_url: book.cover_url || "",
         }));
 
         setRecommendedBooks(randomFive);
@@ -89,14 +77,13 @@ const Central = () => {
     fetchRandomBooks();
   }, []);
 
-  // ... (остальной код без изменений) ...
-
   return (
     <section className="central-page">
       <SideBar />
       <main className="central-content">
         <Header />
         <div className="central-container">
+          {/* --- ЧАСТЬ 1: РЕКОМЕНДАЦИИ --- */}
           <section className="recommendations-section">
             <h1>Рекомендации</h1>
             <p className="subtitle">
@@ -104,9 +91,7 @@ const Central = () => {
               на основе ваших текущих интересов и активности на нашем сайте.
             </p>
 
-            <a href="/book/catalog" className="expand-btn">
-              В полный каталог →
-            </a>
+            <button className="expand-btn">Развернуть →</button>
 
             {loading ? (
               <div className="loading-books">Загрузка рекомендаций...</div>
@@ -137,6 +122,7 @@ const Central = () => {
             )}
           </section>
 
+          {/* --- ЧАСТЬ 2: КАТЕГОРИИ С ИКОНКАМИ --- */}
           <section className="categories-section">
             <h2 className="section-title">Категории книг</h2>
 

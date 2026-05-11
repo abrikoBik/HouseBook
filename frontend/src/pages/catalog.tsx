@@ -67,7 +67,7 @@ const Catalog = () => {
           genre: book.genre?.trim() || "Другое",
           // Заглушка для обложки, если нет реального URL
           cover_url: book.image_uuid
-            ? `http://localhost/cdn/${book.image_uuid}`
+            ? `http://localhost/api/images/${book.image_uuid}`
             : `https://via.placeholder.com/300x450?text=${encodeURIComponent(book.title || "Book")}`,
         }));
 

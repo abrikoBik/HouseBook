@@ -199,17 +199,17 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 //
 //	@summary		Задать обложку
 //	@description	Задаёт обложку для книги.
-//	@accept			json
+//	@accept			mpfd
 //	@produce		json
 //
 //	@tags			Книги
 //
-//	@param			book-id		path		pgtype.UUID	true	"UUID книги"
-//	@param			imageuuid	body		string		true	"ID обложки с сервера хранилища"
+//	@param			book-id	path		pgtype.UUID	true	"UUID книги"
+//	@param			image	formData	file		true	"Файл обложки (PNG или JPEG)"
 //
-//	@success		200			{object}	db.Book
-//	@failure		400			{object}	ErrorResponse
-//	@failure		500			{object}	ErrorResponse
+//	@success		200		{object}	db.Book
+//	@failure		400		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
 //	@router			/api/books/{book-id}/cover [put]
 func SetBookCover(writer http.ResponseWriter, request *http.Request) {
 	var (
@@ -218,9 +218,51 @@ func SetBookCover(writer http.ResponseWriter, request *http.Request) {
 		r    = render.New()
 		q    = db.New(database.Pool)
 	)
-	data.ID, err = util.PathUUID(consts.BookIDPathValue, request)
-	if err = errors.Join(err, json.NewDecoder(request.Body).Decode(&data)); err != nil {
+
+	if data.ID, err = util.PathUUID(consts.BookIDPathValue, request); err != nil {
 		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
+		return
+	}
+
+	var client http.Client
+	req, err := http.NewRequest("POST", consts.StorageURL, nil)
+	if err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+	req.Body = request.Body
+	req.Header.Set("Content-Type", request.Header.Get("Content-Type"))
+	response, err := client.Do(req)
+	if err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+	defer response.Body.Close()
+
+	var errored bool
+	switch response.StatusCode {
+	case http.StatusCreated:
+		idJSON := StorageIDResponse{}
+		if err := json.NewDecoder(response.Body).Decode(&idJSON); err != nil {
+			RenderError(r, writer, ErrorGeneric(err))
+			errored = true
+			return
+		}
+		if err := data.Imageuuid.Scan(idJSON.ID); err != nil {
+			RenderError(r, writer, ErrorGeneric(err))
+			errored = true
+		}
+	default:
+		errorJSON := StorageErrorResponse{}
+		if err := json.NewDecoder(response.Body).Decode(&errorJSON); err != nil {
+			RenderError(r, writer, ErrorGeneric(err))
+			errored = true
+			return
+		}
+		RenderError(r, writer, ErrorImage(errorJSON.Error))
+		errored = true
+	}
+	if errored {
 		return
 	}
 
@@ -286,7 +328,7 @@ func DeleteBook(writer http.ResponseWriter, request *http.Request) {
 // SearchBook godoc
 //
 //	@summary		Найти книги
-//	@description	Возвращает список книг, конкретно соответствующих поисковым параметрам.
+//	@description	Возвращает список книг, соответствующих поисковым параметрам.
 //	@accept			json
 //	@produce		json
 //
@@ -395,66 +437,6 @@ func ListBooks(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	Logger.Info().Int("len(books)", len(books)).Msg("books listed")
-
-	writer.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(writer).Encode(books); err != nil {
-		RenderError(r, writer, ErrorRender(err))
-		return
-	}
-}
-
-// SearchBooksCombined godoc
-//
-//	@summary		Найти книги
-//	@description	Возвращает список книг, соответствующих поисковому параметру. Ведётся поиск сразу по названию, автору и издательству.
-//	@accept			json
-//	@produce		json
-//
-//	@tags			Книги
-//
-//	@param			limit	query		int		false	"Лимит количества возвращаемых элементов"	Example(10)
-//	@param			offset	query		int		false	"Смещение возвращаемых элементов"			Example(5)
-//
-//	@param			query	query		string	false	"Поисковой запрос"							Example(книг)
-//
-//	@success		200		{array}		db.Book
-//	@failure		400		{object}	ErrorResponse
-//	@failure		404		{object}	ErrorResponse
-//	@failure		500		{object}	ErrorResponse
-//	@router			/api/books/combinedSearch [get]
-func SearchBooksCombined(writer http.ResponseWriter, request *http.Request) {
-	var (
-		err    error
-		params db.SearchBooksCombinedParams
-		query  = request.URL.Query()
-		r      = render.New()
-		q      = db.New(database.Pool)
-	)
-	if err := params.Query.Scan(query.Get("query")); err != nil {
-		RenderError(r, writer, ErrorGeneric(err))
-		return
-	}
-	params.Limit, params.Offset, err = util.GetSearchPagination(query)
-	if err != nil {
-		RenderError(r, writer, ErrorBadPaginationParams(err))
-		return
-	}
-
-	if PingDB(r, writer) != nil {
-		return
-	}
-	books, err := q.SearchBooksCombined(database.Context, params)
-	if err != nil {
-		var toWrite ErrorResponse
-		if errors.Is(err, pgx.ErrNoRows) {
-			toWrite = ErrorNotFound(err)
-		} else {
-			toWrite = ErrorGeneric(err)
-		}
-		RenderError(r, writer, toWrite)
-		return
-	}
-	Logger.Info().Int("len(books)", len(books)).Msg("books searched")
 
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(books); err != nil {

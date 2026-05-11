@@ -10,7 +10,7 @@ export default interface BookT {
   publisher: string;
   title: string;
   year?: number;
-  image_uuid?: string;
+  coverImage?: string;
 }
 
 export default interface CommentT {

@@ -20,7 +20,10 @@
   box-sizing: border-box;
 }
 
-/* Блок рекомендаций */
+/* =========================================
+   БЛОК РЕКОМЕНДАЦИЙ
+   ========================================= */
+
 .recommendations-section {
   margin-bottom: 80px;
 }
@@ -50,14 +53,11 @@
   cursor: pointer;
   transition: all 0.2s ease;
   margin-bottom: 32px;
-  text-decoration: none;
-  display: inline-block;
 }
 
 .expand-btn:hover {
   background: #1a1a1a;
   transform: translateY(-2px);
-  color: white;
 }
 
 .books-carousel {
@@ -79,8 +79,7 @@
   border-radius: 4px;
 }
 
-/* Привязка к .central-page */
-.central-page .book-card-link {
+.book-card-link {
   text-decoration: none;
   color: inherit;
   flex-shrink: 0;
@@ -88,8 +87,7 @@
   margin-top: 20px;
 }
 
-/* Стили карточек ТОЛЬКО для центральной страницы */
-.central-page .book-card {
+.book-card {
   display: flex;
   flex-direction: column;
   cursor: pointer;
@@ -97,11 +95,11 @@
   width: 100%;
 }
 
-.central-page .book-card:hover {
+.book-card:hover {
   transform: translateY(-8px);
 }
 
-.central-page .book-cover {
+.book-cover {
   width: 100%;
   aspect-ratio: 2/3;
   overflow: visible;
@@ -115,20 +113,19 @@
   z-index: 1;
 }
 
-.central-page .book-cover img {
+.book-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
 }
 
-/* Анимация для рекомендаций (большая, как ты просил) */
-.central-page .book-card:hover .book-cover {
+.book-card:hover .book-cover {
   transform: scale(1.2);
   z-index: 10;
 }
 
-.central-page .book-info {
+.book-info {
   padding: 0;
   flex-grow: 1;
   display: flex;
@@ -136,7 +133,7 @@
   justify-content: flex-start;
 }
 
-.central-page .book-info h3 {
+.book-info h3 {
   font-size: 16px;
   font-weight: 600;
   color: #333;
@@ -150,7 +147,7 @@
   -webkit-box-orient: vertical;
 }
 
-.central-page .book-info p {
+.book-info p {
   font-size: 14px;
   color: #7f8c8d;
   margin: 0;
@@ -163,9 +160,14 @@
   padding: 40px 0;
 }
 
-/* Категории */
+/* =========================================
+   БЛОК КАТЕГОРИЙ (Сетка 4-3-2-1)
+   ========================================= */
+
+/* --- Стили для блока Категорий (с увеличенными отступами) --- */
+
 .categories-section {
-  margin-top: -40px;
+  margin-top: -40px; /* <-- Подтягиваем весь блок вверх, ближе к рекомендациям */
   padding-bottom: 60px;
 }
 
@@ -173,14 +175,15 @@
   font-size: 1.8rem;
   font-weight: 700;
   color: #1a1a1a;
-  margin: 0 0 50px 0;
+  margin: 0 0 100px 0; /* <-- Увеличили отступ снизу до 50px, чтобы отодвинуть карточки */
   font-family: inherit;
 }
 
+/* Десктоп: 4 колонки */
 .categories-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 50px 40px;
+  gap: 50px 40px; /* Отступы между карточками остались большими */
 }
 
 .category-card {
@@ -205,6 +208,7 @@
   z-index: 2;
 }
 
+/* Анимация только иконки */
 .category-card:hover .category-icon {
   transform: scale(1.2);
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
@@ -223,93 +227,57 @@
   z-index: 1;
 }
 
+/* =========================================
+   АДАПТИВНОСТЬ (также увеличиваем отступы)
+   ========================================= */
+
+/* Планшет: 3 колонки */
 @media (max-width: 1024px) {
   .categories-grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 40px 30px;
+    gap: 40px 30px; /* Чуть меньше, но всё равно просторно */
   }
+
   .category-icon {
     width: 70px;
     height: 70px;
   }
+
   .category-name {
     font-size: 13px;
   }
-  .central-page .book-card-link {
-    text-decoration: none;
-    color: inherit;
-    flex-shrink: 0;
-    width: 220px;
-    margin-top: 20px;
+}
+
+/* Мобильный средний: 2 колонки */
+@media (max-width: 768px) {
+  .categories-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px 20px;
   }
 
-  .central-page .book-card {
-    display: flex;
-    flex-direction: column;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-    width: 100%;
+  .category-icon {
+    width: 60px;
+    height: 60px;
   }
 
-  .central-page .book-card:hover {
-    transform: translateY(-8px);
-  }
-
-  /* Стили обложки как в каталоге */
-  .central-page .book-cover {
-    width: 100%;
-    aspect-ratio: 2/3;
-    overflow: hidden; /* Обрезаем по краям */
-    background: #f0f0f0;
-    border-radius: 8px; /* Скругление как в каталоге */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    margin-bottom: 16px;
-    transition:
-      transform 0.3s ease,
-      box-shadow 0.3s ease;
-    transform-origin: bottom center;
-    position: relative;
-    z-index: 1;
-  }
-
-  .central-page .book-cover img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-  }
-
-  .central-page .book-card:hover .book-cover {
-    transform: scale(1.2);
-    z-index: 10;
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15); /* Тень усиливается при подъеме */
+  .category-name {
+    font-size: 12px;
   }
 }
 
+/* Мобильный маленький: 1 колонка */
 @media (max-width: 480px) {
-  .central-content {
-    margin-left: 60px;
-    padding-top: 60px;
-    width: calc(100% - 60px);
-  }
   .categories-grid {
     grid-template-columns: repeat(1, 1fr);
     gap: 20px;
   }
+
   .category-icon {
     width: 50px;
     height: 50px;
   }
-  .central-page .book-card-link {
-    width: 140px;
-  }
-  .central-page .book-info h3 {
-    font-size: 13px;
-  }
-  .central-page .book-info p {
-    font-size: 11px;
-  }
-  .central-page .book-card:hover .book-cover {
-    transform: scale(1.05);
+
+  .category-name {
+    font-size: 12px;
   }
 }

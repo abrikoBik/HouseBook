@@ -72,7 +72,6 @@ func SendFile(writer http.ResponseWriter, request *http.Request) {
 	}
 	if base64Query == "" {
 		writer.Header().Set("Content-Type", fmt.Sprintf("image/%s", format))
-		writer.Header().Set("Cache-Control", "public, max-age=86400, immutable")
 	} else {
 		logger.Debug().Msg("encoding as base64")
 		writer.Header().Set("Content-Type", "text/plain")
