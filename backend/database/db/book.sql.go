@@ -168,12 +168,12 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, e
 const searchBooks = `-- name: SearchBooks :many
 select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link from books
 where
-    (title = $3 or $3 = '') and
-    (author = $4 or $4 = '') and
-    (genre = $5 or $5 = '') and
-    (publisher = $6 or $6 = '') and
-    (year = $7 or $7 = 0) and
-    (language = $8 or $8 = '')
+    (lower(title) = lower($3) or $3 = '') and
+    (lower(author) = lower($4) or $4 = '') and
+    (lower(genre) = lower($5) or $5 = '') and
+    (lower(publisher) = lower($6) or $6 = '') and
+    (lower(year) = $7 or $7 = 0) and
+    (lower(language) = lower($8) or $8 = '')
 limit $1
 offset $2
 `
