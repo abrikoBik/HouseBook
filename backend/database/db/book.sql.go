@@ -232,6 +232,56 @@ func (q *Queries) SearchBooks(ctx context.Context, arg SearchBooksParams) ([]Boo
 	return items, nil
 }
 
+const searchBooksCombined = `-- name: SearchBooksCombined :many
+select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link from books
+where
+    to_tsvector(lower(title)) @@ to_tsquery(lower($3)) or
+    to_tsvector(lower(author)) @@ to_tsquery(lower($3)) or
+    to_tsvector(lower(publisher)) @@ to_tsquery(lower($3))
+limit $1
+offset $2
+`
+
+type SearchBooksCombinedParams struct {
+	Limit  int32  `db:"limit" json:"limit"`
+	Offset int32  `db:"offset" json:"offset"`
+	Query  string `db:"query" json:"query"`
+}
+
+func (q *Queries) SearchBooksCombined(ctx context.Context, arg SearchBooksCombinedParams) ([]Book, error) {
+	rows, err := q.db.Query(ctx, searchBooksCombined, arg.Limit, arg.Offset, arg.Query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Book
+	for rows.Next() {
+		var i Book
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Author,
+			&i.Isbn,
+			&i.Genre,
+			&i.Publisher,
+			&i.Year,
+			&i.Language,
+			&i.CoverType,
+			&i.PageCount,
+			&i.Description,
+			&i.ImageUuid,
+			&i.Link,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const setCoverImage = `-- name: SetCoverImage :one
 update books
 set image_uuid = $1

@@ -71,3 +71,12 @@ update books
 set image_uuid = @imageUUID
 where id = @id
 returning *;
+
+-- name: SearchBooksCombined :many
+select * from books
+where
+    to_tsvector(lower(title)) @@ to_tsquery(lower(@query)) or
+    to_tsvector(lower(author)) @@ to_tsquery(lower(@query)) or
+    to_tsvector(lower(publisher)) @@ to_tsquery(lower(@query))
+limit $1
+offset $2;
