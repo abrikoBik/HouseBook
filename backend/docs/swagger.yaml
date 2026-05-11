@@ -508,14 +508,15 @@ paths:
   /api/books/{book-id}/cover:
     put:
       consumes:
-      - multipart/form-data
+      - application/json
       description: Задаёт обложку для книги.
       parameters:
-      - description: Файл обложки (PNG или JPEG)
-        in: formData
-        name: image
+      - description: ID обложки с сервера хранилища
+        in: body
+        name: imageuuid
         required: true
-        type: file
+        schema:
+          type: string
       produces:
       - application/json
       responses:

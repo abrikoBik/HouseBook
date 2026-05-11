@@ -583,7 +583,7 @@ const docTemplate = `{
             "put": {
                 "description": "Задаёт обложку для книги.",
                 "consumes": [
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -594,11 +594,13 @@ const docTemplate = `{
                 "summary": "Задать обложку",
                 "parameters": [
                     {
-                        "type": "file",
-                        "description": "Файл обложки (PNG или JPEG)",
-                        "name": "image",
-                        "in": "formData",
-                        "required": true
+                        "description": "ID обложки с сервера хранилища",
+                        "name": "imageuuid",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {

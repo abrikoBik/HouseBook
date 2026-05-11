@@ -204,12 +204,12 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Книги
 //
-//	@param			book-id	path		pgtype.UUID	true	"UUID книги"
-//	@param			imageuuid	body string		true	"ID обложки с сервера хранилища"
+//	@param			book-id		path		pgtype.UUID	true	"UUID книги"
+//	@param			imageuuid	body		string		true	"ID обложки с сервера хранилища"
 //
-//	@success		200		{object}	db.Book
-//	@failure		400		{object}	ErrorResponse
-//	@failure		500		{object}	ErrorResponse
+//	@success		200			{object}	db.Book
+//	@failure		400			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
 //	@router			/api/books/{book-id}/cover [put]
 func SetBookCover(writer http.ResponseWriter, request *http.Request) {
 	var (
