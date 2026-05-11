@@ -1,13 +1,23 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import "../styles/commentArea.css";
 
 // Импорт иконок
 import BoldIcon from "../assets/bold.svg";
 import ItalicIcon from "../assets/italic.svg";
 import UnderlineIcon from "../assets/undeline.svg";
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router";
 
-const CommentArea = () => {
+interface DecodedToken {
+  id: string;
+  exp?: number;
+  iat?: number;
+}
+
+const CommentArea = ({ BookID, onCommentSent }:{ BookID: string, onCommentSent: () => void }) => {
+  const navigate = useNavigate();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [UserID, setUserID] = useState<string>();
 
   const adjustHeight = () => {
     const textarea = textareaRef.current;
@@ -18,18 +28,38 @@ const CommentArea = () => {
   };
 
   const sendComment = async () => {
-    const book = "019df3c0-2bd4-789f-8e57-c220660e4ff9";
-    const user = "019e0368-1df1-7ecd-9950-4e2a579d47ac";
     const textareaBody = textareaRef.current?.value;
 
-    await fetch("/api/comments/", {
+    const response = await fetch("/api/comments/", {
       method: "POST",
-      body: JSON.stringify({ userid: user, bookid: book, body: textareaBody }),
+      body: JSON.stringify({
+        userid: UserID,
+        bookid: BookID,
+        body: textareaBody,
+      }),
     });
+
+    if (response.ok) {
+        if (textareaRef.current) {
+          textareaRef.current.value = "";
+          adjustHeight();
+        }
+        
+        onCommentSent();
+    }
   };
 
   useEffect(() => {
     adjustHeight();
+
+    const token = localStorage.getItem("token");
+
+    if(token) {
+      const decoded = jwtDecode<DecodedToken>(token!);
+      setUserID(decoded.id);
+    } else {
+      navigate("/auth");
+    }
   }, []);
 
   const applyFormat = (prefix: string, suffix: string) => {

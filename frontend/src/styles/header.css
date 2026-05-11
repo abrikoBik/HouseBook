@@ -1,11 +1,10 @@
 #top_menu {
   position: fixed;
-  width: calc(100vw - 100px);
+  width: calc(100vw - 89px);
   top: 0;
-  left: 100px;
-  z-index: 50;
-  background-color: #f1eee3;
-  opacity: 1;
+  left: 89px;
+  background-color: #f1eee393;
+  z-index: 9999;
   height: 60px;
 }
 
@@ -26,6 +25,14 @@
   max-width: 500px;
   width: 50%;
   margin-left: 50px;
+  padding: 5px;
+  border-radius: 50px;
+  background-color: #f1eee394;
+}
+
+#searchBar > label {
+  width: 25px;
+  height: 25px;
 }
 
 #searchBar > input {
