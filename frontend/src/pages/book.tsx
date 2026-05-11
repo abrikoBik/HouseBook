@@ -33,7 +33,7 @@ const Book = () => {
     const book = result as BookT;
     setBook(book);
   };
-  
+
   const getComments = async (id: string) => {
     const response = await fetch(`/api/books/${id}/comments`);
     const result = await response.json();
@@ -108,9 +108,9 @@ const Book = () => {
             />
           ))}
 
-          <CommentArea 
+          <CommentArea
             BookID={uuid!}
-            onCommentSent={() => getComments(uuid!)}  
+            onCommentSent={() => getComments(uuid!)}
           />
         </section>
       </section>
