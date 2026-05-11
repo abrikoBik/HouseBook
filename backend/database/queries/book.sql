@@ -75,8 +75,9 @@ returning *;
 -- name: SearchBooksCombined :many
 select * from books
 where
-    to_tsvector(lower(title)) @@ to_tsquery(lower(@query)) or
-    to_tsvector(lower(author)) @@ to_tsquery(lower(@query)) or
-    to_tsvector(lower(publisher)) @@ to_tsquery(lower(@query))
+    (lower(title) like lower('%' || @query || '%')) or
+    (lower(author) like lower('%' || @query || '%')) or
+    (lower(publisher) like lower('%' || @query || '%'))
+    -- (to_tsvector(publisher) @@ to_tsquery(@query))
 limit $1
 offset $2;

@@ -430,7 +430,10 @@ func SearchBooksCombined(writer http.ResponseWriter, request *http.Request) {
 		r      = render.New()
 		q      = db.New(database.Pool)
 	)
-	params.Query = query.Get("query")
+	if err := params.Query.Scan(query.Get("query")); err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
 	params.Limit, params.Offset, err = util.GetSearchPagination(query)
 	if err != nil {
 		RenderError(r, writer, ErrorBadPaginationParams(err))

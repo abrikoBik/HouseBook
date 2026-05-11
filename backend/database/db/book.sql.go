@@ -235,17 +235,18 @@ func (q *Queries) SearchBooks(ctx context.Context, arg SearchBooksParams) ([]Boo
 const searchBooksCombined = `-- name: SearchBooksCombined :many
 select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link from books
 where
-    to_tsvector(lower(title)) @@ to_tsquery(lower($3)) or
-    to_tsvector(lower(author)) @@ to_tsquery(lower($3)) or
-    to_tsvector(lower(publisher)) @@ to_tsquery(lower($3))
+    (lower(title) like lower('%' || $3 || '%')) or
+    (lower(author) like lower('%' || $3 || '%')) or
+    (lower(publisher) like lower('%' || $3 || '%'))
+    -- (to_tsvector(publisher) @@ to_tsquery(@query))
 limit $1
 offset $2
 `
 
 type SearchBooksCombinedParams struct {
-	Limit  int32  `db:"limit" json:"limit"`
-	Offset int32  `db:"offset" json:"offset"`
-	Query  string `db:"query" json:"query"`
+	Limit  int32       `db:"limit" json:"limit"`
+	Offset int32       `db:"offset" json:"offset"`
+	Query  pgtype.Text `db:"query" json:"query"`
 }
 
 func (q *Queries) SearchBooksCombined(ctx context.Context, arg SearchBooksCombinedParams) ([]Book, error) {
