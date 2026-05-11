@@ -61,7 +61,7 @@ where
     (lower(author) = lower(sqlc.narg('author')) or sqlc.narg('author') = '') and
     (lower(genre) = lower(sqlc.narg('genre')) or sqlc.narg('genre') = '') and
     (lower(publisher) = lower(sqlc.narg('publisher')) or sqlc.narg('publisher') = '') and
-    (lower(year) = sqlc.narg('year') or sqlc.narg('year') = 0) and
+    (year = sqlc.narg('year') or sqlc.narg('year') = 0) and
     (lower(language) = lower(sqlc.narg('language')) or sqlc.narg('language') = '')
 limit $1
 offset $2;
