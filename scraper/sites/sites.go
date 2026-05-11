@@ -7,9 +7,11 @@ import (
 	"housebook_scraper/util"
 	"net/url"
 	"strconv"
+	"sync"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/gsiems/go-isbn/pkg/isbn"
+	"github.com/rs/zerolog"
 )
 
 // Site contains the domain and all Colly scraper strings for a specific site.
@@ -17,11 +19,11 @@ type Site struct {
 	Title, Author, ISBN, Genre, Publisher, // required fields
 	Year, Language, CoverType, PageCount, Description, CoverImage, CoverImageProperty, // non-required fields
 	Domain, Root string
-	Quirks map[string]func(site *Site)
+	Quirks map[string]func(book *types.TempBook)
 }
 
 // Scrape implements a common scraper for all sites to use.
-func (site *Site) Scrape(collector *colly.Collector, requestURL *url.URL) (result types.Book, err error) {
+func (site *Site) Scrape(collector *colly.Collector, requestURL *url.URL, logger *zerolog.Logger) (result types.Book, err error) {
 	// TODO: eliminate doubled code
 	collector.OnHTML(site.Root, func(element *colly.HTMLElement) {
 		result.StoreLink = requestURL.String()
@@ -39,9 +41,17 @@ func (site *Site) Scrape(collector *colly.Collector, requestURL *url.URL) (resul
 		temp.ImageLink = element.ChildAttr(site.CoverImage, site.CoverImageProperty)
 
 		// apply site-specific quirks
-		for _, quirk := range site.Quirks {
-			quirk(site)
+		var wg sync.WaitGroup
+		wg.Add(len(site.Quirks))
+		for name, quirk := range site.Quirks {
+			go func() {
+				logger.Info().Str("name", name).Msg("applying quirk")
+				quirk(&temp)
+				logger.Info().Str("name", name).Msg("applied quirk")
+				wg.Done()
+			}()
 		}
+		wg.Wait()
 		// prepare resulting book
 		result.Title = temp.Title
 		result.Author = temp.Author

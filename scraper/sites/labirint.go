@@ -1,6 +1,10 @@
 package sites
 
-import "housebook_scraper/consts"
+import (
+	"housebook_scraper/consts"
+	"housebook_scraper/types"
+	"strings"
+)
 
 var Labirint = Site{
 	Domain:             consts.LabirintDomain,
@@ -16,4 +20,14 @@ var Labirint = Site{
 	Description:        "._wrapper_1rsml_1>div:nth-child(1)>div",
 	CoverImage:         "._image_1qke2_7",
 	CoverImageProperty: "srcset",
+	Quirks: map[string]func(book *types.TempBook){
+		"fixTitle": func(book *types.TempBook) {
+			split := strings.Split(book.Title, ": ")
+			split = split[:len(split)-1]
+			book.Title = strings.Join(split, ": ")
+		},
+		"fixImageLink": func(book *types.TempBook) {
+			book.ImageLink = strings.Split(book.ImageLink, " ")[0]
+		},
+	},
 }
