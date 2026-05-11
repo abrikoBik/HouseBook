@@ -23,9 +23,9 @@ func Config(c context.Context) *http.ServeMux {
 	logger = zerolog.Ctx(ctx)
 	router := http.NewServeMux()
 	router.HandleFunc("GET /health", Health)
-	router.HandleFunc("POST /mybook", BuildHandler(sites.MyBook))
-	router.HandleFunc("POST /labirint", BuildHandler(sites.Labirint))
-	router.HandleFunc("POST /litres", BuildHandler(sites.Litres))
+	router.HandleFunc("POST /mybook", BuildHandler(sites.MyBook, logger))
+	router.HandleFunc("POST /labirint", BuildHandler(sites.Labirint, logger))
+	router.HandleFunc("POST /litres", BuildHandler(sites.Litres, logger))
 	return router
 }
 
