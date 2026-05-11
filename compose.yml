@@ -33,6 +33,8 @@ services:
     image: housebook-scraper
     restart: on-failure
     env_file: .env
+    depends_on:
+      - storage
     build: scraper
     hostname: scraper
     networks:
@@ -44,7 +46,6 @@ services:
     env_file: .env
     depends_on:
       - db
-      - storage
     build: backend
     hostname: backend
     networks:
@@ -57,6 +58,7 @@ services:
     depends_on:
       - backend
       - storage
+      - scraper
     build: frontend
     develop:
       watch:
