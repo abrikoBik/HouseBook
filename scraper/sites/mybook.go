@@ -17,7 +17,7 @@ var MyBook = Site{
 	PageCount:   ".sc-1c0xbiw-9>p:nth-child(1)",
 	Description: ".iszfik-2>p:nth-child(1)",
 	// FIX: this returns nil
-	CoverImage:         ".kkiIwl>picture:nth-child(1)>source:nth-child(1)",
+	CoverImage:         ".kkiIwl > picture:nth-child(1) > img:nth-child(2)",
 	CoverImageProperty: "srcset",
 	Quirks: map[string]func(book *types.TempBook){
 		"fixImageLink": func(book *types.TempBook) {

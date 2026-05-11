@@ -44,12 +44,12 @@ func (site *Site) Scrape(collector *colly.Collector, requestURL *url.URL, logger
 		var wg sync.WaitGroup
 		wg.Add(len(site.Quirks))
 		for name, quirk := range site.Quirks {
-			go func() {
-				logger.Info().Str("name", name).Msg("applying quirk")
+			go func(n string) {
+				logger.Info().Str("name", n).Msg("applying quirk")
 				quirk(&temp)
-				logger.Info().Str("name", name).Msg("applied quirk")
+				logger.Info().Str("name", n).Msg("applied quirk")
 				wg.Done()
-			}()
+			}(name)
 		}
 		wg.Wait()
 		// prepare resulting book
