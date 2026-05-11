@@ -115,9 +115,9 @@ const Book = () => {
             />
           ))}
 
-          <CommentArea 
+          <CommentArea
             BookID={uuid!}
-            onCommentSent={() => getComments(uuid!)}  
+            onCommentSent={() => getComments(uuid!)}
           />
         </section>
       </section>

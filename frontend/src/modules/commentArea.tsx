@@ -14,7 +14,13 @@ interface DecodedToken {
   iat?: number;
 }
 
-const CommentArea = ({ BookID, onCommentSent }:{ BookID: string, onCommentSent: () => void }) => {
+const CommentArea = ({
+  BookID,
+  onCommentSent,
+}: {
+  BookID: string;
+  onCommentSent: () => void;
+}) => {
   const navigate = useNavigate();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [UserID, setUserID] = useState<string>();
@@ -40,12 +46,12 @@ const CommentArea = ({ BookID, onCommentSent }:{ BookID: string, onCommentSent: 
     });
 
     if (response.ok) {
-        if (textareaRef.current) {
-          textareaRef.current.value = "";
-          adjustHeight();
-        }
-        
-        onCommentSent();
+      if (textareaRef.current) {
+        textareaRef.current.value = "";
+        adjustHeight();
+      }
+
+      onCommentSent();
     }
   };
 
@@ -54,7 +60,7 @@ const CommentArea = ({ BookID, onCommentSent }:{ BookID: string, onCommentSent: 
 
     const token = localStorage.getItem("token");
 
-    if(token) {
+    if (token) {
       const decoded = jwtDecode<DecodedToken>(token!);
       setUserID(decoded.id);
     } else {
