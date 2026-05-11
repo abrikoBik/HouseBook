@@ -1,5 +1,5 @@
 import Header from "../modules/header";
-import Scraper from "../modules/scraper";
+import ScraperPage from "../modules/scraper";
 import SideBar from "../modules/sideBar";
 
 const Scrape = () => {
@@ -9,7 +9,7 @@ const Scrape = () => {
       <SideBar />
       <section id="scraper">
         <h1>Очень временная страница для скраппинга</h1>
-        <Scraper url={""} />
+        <ScraperPage />
       </section>
     </section>
   );
