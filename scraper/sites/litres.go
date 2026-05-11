@@ -13,7 +13,7 @@ var Litres = Site{
 	Publisher:          ".CharacteristicsBlock_characteristics__1XOas>div:nth-child(8)>a",
 	Year:               ".CharacteristicsBlock_characteristics__1XOas>div:nth-child(3)>span",
 	PageCount:          ".CharacteristicsBlock_characteristics__1XOas>div:nth-child(5)>span",
-	Description:        ".BookCard_book__annotation__8wq0r>div:nth-child(2)",
+	Description:        ".Truncate_expandedModern__c4VSi>div:nth-child(1)>p:nth-child(2)",
 	CoverImage:         ".BookCover_img__ncTI5",
 	CoverImageProperty: "src",
 }
