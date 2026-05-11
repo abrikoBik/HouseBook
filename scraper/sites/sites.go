@@ -16,8 +16,9 @@ import (
 // Site contains the domain and all Colly scraper strings for a specific site.
 type Site struct {
 	Title, Author, ISBN, Genre, Publisher, // required fields
-	Year, Language, CoverType, PageCount, Description, CoverImage, // non-required fields
+	Year, Language, CoverType, PageCount, Description, CoverImage, CoverImageProperty, // non-required fields
 	Domain, Root string
+	Quirks map[string]func()
 }
 
 // Scrape implements a common scraper for all sites to use.
@@ -64,7 +65,7 @@ func (site *Site) Scrape(collector *colly.Collector, requestURL *url.URL) (resul
 			}
 		}
 		result.Description = element.ChildText(site.Description)
-		imageLink := element.ChildAttr(site.CoverImage, "srcset")
+		imageLink := element.ChildAttr(site.CoverImage, site.CoverImageProperty)
 		u, err := url.Parse(strings.Split(imageLink, " ")[0])
 		if err != nil {
 			return
@@ -74,6 +75,10 @@ func (site *Site) Scrape(collector *colly.Collector, requestURL *url.URL) (resul
 				u.Scheme = "http"
 			}
 			result.ImageLink = u.String()
+		}
+		// TODO: find a better solution
+		for _, quirk := range site.Quirks {
+			quirk()
 		}
 	})
 	err = collector.Visit(requestURL.String())
