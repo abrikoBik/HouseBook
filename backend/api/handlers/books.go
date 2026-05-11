@@ -286,7 +286,7 @@ func DeleteBook(writer http.ResponseWriter, request *http.Request) {
 // SearchBook godoc
 //
 //	@summary		Найти книги
-//	@description	Возвращает список книг, соответствующих поисковым параметрам.
+//	@description	Возвращает список книг, конкретно соответствующих поисковым параметрам.
 //	@accept			json
 //	@produce		json
 //
@@ -395,6 +395,63 @@ func ListBooks(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	Logger.Info().Int("len(books)", len(books)).Msg("books listed")
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(books); err != nil {
+		RenderError(r, writer, ErrorRender(err))
+		return
+	}
+}
+
+// SearchBooksCombined godoc
+//
+//	@summary		Найти книги
+//	@description	Возвращает список книг, соответствующих поисковому параметру. Ведётся поиск сразу по названию, автору и издательству.
+//	@accept			json
+//	@produce		json
+//
+//	@tags			Книги
+//
+//	@param			limit	query		int		false	"Лимит количества возвращаемых элементов"	Example(10)
+//	@param			offset	query		int		false	"Смещение возвращаемых элементов"			Example(5)
+//
+//	@param			query	query		string	false	"Поисковой запрос"							Example(книг)
+//
+//	@success		200		{array}		db.Book
+//	@failure		400		{object}	ErrorResponse
+//	@failure		404		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
+//	@router			/api/books/combinedSearch [get]
+func SearchBooksCombined(writer http.ResponseWriter, request *http.Request) {
+	var (
+		err    error
+		params db.SearchBooksCombinedParams
+		query  = request.URL.Query()
+		r      = render.New()
+		q      = db.New(database.Pool)
+	)
+	params.Query = query.Get("query")
+	params.Limit, params.Offset, err = util.GetSearchPagination(query)
+	if err != nil {
+		RenderError(r, writer, ErrorBadPaginationParams(err))
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	books, err := q.SearchBooksCombined(database.Context, params)
+	if err != nil {
+		var toWrite ErrorResponse
+		if errors.Is(err, pgx.ErrNoRows) {
+			toWrite = ErrorNotFound(err)
+		} else {
+			toWrite = ErrorGeneric(err)
+		}
+		RenderError(r, writer, toWrite)
+		return
+	}
+	Logger.Info().Int("len(books)", len(books)).Msg("books searched")
 
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(books); err != nil {
