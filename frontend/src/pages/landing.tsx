@@ -17,12 +17,12 @@ const Landing: React.FC = () => {
       </section>
 
       <section id="features-grid">
-        <a href="/book/catalog" className="feature-card-link">
+        <a href="/central" className="feature-card-link">
           <div className="card-header">
             <img src={Lupa} alt="Иконка поиска" className="card-icon-inline" />
-            <h3>Каталог Книг</h3>
+            <h3>Рекомендации</h3>
           </div>
-          <p>Огромная база данных книг всех жанров и авторов.</p>
+          <p>Лучшие предложения только для вас!</p>
         </a>
 
         <a href="/library" className="feature-card-link">

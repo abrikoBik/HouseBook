@@ -1,4 +1,3 @@
-import BookCover from "../assets/Book.png";
 import FavoritesIcon from "../assets/Favourite_Black.svg";
 import "../styles/book.css";
 import SideBar from "../modules/sideBar";
@@ -31,21 +30,15 @@ const Book = () => {
           throw new Error((result as Error).error);
       }
     }
-    setBook(result as BookT);
+    const book = result as BookT;
+    setBook(book);
   };
 
   const getComments = async (id: string) => {
     const response = await fetch(`/api/books/${id}/comments`);
     const result = await response.json();
     if (!response.ok) {
-      switch (response.status) {
-        case 400:
-        case 404:
-          navigate("/404", { replace: true });
-          break;
-        default:
-          throw new Error((result as Error).error);
-      }
+      throw new Error((result as Error).error);
     }
     setBookComments(result);
   };
@@ -53,7 +46,7 @@ const Book = () => {
   useEffect(() => {
     getBook(uuid!);
     getComments(uuid!);
-  }, [uuid]);
+  }, [uuid, navigate]);
 
   return (
     <section id="layout">
@@ -61,7 +54,7 @@ const Book = () => {
       <SideBar />
       <section id="bookBody">
         <div id="cover">
-          <img src={BookCover} alt="book" />
+          <img src={`/cdn/${book?.image_uuid}`} alt="book" />
           <div>
             <div>
               <h1 className={"desc"}>{book?.title}</h1>
