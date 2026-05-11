@@ -15,7 +15,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
-func BuildHandler(scraper sites.Site) func(http.ResponseWriter, *http.Request) {
+func BuildHandler(scraper sites.Site, logger *zerolog.Logger) func(http.ResponseWriter, *http.Request) {
 	collector := colly.NewCollector(
 		colly.StdlibContext(ctx),
 		colly.AllowedDomains(scraper.Domain),
@@ -49,7 +49,7 @@ func BuildHandler(scraper sites.Site) func(http.ResponseWriter, *http.Request) {
 			response.Error().Err(err).Send()
 			return
 		}
-		book, err := scraper.Scrape(collector, requestURL)
+		book, err := scraper.Scrape(collector, requestURL, logger)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			response.Error().Err(err).Send()

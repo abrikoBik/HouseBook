@@ -18,3 +18,20 @@ type Book struct {
 
 	ImageLink string `json:"-"`
 }
+
+// TempBook holds all scraped fields as raw text for easier processing by quirks.
+type TempBook struct {
+	Title,
+	Author,
+	ISBN,
+	Genre,
+	Publisher,
+	StoreLink,
+	Year,
+	Language,
+	CoverType,
+	PageCount,
+	Description,
+	ImageUUID,
+	ImageLink string
+}
