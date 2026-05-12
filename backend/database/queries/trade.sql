@@ -42,7 +42,7 @@ returning *;
 delete from trades
 where id = @id;
 
--- name: AddBookToTrade :exec
+-- name: AddBookToTrade :execrows
 insert into trade_books (
     trade_id,
     book_id,

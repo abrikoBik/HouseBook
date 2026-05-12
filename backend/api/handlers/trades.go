@@ -305,7 +305,12 @@ func AddBookToTrade(writer http.ResponseWriter, request *http.Request) {
 	if PingDB(r, writer) != nil {
 		return
 	}
-	if err = q.AddBookToTrade(database.Context, data); err != nil {
+	rows, err := q.AddBookToTrade(database.Context, data)
+	if err == nil && rows == 0 {
+		RenderError(r, writer, ErrorTrade(err, "book is not exchangeable"))
+		return
+	}
+	if err != nil {
 		var (
 			pgErr   *pgconn.PgError
 			toWrite ErrorResponse

@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const addBookToTrade = `-- name: AddBookToTrade :exec
+const addBookToTrade = `-- name: AddBookToTrade :execrows
 insert into trade_books (
     trade_id,
     book_id,
@@ -38,14 +38,17 @@ type AddBookToTradeParams struct {
 	Ownerid   pgtype.UUID `db:"ownerid" json:"ownerid"`
 }
 
-func (q *Queries) AddBookToTrade(ctx context.Context, arg AddBookToTradeParams) error {
-	_, err := q.db.Exec(ctx, addBookToTrade,
+func (q *Queries) AddBookToTrade(ctx context.Context, arg AddBookToTradeParams) (int64, error) {
+	result, err := q.db.Exec(ctx, addBookToTrade,
 		arg.Tradeid,
 		arg.Bookid,
 		arg.Libraryid,
 		arg.Ownerid,
 	)
-	return err
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
 }
 
 const confirmTrade = `-- name: ConfirmTrade :one
