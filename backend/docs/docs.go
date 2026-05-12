@@ -1628,6 +1628,15 @@ const docTemplate = `{
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    {
+                        "description": "ID библиотеки, из которой возьмётся книга",
+                        "name": "libraryid",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -2444,11 +2453,11 @@ const docTemplate = `{
                 "book_id": {
                     "type": "string"
                 },
+                "exchangeable": {
+                    "type": "boolean"
+                },
                 "library_id": {
                     "type": "string"
-                },
-                "quantity": {
-                    "$ref": "#/definitions/pgtype.Numeric"
                 }
             }
         },
@@ -2527,6 +2536,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "book_id": {
+                    "type": "string"
+                },
+                "library_id": {
                     "type": "string"
                 },
                 "owner_id": {

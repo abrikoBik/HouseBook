@@ -63,10 +63,10 @@ definitions:
     properties:
       book_id:
         type: string
+      exchangeable:
+        type: boolean
       library_id:
         type: string
-      quantity:
-        $ref: '#/definitions/pgtype.Numeric'
     type: object
   db.ListUserSessionsRow:
     properties:
@@ -117,6 +117,8 @@ definitions:
   db.TradeBook:
     properties:
       book_id:
+        type: string
+      library_id:
         type: string
       owner_id:
         type: string
@@ -1267,6 +1269,12 @@ paths:
       - description: ID книги
         in: body
         name: bookid
+        required: true
+        schema:
+          type: string
+      - description: ID библиотеки, из которой возьмётся книга
+        in: body
+        name: libraryid
         required: true
         schema:
           type: string

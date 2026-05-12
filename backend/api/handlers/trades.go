@@ -277,6 +277,7 @@ func ListUserTrades(writer http.ResponseWriter, request *http.Request) {
 //	@param			trade-id	path		pgtype.UUID	true	"UUID сделки"
 //	@param			ownerid		body		pgtype.UUID	true	"UUID владельца книги"
 //	@param			bookid		body		pgtype.UUID	true	"ID книги"
+//	@param			libraryid	body		pgtype.UUID	true	"ID библиотеки, из которой возьмётся книга"
 //
 //	@success		201			{string}	string		""
 //	@failure		400			{object}	ErrorResponse
@@ -459,8 +460,14 @@ func ConfirmTrade(writer http.ResponseWriter, request *http.Request) {
 		err  error
 		data db.ConfirmTradeParams
 		r    = render.New()
-		q    = db.New(database.Pool)
 	)
+	pool, err := database.Pool.Begin(database.Context)
+	if err != nil {
+		RenderError(r, writer, ErrorDatabase(err))
+		return
+	}
+	defer pool.Rollback(database.Context)
+	q := db.New(pool)
 	if err := json.NewDecoder(request.Body).Decode(&data); err != nil {
 		RenderError(r, writer, ErrorBadJSON(err))
 		return
@@ -486,6 +493,18 @@ func ConfirmTrade(writer http.ResponseWriter, request *http.Request) {
 		Time("completedAt", trade.CompletedAt.Time).
 		Msg("trade confirmed")
 
+	if !trade.CompletedAt.Time.IsZero() {
+		if err := q.MoveTradeBooks(database.Context, trade.ID); err != nil {
+			RenderError(r, writer, ErrorGeneric(err))
+			return
+		}
+		Logger.Info().Msg("both parties confirmed trade; books moved")
+	}
+
+	if err := pool.Commit(database.Context); err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(trade); err != nil {
 		RenderError(r, writer, ErrorRender(err))

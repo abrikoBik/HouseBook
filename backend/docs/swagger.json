@@ -1617,6 +1617,15 @@
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    {
+                        "description": "ID библиотеки, из которой возьмётся книга",
+                        "name": "libraryid",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -2433,11 +2442,11 @@
                 "book_id": {
                     "type": "string"
                 },
+                "exchangeable": {
+                    "type": "boolean"
+                },
                 "library_id": {
                     "type": "string"
-                },
-                "quantity": {
-                    "$ref": "#/definitions/pgtype.Numeric"
                 }
             }
         },
@@ -2516,6 +2525,9 @@
             "type": "object",
             "properties": {
                 "book_id": {
+                    "type": "string"
+                },
+                "library_id": {
                     "type": "string"
                 },
                 "owner_id": {
