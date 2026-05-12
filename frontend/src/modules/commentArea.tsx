@@ -8,12 +8,6 @@ import UnderlineIcon from "../assets/undeline.svg";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router";
 
-interface DecodedToken {
-  id: string;
-  exp?: number;
-  iat?: number;
-}
-
 const CommentArea = ({
   BookID,
   onCommentSent,
@@ -58,11 +52,10 @@ const CommentArea = ({
   useEffect(() => {
     adjustHeight();
 
-    const token = localStorage.getItem("token");
+    const id = localStorage.getItem("UserID");
 
-    if (token) {
-      const decoded = jwtDecode<DecodedToken>(token!);
-      setUserID(decoded.id);
+    if (id) {  
+      setUserID(id);
     } else {
       navigate("/auth");
     }

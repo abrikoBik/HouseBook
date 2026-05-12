@@ -3,19 +3,6 @@ import SideBar from "../modules/sideBar";
 import Header from "../modules/header";
 import "../styles/central.css";
 
-import ComedyIcon from "../assets/Comedy.png";
-import DocumentaryIcon from "../assets/Documentary.png";
-import NovelIcon from "../assets/Novel.png";
-import HistoryIcon from "../assets/History.png";
-import SciFiIcon from "../assets/Sci-Fi.png";
-import ActionIcon from "../assets/Action.png";
-import DramaIcon from "../assets/Drama.png";
-import AdventureIcon from "../assets/Adventure.png";
-import ThrillerIcon from "../assets/Thriller.png";
-import FantasyIcon from "../assets/Fantasy.png";
-import HorrorIcon from "../assets/Horror.png";
-import DetectiveIcon from "../assets/Detective.png";
-
 interface Book {
   id: string;
   title: string;
@@ -40,21 +27,6 @@ interface ApiBook {
 const Central = () => {
   const [recommendedBooks, setRecommendedBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const categories: Category[] = [
-    { id: "Фантастика", name: "Фантастика", icon_url: FantasyIcon },
-    { id: "Детектив", name: "Детективы", icon_url: DetectiveIcon },
-    { id: "Триллеры", name: "Триллеры", icon_url: ThrillerIcon },
-    { id: "Ужасы", name: "Ужасы", icon_url: HorrorIcon },
-    { id: "Приключения", name: "Приключения", icon_url: AdventureIcon },
-    { id: "Наука", name: "Научная фантастика", icon_url: SciFiIcon },
-    { id: "История", name: "История", icon_url: HistoryIcon },
-    { id: "Комедия", name: "Комедия", icon_url: ComedyIcon },
-    { id: "Документальное", name: "Документальное", icon_url: DocumentaryIcon },
-    { id: "Романы", name: "Романы", icon_url: NovelIcon },
-    { id: "Экшен", name: "Экшен", icon_url: ActionIcon },
-    { id: "Драма", name: "Драма", icon_url: DramaIcon },
-  ];
 
   // ... (импорты и интерфейсы без изменений) ...
 
@@ -135,27 +107,6 @@ const Central = () => {
                 ))}
               </div>
             )}
-          </section>
-
-          <section className="categories-section">
-            <h2 className="section-title">Категории книг</h2>
-
-            <div className="categories-grid">
-              {categories.map((category) => (
-                <a
-                  href={`/book/catalog?genre=${encodeURIComponent(category.id)}`}
-                  key={category.id}
-                  className="category-card"
-                >
-                  <img
-                    src={category.icon_url}
-                    alt={category.name}
-                    className="category-icon"
-                  />
-                  <p className="category-name">{category.name}</p>
-                </a>
-              ))}
-            </div>
           </section>
         </div>
       </main>

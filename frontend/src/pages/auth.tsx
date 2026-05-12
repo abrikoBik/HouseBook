@@ -107,6 +107,7 @@ const Auth = () => {
 
     const responseJSON = await sessionResponse.json();
     // TODO: install JWT unhash library to get user id
+    // TODO: save jwt to cookies
     localStorage.setItem("token", responseJSON["jwt"]);
     navigate("/profile");
   };

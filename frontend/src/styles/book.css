@@ -34,10 +34,8 @@
   }
 
   & > img {
-    max-width: 383px;
-    max-height: 600px;
-    width: auto;
-    height: auto;
+    width: 383px;
+    height: 600px;
 
     box-shadow: -20px 15px 40px 10px rgba(0, 0, 0, 0.25);
   }
@@ -113,7 +111,7 @@
   display: flex;
   flex-direction: row;
   align-items: start;
-  height: 20rem;
+  height: auto;
 
   & > div {
     width: 60%;
