@@ -14,23 +14,20 @@ import (
 const addBookToLibrary = `-- name: AddBookToLibrary :exec
 insert into library_books (
     library_id,
-    book_id,
-    quantity
+    book_id
 ) values (
     $1,
-    $2,
-    $3
+    $2
 )
 `
 
 type AddBookToLibraryParams struct {
-	Libraryid pgtype.UUID    `db:"libraryid" json:"libraryid"`
-	Bookid    pgtype.UUID    `db:"bookid" json:"bookid"`
-	Quantity  pgtype.Numeric `db:"quantity" json:"quantity"`
+	Libraryid pgtype.UUID `db:"libraryid" json:"libraryid"`
+	Bookid    pgtype.UUID `db:"bookid" json:"bookid"`
 }
 
 func (q *Queries) AddBookToLibrary(ctx context.Context, arg AddBookToLibraryParams) error {
-	_, err := q.db.Exec(ctx, addBookToLibrary, arg.Libraryid, arg.Bookid, arg.Quantity)
+	_, err := q.db.Exec(ctx, addBookToLibrary, arg.Libraryid, arg.Bookid)
 	return err
 }
 

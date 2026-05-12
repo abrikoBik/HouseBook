@@ -38,10 +38,9 @@ type Library struct {
 }
 
 type LibraryBook struct {
-	LibraryID    pgtype.UUID    `db:"library_id" json:"library_id"`
-	BookID       pgtype.UUID    `db:"book_id" json:"book_id"`
-	Quantity     pgtype.Numeric `db:"quantity" json:"quantity"`
-	Exchangeable bool           `db:"exchangeable" json:"exchangeable"`
+	LibraryID    pgtype.UUID `db:"library_id" json:"library_id"`
+	BookID       pgtype.UUID `db:"book_id" json:"book_id"`
+	Exchangeable bool        `db:"exchangeable" json:"exchangeable"`
 }
 
 type Session struct {
@@ -62,9 +61,10 @@ type Trade struct {
 }
 
 type TradeBook struct {
-	TradeID pgtype.UUID `db:"trade_id" json:"trade_id"`
-	BookID  pgtype.UUID `db:"book_id" json:"book_id"`
-	OwnerID pgtype.UUID `db:"owner_id" json:"owner_id"`
+	TradeID   pgtype.UUID `db:"trade_id" json:"trade_id"`
+	BookID    pgtype.UUID `db:"book_id" json:"book_id"`
+	LibraryID pgtype.UUID `db:"library_id" json:"library_id"`
+	OwnerID   pgtype.UUID `db:"owner_id" json:"owner_id"`
 }
 
 type User struct {

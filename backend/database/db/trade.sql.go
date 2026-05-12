@@ -15,22 +15,30 @@ const addBookToTrade = `-- name: AddBookToTrade :exec
 insert into trade_books (
     trade_id,
     book_id,
+    library_id,
     owner_id
 ) values (
     $1,
     $2,
-    $3
+    $3,
+    $4
 )
 `
 
 type AddBookToTradeParams struct {
-	Tradeid pgtype.UUID `db:"tradeid" json:"tradeid"`
-	Bookid  pgtype.UUID `db:"bookid" json:"bookid"`
-	Ownerid pgtype.UUID `db:"ownerid" json:"ownerid"`
+	Tradeid   pgtype.UUID `db:"tradeid" json:"tradeid"`
+	Bookid    pgtype.UUID `db:"bookid" json:"bookid"`
+	Libraryid pgtype.UUID `db:"libraryid" json:"libraryid"`
+	Ownerid   pgtype.UUID `db:"ownerid" json:"ownerid"`
 }
 
 func (q *Queries) AddBookToTrade(ctx context.Context, arg AddBookToTradeParams) error {
-	_, err := q.db.Exec(ctx, addBookToTrade, arg.Tradeid, arg.Bookid, arg.Ownerid)
+	_, err := q.db.Exec(ctx, addBookToTrade,
+		arg.Tradeid,
+		arg.Bookid,
+		arg.Libraryid,
+		arg.Ownerid,
+	)
 	return err
 }
 
@@ -282,4 +290,28 @@ func (q *Queries) ListUserTrades(ctx context.Context, arg ListUserTradesParams) 
 		return nil, err
 	}
 	return items, nil
+}
+
+const moveTradeBooks = `-- name: MoveTradeBooks :exec
+update library_books lb
+set
+    library_id = recipient_lib.id,
+    exchangeable = false
+from trade_books tb
+join trades t ON tb.trade_id = t.id
+join libraries recipient_lib on recipient_lib.user_id = (
+    case
+        when tb.owner_id = t.owner_id then t.buyer_id
+        else t.owner_id
+    end
+)
+where tb.trade_id = $1
+  and t.completed_at is not null
+  and lb.library_id = tb.library_id
+  and lb.book_id = tb.book_id
+`
+
+func (q *Queries) MoveTradeBooks(ctx context.Context, id pgtype.UUID) error {
+	_, err := q.db.Exec(ctx, moveTradeBooks, id)
+	return err
 }

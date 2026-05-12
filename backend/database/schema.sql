@@ -47,23 +47,23 @@ create table trades (
     completed_at timestamp
 );
 
-create table trade_books (
-    trade_id uuid references trades(id) on delete cascade,
-    book_id uuid references books(id),
-    owner_id uuid not null references users(id),
-    primary key (trade_id, book_id)
-);
-
 create table libraries (
     id uuid primary key default uuidv7(),
     user_id uuid not null references users(id),
     name text not null default 'Библиотека'
 );
 
+create table trade_books (
+    trade_id uuid references trades(id) on delete cascade,
+    book_id uuid references books(id),
+    library_id uuid references libraries(id),
+    owner_id uuid not null references users(id),
+    primary key (trade_id, book_id)
+);
+
 create table library_books (
     library_id uuid references libraries(id) on delete cascade,
     book_id uuid references books(id),
-    quantity numeric not null default 1,
     exchangeable boolean not null default false,
     primary key (library_id, book_id)
 );

@@ -38,6 +38,29 @@ insert into trades (
 )
 returning *;
 
+-- name: DeleteTrade :exec
+delete from trades
+where id = @id;
+
+-- name: AddBookToTrade :exec
+insert into trade_books (
+    trade_id,
+    book_id,
+    library_id,
+    owner_id
+) values (
+    @tradeID,
+    @bookID,
+    @libraryID,
+    @ownerID
+);
+
+-- name: DeleteBookFromTrade :exec
+delete from trade_books
+where
+trade_id = @trade_id and
+book_id = @book_id;
+
 -- name: ConfirmTrade :one
 update trades
 set
@@ -62,23 +85,20 @@ end
 where id = @id
 returning *;
 
--- name: DeleteTrade :exec
-delete from trades
-where id = @id;
-
--- name: AddBookToTrade :exec
-insert into trade_books (
-    trade_id,
-    book_id,
-    owner_id
-) values (
-    @tradeID,
-    @bookID,
-    @ownerID
-);
-
--- name: DeleteBookFromTrade :exec
-delete from trade_books
-where
-trade_id = @trade_id and
-book_id = @book_id;
+-- name: MoveTradeBooks :exec
+update library_books lb
+set
+    library_id = recipient_lib.id,
+    exchangeable = false
+from trade_books tb
+join trades t ON tb.trade_id = t.id
+join libraries recipient_lib on recipient_lib.user_id = (
+    case
+        when tb.owner_id = t.owner_id then t.buyer_id
+        else t.owner_id
+    end
+)
+where tb.trade_id = @id
+  and t.completed_at is not null
+  and lb.library_id = tb.library_id
+  and lb.book_id = tb.book_id;

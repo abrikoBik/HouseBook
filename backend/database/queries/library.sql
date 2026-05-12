@@ -46,12 +46,10 @@ where id = @id;
 -- name: AddBookToLibrary :exec
 insert into library_books (
     library_id,
-    book_id,
-    quantity
+    book_id
 ) values (
     @libraryID,
-    @bookID,
-    @quantity
+    @bookID
 );
 
 -- name: DeleteBookFromLibrary :exec
