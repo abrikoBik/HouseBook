@@ -48,12 +48,18 @@ insert into trade_books (
     book_id,
     library_id,
     owner_id
-) values (
+)
+select
     @tradeID,
     @bookID,
     @libraryID,
     @ownerID
-);
+from library_books lb
+join libraries l on lb.library_id = l.id
+where lb.book_id = @bookID
+  and lb.library_id = @libraryID
+  and l.user_id = @ownerID
+  and lb.exchangeable = true;
 
 -- name: DeleteBookFromTrade :exec
 delete from trade_books

@@ -17,12 +17,18 @@ insert into trade_books (
     book_id,
     library_id,
     owner_id
-) values (
+)
+select
     $1,
     $2,
     $3,
     $4
-)
+from library_books lb
+join libraries l on lb.library_id = l.id
+where lb.book_id = $2
+  and lb.library_id = $3
+  and l.user_id = $4
+  and lb.exchangeable = true
 `
 
 type AddBookToTradeParams struct {
