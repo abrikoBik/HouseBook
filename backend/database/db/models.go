@@ -38,9 +38,10 @@ type Library struct {
 }
 
 type LibraryBook struct {
-	LibraryID pgtype.UUID    `db:"library_id" json:"library_id"`
-	BookID    pgtype.UUID    `db:"book_id" json:"book_id"`
-	Quantity  pgtype.Numeric `db:"quantity" json:"quantity"`
+	LibraryID    pgtype.UUID    `db:"library_id" json:"library_id"`
+	BookID       pgtype.UUID    `db:"book_id" json:"book_id"`
+	Quantity     pgtype.Numeric `db:"quantity" json:"quantity"`
+	Exchangeable bool           `db:"exchangeable" json:"exchangeable"`
 }
 
 type Session struct {

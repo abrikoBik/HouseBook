@@ -64,6 +64,7 @@ create table library_books (
     library_id uuid references libraries(id) on delete cascade,
     book_id uuid references books(id),
     quantity numeric not null default 1,
+    exchangeable boolean not null default false,
     primary key (library_id, book_id)
 );
 
