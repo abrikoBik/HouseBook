@@ -1,4 +1,4 @@
-alter table library_books drop column quantities;
+alter table library_books drop column quantity;
 alter table library_books add exchangeable boolean not null default false;
 alter table trade_books add library_id uuid references libraries(id);
 

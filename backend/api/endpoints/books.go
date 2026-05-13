@@ -20,6 +20,7 @@ func routeBooks(router chi.Router) {
 			r.With(middleware.JSONResponse).Put("/cover", handlers.SetBookCover)
 			r.Delete("/", handlers.DeleteBook)
 			r.With(middleware.JSONResponse).Get(consts.CommentsEndpoint, handlers.ListBookComments)
+			r.With(middleware.JSONResponse).Get(consts.ExchangeableEndpoint, handlers.SearchExchangeableBooks)
 		})
 	})
 }

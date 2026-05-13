@@ -462,3 +462,61 @@ func SearchBooksCombined(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 }
+
+// SearchExchangeableBooks godoc
+//
+//	@summary		Поиск книг, готовых к обмену
+//	@description	Возвращает список всех экземпляров книги, готовых к обмену.
+//	@accept			plain
+//	@produce		json
+//
+//	@tags			Библиотеки,Книги
+//
+//	@param			book-id	path		pgtype.UUID	true	"UUID книги"
+//	@param			limit	query		int			false	"Лимит количества возвращаемых элементов"	Example(10)
+//	@param			offset	query		int			false	"Смещение возвращаемых элементов"			Example(5)
+//
+//	@success		200		{array}		db.SearchExchangeableBooksRow
+//	@failure		400		{object}	ErrorResponse
+//	@failure		404		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
+//	@router			/api/books/{book-id}/exchangeable [get]
+func SearchExchangeableBooks(writer http.ResponseWriter, request *http.Request) {
+	var (
+		err    error
+		params db.SearchExchangeableBooksParams
+		query  = request.URL.Query()
+		r      = render.New()
+		q      = db.New(database.Pool)
+	)
+	if params.Bookid, err = util.PathUUID(consts.BookIDPathValue, request); err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
+		return
+	}
+	if params.Limit, params.Offset, err = util.GetSearchPagination(query); err != nil {
+		RenderError(r, writer, ErrorBadPaginationParams(err))
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	books, err := q.SearchExchangeableBooks(database.Context, params)
+	if err != nil {
+		var toWrite ErrorResponse
+		if errors.Is(err, pgx.ErrNoRows) {
+			toWrite = ErrorNotFound(err)
+		} else {
+			toWrite = ErrorGeneric(err)
+		}
+		RenderError(r, writer, toWrite)
+		return
+	}
+	Logger.Info().Int("len(books)", len(books)).Msg("exchangeable books listed")
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(books); err != nil {
+		RenderError(r, writer, ErrorRender(err))
+		return
+	}
+}

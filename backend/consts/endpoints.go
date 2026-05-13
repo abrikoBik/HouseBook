@@ -3,13 +3,14 @@ package consts
 import "fmt"
 
 const (
-	DocsEndpoint      = "/docs"
-	BooksEndpoint     = "/books"
-	UsersEndpoint     = "/users"
-	TradesEndpoint    = "/trades"
-	LibrariesEndpoint = "/libraries"
-	CommentsEndpoint  = "/comments"
-	SessionsEndpoint  = "/sessions"
+	DocsEndpoint         = "/docs"
+	BooksEndpoint        = "/books"
+	UsersEndpoint        = "/users"
+	TradesEndpoint       = "/trades"
+	LibrariesEndpoint    = "/libraries"
+	CommentsEndpoint     = "/comments"
+	SessionsEndpoint     = "/sessions"
+	ExchangeableEndpoint = "/exchangeable"
 
 	GenericIDPathValue = "id"
 	BookIDPathValue    = "book-id"
