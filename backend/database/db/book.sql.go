@@ -170,7 +170,8 @@ func (q *Queries) GetRecommendedBooks(ctx context.Context, arg GetRecommendedBoo
 }
 
 const listBooks = `-- name: ListBooks :many
-select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link, added_at from books
+select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link, added_at from books b
+order by b.added_at desc
 limit $1
 offset $2
 `

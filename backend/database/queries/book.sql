@@ -4,7 +4,8 @@ where id = @id
 limit 1;
 
 -- name: ListBooks :many
-select * from books
+select * from books b
+order by b.added_at desc
 limit $1
 offset $2;
 
