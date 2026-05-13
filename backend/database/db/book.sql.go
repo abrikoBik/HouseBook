@@ -35,7 +35,7 @@ insert into books (
     $9,
     $10
 )
-returning id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link
+returning id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link, added_at
 `
 
 type CreateBookParams struct {
@@ -79,6 +79,7 @@ func (q *Queries) CreateBook(ctx context.Context, arg CreateBookParams) (Book, e
 		&i.Description,
 		&i.ImageUuid,
 		&i.Link,
+		&i.AddedAt,
 	)
 	return i, err
 }
@@ -94,7 +95,7 @@ func (q *Queries) DeleteBook(ctx context.Context, id pgtype.UUID) error {
 }
 
 const getBook = `-- name: GetBook :one
-select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link from books
+select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link, added_at from books
 where id = $1
 limit 1
 `
@@ -116,12 +117,61 @@ func (q *Queries) GetBook(ctx context.Context, id pgtype.UUID) (Book, error) {
 		&i.Description,
 		&i.ImageUuid,
 		&i.Link,
+		&i.AddedAt,
 	)
 	return i, err
 }
 
+const getRecommendedBooks = `-- name: GetRecommendedBooks :many
+select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link, added_at from books
+order by random()
+limit $1
+offset $2
+`
+
+type GetRecommendedBooksParams struct {
+	Limit  int32 `db:"limit" json:"limit"`
+	Offset int32 `db:"offset" json:"offset"`
+}
+
+func (q *Queries) GetRecommendedBooks(ctx context.Context, arg GetRecommendedBooksParams) ([]Book, error) {
+	rows, err := q.db.Query(ctx, getRecommendedBooks, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Book
+	for rows.Next() {
+		var i Book
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Author,
+			&i.Isbn,
+			&i.Genre,
+			&i.Publisher,
+			&i.Year,
+			&i.Language,
+			&i.CoverType,
+			&i.PageCount,
+			&i.Description,
+			&i.ImageUuid,
+			&i.Link,
+			&i.AddedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listBooks = `-- name: ListBooks :many
-select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link from books
+select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link, added_at from books b
+order by b.added_at desc
 limit $1
 offset $2
 `
@@ -154,6 +204,7 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, e
 			&i.Description,
 			&i.ImageUuid,
 			&i.Link,
+			&i.AddedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -166,7 +217,7 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, e
 }
 
 const searchBooks = `-- name: SearchBooks :many
-select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link from books
+select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link, added_at from books
 where
     (lower(title) = lower($3) or $3 = '') and
     (lower(author) = lower($4) or $4 = '') and
@@ -221,6 +272,7 @@ func (q *Queries) SearchBooks(ctx context.Context, arg SearchBooksParams) ([]Boo
 			&i.Description,
 			&i.ImageUuid,
 			&i.Link,
+			&i.AddedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -233,12 +285,11 @@ func (q *Queries) SearchBooks(ctx context.Context, arg SearchBooksParams) ([]Boo
 }
 
 const searchBooksCombined = `-- name: SearchBooksCombined :many
-select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link from books
+select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link, added_at from books
 where
     (lower(title) like lower('%' || $3 || '%')) or
     (lower(author) like lower('%' || $3 || '%')) or
     (lower(publisher) like lower('%' || $3 || '%'))
-    -- (to_tsvector(publisher) @@ to_tsquery(@query))
 limit $1
 offset $2
 `
@@ -272,6 +323,7 @@ func (q *Queries) SearchBooksCombined(ctx context.Context, arg SearchBooksCombin
 			&i.Description,
 			&i.ImageUuid,
 			&i.Link,
+			&i.AddedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -332,7 +384,7 @@ const setCoverImage = `-- name: SetCoverImage :one
 update books
 set image_uuid = $1
 where id = $2
-returning id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link
+returning id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link, added_at
 `
 
 type SetCoverImageParams struct {
@@ -357,6 +409,7 @@ func (q *Queries) SetCoverImage(ctx context.Context, arg SetCoverImageParams) (B
 		&i.Description,
 		&i.ImageUuid,
 		&i.Link,
+		&i.AddedAt,
 	)
 	return i, err
 }
@@ -375,7 +428,7 @@ set
     page_count = coalesce($9, page_count),
     description = coalesce($10, description)
 where id = $11
-returning id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link
+returning id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link, added_at
 `
 
 type UpdateBookParams struct {
@@ -421,6 +474,7 @@ func (q *Queries) UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, e
 		&i.Description,
 		&i.ImageUuid,
 		&i.Link,
+		&i.AddedAt,
 	)
 	return i, err
 }
