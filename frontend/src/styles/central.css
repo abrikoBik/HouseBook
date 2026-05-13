@@ -10,6 +10,10 @@
   padding-top: 80px;
   width: calc(100% - clamp(120px, 8vw, 120px));
   box-sizing: border-box;
+
+  overflow: hidden;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .central-container {

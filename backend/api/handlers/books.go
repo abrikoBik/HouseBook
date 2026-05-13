@@ -33,6 +33,7 @@ import (
 //	@param			publisher	body		string	true	"Издательство книги"			Example(Хороший Издатель)
 //	@param			title		body		string	true	"Название книги"				Example(Интересная книга)
 //	@param			year		body		int		false	"Год выпуска книги"				Example(2026)
+//	@param			link		body		string	false	"Ссылка на магазин с книгой"	Example(https://www.litres.ru/book/gregori-devid-roberts/shantaram-5815016/)
 //
 //	@success		201			{object}	db.Book
 //	@failure		400			{object}	ErrorResponse
@@ -204,12 +205,12 @@ func UpdateBook(writer http.ResponseWriter, request *http.Request) {
 //
 //	@tags			Книги
 //
-//	@param			book-id	path		pgtype.UUID	true	"UUID книги"
-//	@param			imageuuid	body string		true	"ID обложки с сервера хранилища"
+//	@param			book-id		path		pgtype.UUID	true	"UUID книги"
+//	@param			imageuuid	body		string		true	"ID обложки с сервера хранилища"
 //
-//	@success		200		{object}	db.Book
-//	@failure		400		{object}	ErrorResponse
-//	@failure		500		{object}	ErrorResponse
+//	@success		200			{object}	db.Book
+//	@failure		400			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
 //	@router			/api/books/{book-id}/cover [put]
 func SetBookCover(writer http.ResponseWriter, request *http.Request) {
 	var (
@@ -286,7 +287,7 @@ func DeleteBook(writer http.ResponseWriter, request *http.Request) {
 // SearchBook godoc
 //
 //	@summary		Найти книги
-//	@description	Возвращает список книг, соответствующих поисковым параметрам.
+//	@description	Возвращает список книг, конкретно соответствующих поисковым параметрам.
 //	@accept			json
 //	@produce		json
 //
@@ -395,6 +396,178 @@ func ListBooks(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	Logger.Info().Int("len(books)", len(books)).Msg("books listed")
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(books); err != nil {
+		RenderError(r, writer, ErrorRender(err))
+		return
+	}
+}
+
+// GetRecommendedBooks godoc
+//
+//	@summary		Список рекомендуемых книг
+//	@description	Возвращает список рекомендуемых книг (рандом).
+//	@accept			plain
+//	@produce		json
+//
+//	@tags			Книги
+//
+//	@param			limit	query		int	false	"Лимит количества возвращаемых элементов"	Example(10)
+//	@param			offset	query		int	false	"Смещение возвращаемых элементов"			Example(5)
+//
+//	@success		200		{array}		db.Book
+//	@failure		400		{object}	ErrorResponse
+//	@failure		404		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
+//	@router			/api/books/recommended [get]
+func GetRecommendedBooks(writer http.ResponseWriter, request *http.Request) {
+	var (
+		err    error
+		params db.GetRecommendedBooksParams
+		query  = request.URL.Query()
+		r      = render.New()
+		q      = db.New(database.Pool)
+	)
+	params.Limit, params.Offset, err = util.GetSearchPagination(query)
+	if err != nil {
+		RenderError(r, writer, ErrorBadPaginationParams(err))
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	books, err := q.GetRecommendedBooks(database.Context, params)
+	if err != nil {
+		var toWrite ErrorResponse
+		if errors.Is(err, pgx.ErrNoRows) {
+			toWrite = ErrorNotFound(err)
+		} else {
+			toWrite = ErrorGeneric(err)
+		}
+		RenderError(r, writer, toWrite)
+		return
+	}
+	Logger.Info().Int("len(books)", len(books)).Msg("recommended books listed")
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(books); err != nil {
+		RenderError(r, writer, ErrorRender(err))
+		return
+	}
+}
+
+// SearchBooksCombined godoc
+//
+//	@summary		Найти книги
+//	@description	Возвращает список книг, соответствующих поисковому параметру. Ведётся поиск сразу по названию, автору и издательству.
+//	@accept			json
+//	@produce		json
+//
+//	@tags			Книги
+//
+//	@param			limit	query		int		false	"Лимит количества возвращаемых элементов"	Example(10)
+//	@param			offset	query		int		false	"Смещение возвращаемых элементов"			Example(5)
+//
+//	@param			query	query		string	false	"Поисковой запрос"							Example(книг)
+//
+//	@success		200		{array}		db.Book
+//	@failure		400		{object}	ErrorResponse
+//	@failure		404		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
+//	@router			/api/books/combinedSearch [get]
+func SearchBooksCombined(writer http.ResponseWriter, request *http.Request) {
+	var (
+		err    error
+		params db.SearchBooksCombinedParams
+		query  = request.URL.Query()
+		r      = render.New()
+		q      = db.New(database.Pool)
+	)
+	if err := params.Query.Scan(query.Get("query")); err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+	params.Limit, params.Offset, err = util.GetSearchPagination(query)
+	if err != nil {
+		RenderError(r, writer, ErrorBadPaginationParams(err))
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	books, err := q.SearchBooksCombined(database.Context, params)
+	if err != nil {
+		var toWrite ErrorResponse
+		if errors.Is(err, pgx.ErrNoRows) {
+			toWrite = ErrorNotFound(err)
+		} else {
+			toWrite = ErrorGeneric(err)
+		}
+		RenderError(r, writer, toWrite)
+		return
+	}
+	Logger.Info().Int("len(books)", len(books)).Msg("books searched")
+
+	writer.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(writer).Encode(books); err != nil {
+		RenderError(r, writer, ErrorRender(err))
+		return
+	}
+}
+
+// SearchExchangeableBooks godoc
+//
+//	@summary		Поиск книг, готовых к обмену
+//	@description	Возвращает список всех экземпляров книги, готовых к обмену.
+//	@accept			plain
+//	@produce		json
+//
+//	@tags			Библиотеки,Книги
+//
+//	@param			book-id	path		pgtype.UUID	true	"UUID книги"
+//	@param			limit	query		int			false	"Лимит количества возвращаемых элементов"	Example(10)
+//	@param			offset	query		int			false	"Смещение возвращаемых элементов"			Example(5)
+//
+//	@success		200		{array}		db.SearchExchangeableBooksRow
+//	@failure		400		{object}	ErrorResponse
+//	@failure		404		{object}	ErrorResponse
+//	@failure		500		{object}	ErrorResponse
+//	@router			/api/books/{book-id}/exchangeable [get]
+func SearchExchangeableBooks(writer http.ResponseWriter, request *http.Request) {
+	var (
+		err    error
+		params db.SearchExchangeableBooksParams
+		query  = request.URL.Query()
+		r      = render.New()
+		q      = db.New(database.Pool)
+	)
+	if params.Bookid, err = util.PathUUID(consts.BookIDPathValue, request); err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
+		return
+	}
+	if params.Limit, params.Offset, err = util.GetSearchPagination(query); err != nil {
+		RenderError(r, writer, ErrorBadPaginationParams(err))
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	books, err := q.SearchExchangeableBooks(database.Context, params)
+	if err != nil {
+		var toWrite ErrorResponse
+		if errors.Is(err, pgx.ErrNoRows) {
+			toWrite = ErrorNotFound(err)
+		} else {
+			toWrite = ErrorGeneric(err)
+		}
+		RenderError(r, writer, toWrite)
+		return
+	}
+	Logger.Info().Int("len(books)", len(books)).Msg("exchangeable books listed")
 
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(books); err != nil {

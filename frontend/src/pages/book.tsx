@@ -17,6 +17,15 @@ const Book = () => {
   const [book, setBook] = useState<BookT>();
   const [bookComments, setBookComments] = useState<CommentT[]>();
 
+  const getComments = async (id: string) => {
+    const response = await fetch(`/api/books/${id}/comments`);
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error((result as Error).error);
+    }
+    setBookComments(result);
+  };
+
   useEffect(() => {
     const getBook = async (id: string) => {
       const response = await fetch(`/api/books/${id}`);
@@ -34,14 +43,7 @@ const Book = () => {
       const book = result as BookT;
       setBook(book);
     };
-    const getComments = async (id: string) => {
-      const response = await fetch(`/api/books/${id}/comments`);
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error((result as Error).error);
-      }
-      setBookComments(result);
-    };
+
     getBook(uuid!);
     getComments(uuid!);
   }, [uuid, navigate]);
@@ -106,7 +108,10 @@ const Book = () => {
             />
           ))}
 
-          <CommentArea />
+          <CommentArea
+            BookID={uuid!}
+            onCommentSent={() => getComments(uuid!)}
+          />
         </section>
       </section>
     </section>

@@ -181,6 +181,15 @@ const docTemplate = `{
                         "schema": {
                             "type": "integer"
                         }
+                    },
+                    {
+                        "example": "https://www.litres.ru/book/gregori-devid-roberts/shantaram-5815016/",
+                        "description": "Ссылка на магазин с книгой",
+                        "name": "link",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -211,9 +220,136 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/books/combinedSearch": {
+            "get": {
+                "description": "Возвращает список книг, соответствующих поисковому параметру. Ведётся поиск сразу по названию, автору и издательству.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Книги"
+                ],
+                "summary": "Найти книги",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Лимит количества возвращаемых элементов",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Смещение возвращаемых элементов",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "книг",
+                        "description": "Поисковой запрос",
+                        "name": "query",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Book"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/books/recommended": {
+            "get": {
+                "description": "Возвращает список рекомендуемых книг (рандом).",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Книги"
+                ],
+                "summary": "Список рекомендуемых книг",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Лимит количества возвращаемых элементов",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Смещение возвращаемых элементов",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Book"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/books/search": {
             "get": {
-                "description": "Возвращает список книг, соответствующих поисковым параметрам.",
+                "description": "Возвращает список книг, конкретно соответствующих поисковым параметрам.",
                 "consumes": [
                     "application/json"
                 ],
@@ -583,7 +719,7 @@ const docTemplate = `{
             "put": {
                 "description": "Задаёт обложку для книги.",
                 "consumes": [
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -594,11 +730,13 @@ const docTemplate = `{
                 "summary": "Задать обложку",
                 "parameters": [
                     {
-                        "type": "file",
-                        "description": "Файл обложки (PNG или JPEG)",
-                        "name": "image",
-                        "in": "formData",
-                        "required": true
+                        "description": "ID обложки с сервера хранилища",
+                        "name": "imageuuid",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -610,6 +748,67 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/books/{book-id}/exchangeable": {
+            "get": {
+                "description": "Возвращает список всех экземпляров книги, готовых к обмену.",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Библиотеки",
+                    "Книги"
+                ],
+                "summary": "Поиск книг, готовых к обмену",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Лимит количества возвращаемых элементов",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Смещение возвращаемых элементов",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.SearchExchangeableBooksRow"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponse"
                         }
@@ -840,12 +1039,12 @@ const docTemplate = `{
                 "summary": "Создать библиотеку",
                 "parameters": [
                     {
-                        "description": "ID владельца библиотеки",
+                        "description": "UUID владельца библиотеки",
                         "name": "userid",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "string"
                         }
                     },
                     {
@@ -1037,20 +1236,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "ID книги",
+                        "description": "UUID книги",
                         "name": "bookid",
                         "in": "body",
                         "required": true,
                         "schema": {
                             "type": "string"
-                        }
-                    },
-                    {
-                        "description": "Количество экземпляров книги",
-                        "name": "quantity",
-                        "in": "body",
-                        "schema": {
-                            "type": "integer"
                         }
                     }
                 ],
@@ -1099,6 +1290,56 @@ const docTemplate = `{
                 "responses": {
                     "201": {
                         "description": "Created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Сделать книгу доступной к обмену или наоборот.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Библиотеки",
+                    "Книги"
+                ],
+                "summary": "Изменить статус обмена книги",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID библиотеки",
+                        "name": "library-id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "UUID книги",
+                        "name": "book-id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "string"
                         }
@@ -1554,6 +1795,15 @@ const docTemplate = `{
                     {
                         "description": "ID книги",
                         "name": "bookid",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "ID библиотеки, из которой возьмётся книга",
+                        "name": "libraryid",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -2283,6 +2533,9 @@ const docTemplate = `{
         "db.Book": {
             "type": "object",
             "properties": {
+                "added_at": {
+                    "$ref": "#/definitions/pgtype.Timestamp"
+                },
                 "author": {
                     "type": "string"
                 },
@@ -2375,11 +2628,11 @@ const docTemplate = `{
                 "book_id": {
                     "type": "string"
                 },
+                "exchangeable": {
+                    "type": "boolean"
+                },
                 "library_id": {
                     "type": "string"
-                },
-                "quantity": {
-                    "$ref": "#/definitions/pgtype.Numeric"
                 }
             }
         },
@@ -2404,6 +2657,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.SearchExchangeableBooksRow": {
+            "type": "object",
+            "properties": {
+                "library_id": {
                     "type": "string"
                 },
                 "user_id": {
@@ -2458,6 +2722,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "book_id": {
+                    "type": "string"
+                },
+                "library_id": {
                     "type": "string"
                 },
                 "owner_id": {
