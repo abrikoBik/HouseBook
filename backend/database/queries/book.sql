@@ -78,7 +78,6 @@ where
     (lower(title) like lower('%' || @query || '%')) or
     (lower(author) like lower('%' || @query || '%')) or
     (lower(publisher) like lower('%' || @query || '%'))
-    -- (to_tsvector(publisher) @@ to_tsquery(@query))
 limit $1
 offset $2;
 
@@ -92,5 +91,11 @@ from library_books lb
 where
     lb.exchangeable = true and
     lb.book_id = @bookID
+limit $1
+offset $2;
+
+-- name: GetRecommendedBooks :many
+select * from books
+order by random()
 limit $1
 offset $2;

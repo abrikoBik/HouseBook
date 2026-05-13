@@ -120,6 +120,52 @@ func (q *Queries) GetBook(ctx context.Context, id pgtype.UUID) (Book, error) {
 	return i, err
 }
 
+const getRecommendedBooks = `-- name: GetRecommendedBooks :many
+select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link from books
+order by random()
+limit $1
+offset $2
+`
+
+type GetRecommendedBooksParams struct {
+	Limit  int32 `db:"limit" json:"limit"`
+	Offset int32 `db:"offset" json:"offset"`
+}
+
+func (q *Queries) GetRecommendedBooks(ctx context.Context, arg GetRecommendedBooksParams) ([]Book, error) {
+	rows, err := q.db.Query(ctx, getRecommendedBooks, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Book
+	for rows.Next() {
+		var i Book
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Author,
+			&i.Isbn,
+			&i.Genre,
+			&i.Publisher,
+			&i.Year,
+			&i.Language,
+			&i.CoverType,
+			&i.PageCount,
+			&i.Description,
+			&i.ImageUuid,
+			&i.Link,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listBooks = `-- name: ListBooks :many
 select id, title, author, isbn, genre, publisher, year, language, cover_type, page_count, description, image_uuid, link from books
 limit $1
@@ -238,7 +284,6 @@ where
     (lower(title) like lower('%' || $3 || '%')) or
     (lower(author) like lower('%' || $3 || '%')) or
     (lower(publisher) like lower('%' || $3 || '%'))
-    -- (to_tsvector(publisher) @@ to_tsquery(@query))
 limit $1
 offset $2
 `
