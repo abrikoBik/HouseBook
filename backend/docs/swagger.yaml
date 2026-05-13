@@ -3,6 +3,8 @@ definitions:
     type: object
   db.Book:
     properties:
+      added_at:
+        $ref: '#/definitions/pgtype.Timestamp'
       author:
         type: string
       cover_type:
@@ -315,6 +317,12 @@ paths:
         name: year
         schema:
           type: integer
+      - description: Ссылка на магазин с книгой
+        example: https://www.litres.ru/book/gregori-devid-roberts/shantaram-5815016/
+        in: body
+        name: link
+        schema:
+          type: string
       produces:
       - application/json
       responses:

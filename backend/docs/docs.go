@@ -181,6 +181,15 @@ const docTemplate = `{
                         "schema": {
                             "type": "integer"
                         }
+                    },
+                    {
+                        "example": "https://www.litres.ru/book/gregori-devid-roberts/shantaram-5815016/",
+                        "description": "Ссылка на магазин с книгой",
+                        "name": "link",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -2524,6 +2533,9 @@ const docTemplate = `{
         "db.Book": {
             "type": "object",
             "properties": {
+                "added_at": {
+                    "$ref": "#/definitions/pgtype.Timestamp"
+                },
                 "author": {
                     "type": "string"
                 },

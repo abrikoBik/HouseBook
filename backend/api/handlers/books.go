@@ -33,6 +33,7 @@ import (
 //	@param			publisher	body		string	true	"Издательство книги"			Example(Хороший Издатель)
 //	@param			title		body		string	true	"Название книги"				Example(Интересная книга)
 //	@param			year		body		int		false	"Год выпуска книги"				Example(2026)
+//	@param			link		body		string	false	"Ссылка на магазин с книгой"	Example(https://www.litres.ru/book/gregori-devid-roberts/shantaram-5815016/)
 //
 //	@success		201			{object}	db.Book
 //	@failure		400			{object}	ErrorResponse
