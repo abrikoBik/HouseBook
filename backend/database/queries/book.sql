@@ -81,3 +81,16 @@ where
     -- (to_tsvector(publisher) @@ to_tsquery(@query))
 limit $1
 offset $2;
+
+-- name: SearchExchangeableBooks :many
+select
+    u.id as user_id,
+    l.id as library_id
+from library_books lb
+    join libraries l on lb.library_id = l.id
+    join users u on l.user_id = u.id
+where
+    lb.exchangeable = true and
+    lb.book_id = @bookID
+limit $1
+offset $2;

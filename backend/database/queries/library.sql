@@ -10,7 +10,7 @@ group by libraries.id
 limit 1;
 
 -- name: ListLibraryBooks :many
-select books.id from libraries
+select books.id, library_books.exchangeable from libraries
 join users on libraries.user_id = users.id
 left join library_books on libraries.id = library_books.library_id
 left join books on library_books.book_id = books.id
@@ -46,12 +46,10 @@ where id = @id;
 -- name: AddBookToLibrary :exec
 insert into library_books (
     library_id,
-    book_id,
-    quantity
+    book_id
 ) values (
     @libraryID,
-    @bookID,
-    @quantity
+    @bookID
 );
 
 -- name: DeleteBookFromLibrary :exec
@@ -59,3 +57,12 @@ delete from library_books
 where
 library_id = @libraryID and
 book_id = @bookID;
+
+-- name: ChangeBookExchangeable :one
+update library_books
+set
+    exchangeable = not exchangeable
+where
+    library_id = @libraryID and
+    book_id = @bookID
+returning *;

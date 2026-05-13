@@ -283,6 +283,51 @@ func (q *Queries) SearchBooksCombined(ctx context.Context, arg SearchBooksCombin
 	return items, nil
 }
 
+const searchExchangeableBooks = `-- name: SearchExchangeableBooks :many
+select
+    u.id as user_id,
+    l.id as library_id
+from library_books lb
+    join libraries l on lb.library_id = l.id
+    join users u on l.user_id = u.id
+where
+    lb.exchangeable = true and
+    lb.book_id = $3
+limit $1
+offset $2
+`
+
+type SearchExchangeableBooksParams struct {
+	Limit  int32       `db:"limit" json:"limit"`
+	Offset int32       `db:"offset" json:"offset"`
+	Bookid pgtype.UUID `db:"bookid" json:"bookid"`
+}
+
+type SearchExchangeableBooksRow struct {
+	UserID    pgtype.UUID `db:"user_id" json:"user_id"`
+	LibraryID pgtype.UUID `db:"library_id" json:"library_id"`
+}
+
+func (q *Queries) SearchExchangeableBooks(ctx context.Context, arg SearchExchangeableBooksParams) ([]SearchExchangeableBooksRow, error) {
+	rows, err := q.db.Query(ctx, searchExchangeableBooks, arg.Limit, arg.Offset, arg.Bookid)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SearchExchangeableBooksRow
+	for rows.Next() {
+		var i SearchExchangeableBooksRow
+		if err := rows.Scan(&i.UserID, &i.LibraryID); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const setCoverImage = `-- name: SetCoverImage :one
 update books
 set image_uuid = $1

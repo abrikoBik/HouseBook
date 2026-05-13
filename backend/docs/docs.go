@@ -692,6 +692,67 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/books/{book-id}/exchangeable": {
+            "get": {
+                "description": "Возвращает список всех экземпляров книги, готовых к обмену.",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Библиотеки",
+                    "Книги"
+                ],
+                "summary": "Поиск книг, готовых к обмену",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Лимит количества возвращаемых элементов",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Смещение возвращаемых элементов",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.SearchExchangeableBooksRow"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/comments": {
             "post": {
                 "description": "Создаёт новый отзыв о книге.",
@@ -909,12 +970,12 @@ const docTemplate = `{
                 "summary": "Создать библиотеку",
                 "parameters": [
                     {
-                        "description": "ID владельца библиотеки",
+                        "description": "UUID владельца библиотеки",
                         "name": "userid",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "string"
                         }
                     },
                     {
@@ -1106,20 +1167,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "ID книги",
+                        "description": "UUID книги",
                         "name": "bookid",
                         "in": "body",
                         "required": true,
                         "schema": {
                             "type": "string"
-                        }
-                    },
-                    {
-                        "description": "Количество экземпляров книги",
-                        "name": "quantity",
-                        "in": "body",
-                        "schema": {
-                            "type": "integer"
                         }
                     }
                 ],
@@ -1168,6 +1221,56 @@ const docTemplate = `{
                 "responses": {
                     "201": {
                         "description": "Created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Сделать книгу доступной к обмену или наоборот.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Библиотеки",
+                    "Книги"
+                ],
+                "summary": "Изменить статус обмена книги",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID библиотеки",
+                        "name": "library-id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "UUID книги",
+                        "name": "book-id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "string"
                         }
@@ -1623,6 +1726,15 @@ const docTemplate = `{
                     {
                         "description": "ID книги",
                         "name": "bookid",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "ID библиотеки, из которой возьмётся книга",
+                        "name": "libraryid",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -2444,11 +2556,11 @@ const docTemplate = `{
                 "book_id": {
                     "type": "string"
                 },
+                "exchangeable": {
+                    "type": "boolean"
+                },
                 "library_id": {
                     "type": "string"
-                },
-                "quantity": {
-                    "$ref": "#/definitions/pgtype.Numeric"
                 }
             }
         },
@@ -2473,6 +2585,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.SearchExchangeableBooksRow": {
+            "type": "object",
+            "properties": {
+                "library_id": {
                     "type": "string"
                 },
                 "user_id": {
@@ -2527,6 +2650,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "book_id": {
+                    "type": "string"
+                },
+                "library_id": {
                     "type": "string"
                 },
                 "owner_id": {

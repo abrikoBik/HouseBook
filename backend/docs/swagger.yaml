@@ -63,10 +63,10 @@ definitions:
     properties:
       book_id:
         type: string
+      exchangeable:
+        type: boolean
       library_id:
         type: string
-      quantity:
-        $ref: '#/definitions/pgtype.Numeric'
     type: object
   db.ListUserSessionsRow:
     properties:
@@ -82,6 +82,13 @@ definitions:
       id:
         type: string
       name:
+        type: string
+      user_id:
+        type: string
+    type: object
+  db.SearchExchangeableBooksRow:
+    properties:
+      library_id:
         type: string
       user_id:
         type: string
@@ -117,6 +124,8 @@ definitions:
   db.TradeBook:
     properties:
       book_id:
+        type: string
+      library_id:
         type: string
       owner_id:
         type: string
@@ -535,6 +544,47 @@ paths:
       summary: Задать обложку
       tags:
       - Книги
+  /api/books/{book-id}/exchangeable:
+    get:
+      consumes:
+      - text/plain
+      description: Возвращает список всех экземпляров книги, готовых к обмену.
+      parameters:
+      - description: Лимит количества возвращаемых элементов
+        example: 10
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение возвращаемых элементов
+        example: 5
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.SearchExchangeableBooksRow'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Поиск книг, готовых к обмену
+      tags:
+      - Библиотеки
+      - Книги
   /api/books/combinedSearch:
     get:
       consumes:
@@ -791,12 +841,12 @@ paths:
       - application/json
       description: Создаёт новую пользовательскую библиотеку.
       parameters:
-      - description: ID владельца библиотеки
+      - description: UUID владельца библиотеки
         in: body
         name: userid
         required: true
         schema:
-          type: integer
+          type: string
       - description: Название библиотеки
         example: Избранное
         in: body
@@ -922,17 +972,12 @@ paths:
         name: library-id
         required: true
         type: string
-      - description: ID книги
+      - description: UUID книги
         in: body
         name: bookid
         required: true
         schema:
           type: string
-      - description: Количество экземпляров книги
-        in: body
-        name: quantity
-        schema:
-          type: integer
       produces:
       - application/json
       responses:
@@ -977,6 +1022,40 @@ paths:
           schema:
             $ref: '#/definitions/handlers.ErrorResponse'
       summary: Удалить книгу
+      tags:
+      - Библиотеки
+      - Книги
+    patch:
+      consumes:
+      - application/json
+      description: Сделать книгу доступной к обмену или наоборот.
+      parameters:
+      - description: UUID библиотеки
+        in: path
+        name: library-id
+        required: true
+        type: string
+      - description: UUID книги
+        in: path
+        name: book-id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Изменить статус обмена книги
       tags:
       - Библиотеки
       - Книги
@@ -1267,6 +1346,12 @@ paths:
       - description: ID книги
         in: body
         name: bookid
+        required: true
+        schema:
+          type: string
+      - description: ID библиотеки, из которой возьмётся книга
+        in: body
+        name: libraryid
         required: true
         schema:
           type: string
