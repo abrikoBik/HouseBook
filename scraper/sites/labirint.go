@@ -9,7 +9,7 @@ import (
 var Labirint = Site{
 	Domain:             consts.LabirintDomain,
 	Root:               "body",
-	Title:              "h1",
+	Title:              "._h1_5o36c_18",
 	Author:             "._features_ctofl_78>div:nth-child(1)>div:nth-child(2)>a",
 	ISBN:               "._right_u86in_12>div:nth-child(2)>.text-black>span",
 	Language:           "._right_u86in_12>div:nth-child(3)>.text-black>span",

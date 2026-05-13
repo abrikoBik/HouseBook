@@ -9,7 +9,7 @@ import (
 var Litres = Site{
 	Domain:             consts.LitresDomain,
 	Root:               "body",
-	Title:              "h1",
+	Title:              ".BookCard_book__title__EVxWV",
 	Author:             "li.Breadcrumbs_breadcrumbs__item__zPK82:nth-child(3) > a:nth-child(1) > span:nth-child(2)",
 	ISBN:               "div.CharacteristicsBlock_characteristic__4pi7v:nth-child(5) > span:nth-child(2)[itemprop=\"isbn\"]",
 	Genre:              "li.Breadcrumbs_breadcrumbs__item__zPK82:nth-child(2) > a:nth-child(1) > span:nth-child(1)",
