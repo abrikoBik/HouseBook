@@ -26,9 +26,9 @@ interface DecodedToken {
   iat?: number;
 }
 
-interface Username {
-  name: string;
-}
+// interface Username {
+//   name: string;
+// }
 
 const Header = () => {
   const navigate = useNavigate();
@@ -39,20 +39,19 @@ const Header = () => {
   const searchRef = useRef<HTMLDivElement>(null);
   const [username, setUsername] = useState<string>();
 
-  const getUsername = async (id: string) => {
-    const response = await fetch(`/api/users/${id}`);
-    const respJSON = await response.json();
-
-    if(!response.ok) {
-      navigate('/auth');
-    } else {
-      setUsername(respJSON["name"]);
-    }
-  }
-
   useEffect(() => {
+    const getUsername = async (id: string) => {
+      const response = await fetch(`/api/users/${id}`);
+      const respJSON = await response.json();
+
+      if (!response.ok) {
+        navigate("/auth");
+      } else {
+        setUsername(respJSON["name"]);
+      }
+    };
+
     const token = localStorage.getItem("token");
-    
     if (token) {
       const decoded = jwtDecode<DecodedToken>(token!);
       localStorage.setItem("UserID", decoded.id);
@@ -60,7 +59,7 @@ const Header = () => {
     } else {
       navigate("/auth");
     }
-  }, [])
+  }, [navigate]);
 
   useEffect(() => {
     const fetchCatalog = async () => {

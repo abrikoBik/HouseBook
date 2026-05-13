@@ -10,19 +10,19 @@ interface Book {
   cover_url?: string;
 }
 
-interface Category {
-  id: string;
-  name: string;
-  icon_url: string;
-}
+// interface Category {
+//   id: string;
+//   name: string;
+//   icon_url: string;
+// }
 
-interface ApiBook {
-  id: string;
-  title?: string | null;
-  author?: string | null;
-  cover_url?: string | null;
-  image_uuid?: string | null;
-}
+// interface ApiBook {
+//   id: string;
+//   title?: string | null;
+//   author?: string | null;
+//   cover_url?: string | null;
+//   image_uuid?: string | null;
+// }
 
 const Central = () => {
   const [recommendedBooks, setRecommendedBooks] = useState<Book[]>([]);
@@ -34,23 +34,10 @@ const Central = () => {
     const fetchRandomBooks = async () => {
       try {
         setLoading(true);
-        const res = await fetch("http://localhost/api/books");
+        const res = await fetch("http://localhost/api/books/recommended");
         if (!res.ok) throw new Error("Failed to fetch books");
-
-        const allBooks: ApiBook[] = await res.json();
-
-        const shuffled = [...allBooks].sort(() => 0.5 - Math.random());
-        const randomFive: Book[] = shuffled.slice(0, 5).map((book) => ({
-          id: book.id,
-          title: book.title?.trim() || "Без названия",
-          author: book.author?.trim() || "Неизвестный автор",
-          // Единая логика: image_uuid -> URL, иначе cover_url, иначе undefined
-          cover_url: book.image_uuid
-            ? `/cdn/${book.image_uuid}`
-            : book.cover_url || undefined,
-        }));
-
-        setRecommendedBooks(randomFive);
+        const books = await res.json();
+        setRecommendedBooks(books);
       } catch (error) {
         console.error("Error loading recommendations:", error);
       } finally {

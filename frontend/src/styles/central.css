@@ -12,7 +12,7 @@
   box-sizing: border-box;
 
   overflow: hidden;
-  -ms-overflow-style: none; 
+  -ms-overflow-style: none;
   scrollbar-width: none;
 }
 

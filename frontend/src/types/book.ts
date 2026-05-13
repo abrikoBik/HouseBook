@@ -11,6 +11,7 @@ export default interface BookT {
   title: string;
   year?: number;
   image_uuid?: string;
+  link?: string;
 }
 
 export default interface CommentT {
