@@ -2595,46 +2595,7 @@ const docTemplate = `{
         "db.SearchExchangeableBooksRow": {
             "type": "object",
             "properties": {
-                "book_id": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "exchangeable": {
-                    "type": "boolean"
-                },
-                "finished_reading_id": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "id_2": {
-                    "type": "string"
-                },
-                "image_uuid": {
-                    "type": "string"
-                },
                 "library_id": {
-                    "type": "string"
-                },
-                "login": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "name_2": {
-                    "type": "string"
-                },
-                "now_reading_id": {
-                    "type": "string"
-                },
-                "rating": {
-                    "type": "number"
-                },
-                "trade_ready_id": {
                     "type": "string"
                 },
                 "user_id": {
