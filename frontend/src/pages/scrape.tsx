@@ -8,7 +8,6 @@ const Scrape = () => {
       <Header />
       <SideBar />
       <section id="scraper">
-        <h1>Очень временная страница для скраппинга</h1>
         <ScraperPage />
       </section>
     </section>

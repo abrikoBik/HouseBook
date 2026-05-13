@@ -61,29 +61,31 @@ const Header = () => {
     }
   }, [navigate]);
 
+  const fetchCatalog = async (query: string) => {
+    try {
+      const res = await fetch(`/api/books/combinedSearch?query=${query}`);
+      if (!res.ok) throw new Error("Failed to fetch catalog");
+      const data: ApiBook[] = await res.json();
+      console.log(data);
+
+      // 🔁 Единая логика формирования URL обложки (как в Catalog.tsx)
+      const mapped: Book[] = data.map((b) => ({
+        id: b.id,
+        title: b.title?.trim() || "Без названия",
+        author: b.author?.trim() || "Неизвестный автор",
+        cover_url: b.image_uuid
+          ? `http://localhost/cdn/${b.image_uuid}` // ← Изменено на /cdn/
+          : `https://via.placeholder.com/300x450?text=${encodeURIComponent(b.title || "Book")}`, // ← Заглушка как в каталоге
+      }));
+
+      setAllBooks(mapped);
+    } catch (err) {
+      console.error("Catalog fetch error:", err);
+    }
+  };
+
   useEffect(() => {
-    const fetchCatalog = async () => {
-      try {
-        const res = await fetch("/api/books");
-        if (!res.ok) throw new Error("Failed to fetch catalog");
-        const data: ApiBook[] = await res.json();
-
-        // 🔁 Единая логика формирования URL обложки (как в Catalog.tsx)
-        const mapped: Book[] = data.map((b) => ({
-          id: b.id,
-          title: b.title?.trim() || "Без названия",
-          author: b.author?.trim() || "Неизвестный автор",
-          cover_url: b.image_uuid
-            ? `http://localhost/cdn/${b.image_uuid}` // ← Изменено на /cdn/
-            : `https://via.placeholder.com/300x450?text=${encodeURIComponent(b.title || "Book")}`, // ← Заглушка как в каталоге
-        }));
-
-        setAllBooks(mapped);
-      } catch (err) {
-        console.error("Catalog fetch error:", err);
-      }
-    };
-    fetchCatalog();
+    fetchCatalog(query);
   }, []);
 
   useEffect(() => {
@@ -137,7 +139,11 @@ const Header = () => {
             type="text"
             placeholder="Поиск по названию книги, автору, изданию"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              fetchCatalog(query);
+              setTimeout(() => {}, 300);
+            }}
             onFocus={() => query.length >= 2 && setShowDropdown(true)}
           />
 

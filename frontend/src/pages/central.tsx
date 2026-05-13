@@ -2,30 +2,10 @@ import { useState, useEffect } from "react";
 import SideBar from "../modules/sideBar";
 import Header from "../modules/header";
 import "../styles/central.css";
-
-interface Book {
-  id: string;
-  title: string;
-  author: string;
-  cover_url?: string;
-}
-
-// interface Category {
-//   id: string;
-//   name: string;
-//   icon_url: string;
-// }
-
-// interface ApiBook {
-//   id: string;
-//   title?: string | null;
-//   author?: string | null;
-//   cover_url?: string | null;
-//   image_uuid?: string | null;
-// }
+import type BookT from "../types/book";
 
 const Central = () => {
-  const [recommendedBooks, setRecommendedBooks] = useState<Book[]>([]);
+  const [recommendedBooks, setRecommendedBooks] = useState<BookT[]>([]);
   const [loading, setLoading] = useState(true);
 
   // ... (импорты и интерфейсы без изменений) ...
@@ -79,8 +59,11 @@ const Central = () => {
                   >
                     <div className="book-card">
                       <div className="book-cover">
-                        {book.cover_url ? (
-                          <img src={book.cover_url} alt={book.title} />
+                        {book.image_uuid ? (
+                          <img
+                            src={`/cdn/${book.image_uuid}`}
+                            alt={book.title}
+                          />
                         ) : (
                           <div className="cover-placeholder"></div>
                         )}
