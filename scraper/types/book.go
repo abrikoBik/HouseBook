@@ -7,7 +7,7 @@ type Book struct {
 	ISBN      string `json:"isbn"`
 	Genre     string `json:"genre"`
 	Publisher string `json:"publisher"`
-	StoreLink string `json:"store_link"`
+	StoreLink string `json:"link"`
 
 	Year        int    `json:"year,omitempty"`
 	Language    string `json:"language,omitempty"`

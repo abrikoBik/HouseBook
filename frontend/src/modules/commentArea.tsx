@@ -5,7 +5,7 @@ import "../styles/commentArea.css";
 import BoldIcon from "../assets/bold.svg";
 import ItalicIcon from "../assets/italic.svg";
 import UnderlineIcon from "../assets/undeline.svg";
-import { jwtDecode } from "jwt-decode";
+// import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router";
 
 const CommentArea = ({
@@ -54,12 +54,12 @@ const CommentArea = ({
 
     const id = localStorage.getItem("UserID");
 
-    if (id) {  
+    if (id) {
       setUserID(id);
     } else {
       navigate("/auth");
     }
-  }, []);
+  }, [navigate]);
 
   const applyFormat = (prefix: string, suffix: string) => {
     const textarea = textareaRef.current;
