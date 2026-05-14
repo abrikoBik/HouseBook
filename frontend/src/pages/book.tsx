@@ -57,8 +57,8 @@ const Book = () => {
           <img src={`/cdn/${book?.image_uuid}`} alt="book" />
           <div>
             <div>
-              <h1 className={"desc"}>{book?.title}</h1>
-              <h4 className={"desc"}>{book?.author}</h4>
+              <h1 id="bookTitle">{book?.title}</h1>
+              <h4 id="bookAuthor">{book?.author}</h4>
             </div>
             <div>
               <button id="bronya">Забронировать</button>

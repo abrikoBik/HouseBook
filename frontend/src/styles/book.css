@@ -13,7 +13,7 @@
   z-index: 200;
   flex-direction: row;
   justify-content: space-between;
-  margin-bottom: -15%;
+  margin-bottom: -10%;
 
   width: 65%;
 
@@ -142,4 +142,12 @@
   & > div > div {
     width: 80%;
   }
+}
+
+#bookTitle {
+  font-size: 3rem !important;
+}
+
+#bookAuthor {
+  font-size: 1.2rem !important;
 }
