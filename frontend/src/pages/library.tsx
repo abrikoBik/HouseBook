@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Header from "../modules/header";
 import SideBar from "../modules/sideBar";
 import "../styles/library.css";
@@ -10,77 +10,115 @@ interface LibraryType {
 }
 
 interface LibBook {
-  bookID: string;
+  id: string;
   exchange: boolean;
+}
+
+interface ApiBook {
+  id: string;
+  title: string | null;
+  author: string | null;
+  image_uuid: string | null;
+}
+
+interface DisplayBook {
+  id: string;
+  title: string;
+  author: string;
+  cover_url: string;
 }
 
 const Library = () => {
   const [activeTab, setActiveTab] = useState(0);
+  
+  const [userLibs, setUserLibs] = useState<LibraryType[]>([]);
+  const [displayBooks, setDisplayBooks] = useState<DisplayBook[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // TODO: Make one big array which will store all libs
-  const [inProcessLib, setInProcessLib] = useState<LibBook[]>([]);
-  const [readyForExchangeLib, setReadyForExchangeLib] = useState<LibBook[]>([]);
-  const [readLib, setReadLib] = useState<LibBook[]>([]);
-
-  const fetchLibraries = async () => {
+  const fetchLibraries = useCallback(async () => {
     const id = localStorage.getItem("UserID");
-    const user_libs_resp = await fetch(`/api/users/${id}/libraries`);
-    const user_libs: LibraryType[] = await user_libs_resp.json();
-    if (user_libs_resp.ok) {
-      console.log(user_libs);
+    if (!id) return;
 
-      const return_libs: string[] = [];
-      user_libs.forEach((el) => {
-        return_libs.push(el.id);
+    try {
+      const response = await fetch(`/api/users/${id}/libraries`);
+      if (response.ok) {
+        const data: LibraryType[] = await response.json();
+        setUserLibs(data);
+      } else {
+        console.error("Failed to fetch libraries");
+      }
+    } catch (error) {
+      console.error("Error fetching libraries:", error);
+    }
+  }, []);
+
+  const fetchLibBookIds = async (libId: string): Promise<LibBook[]> => {
+    const response = await fetch(`/api/libraries/${libId}/books`);
+    if (!response.ok) return [];
+    return await response.json();
+  };
+
+  const fetchBooksForLibrary = useCallback(async (libId: string) => {
+    setIsLoading(true);
+    setDisplayBooks([]);
+
+    try {
+      const libBooksList = await fetchLibBookIds(libId);
+
+      if (libBooksList.length === 0) {
+        setIsLoading(false);
+        return;
+      }
+
+      const booksDetailsPromises = libBooksList.map(async (item: LibBook) => {
+        try {
+          const res = await fetch(`/api/books/${item.id}`);
+          if (!res.ok) return null;
+          
+          const bookData: ApiBook = await res.json();
+          
+          return {
+            id: bookData.id,
+            title: bookData.title?.trim() || "Без названия",
+            author: bookData.author?.trim() || "Неизвестный автор",
+            cover_url: bookData.image_uuid
+              ? `http://localhost/cdn/${bookData.image_uuid}`
+              : `https://via.placeholder.com/300x450?text=No+Cover`,
+          };
+        } catch (err) {
+          console.warn(`Failed to load book ${item.id}`, err);
+          return null;
+        }
       });
 
-      return return_libs;
-    }
-  };
+      const results = await Promise.all(booksDetailsPromises);
+      
+      const validBooks = results.filter((b): b is DisplayBook => b !== null);
+      setDisplayBooks(validBooks);
 
-  const fetchLib = async (id: string) => {
-    const lib_books_resp = await fetch(`/api/libraries/${id}/books`);
-    const lib_books = await lib_books_resp.json();
-    return lib_books;
-  };
+    } catch (error) {
+      console.error("Error loading books for library:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const loadData = async () => {
-      const libs = await fetchLibraries();
+    fetchLibraries();
+  }, [fetchLibraries]);
 
-      if (libs && libs.length >= 3) {
-        const [readData, inProcessData, exchangeData] = await Promise.all([
-          fetchLib(libs[0]),
-          fetchLib(libs[1]),
-          fetchLib(libs[2]),
-        ]);
-
-        if (readData[0].id == null) {
-          setReadLib([]);
-        } else {
-          setReadLib(readData || []);
-        }
-
-        if (inProcessData[0].id == null) {
-          setInProcessLib([]);
-        } else {
-          setInProcessLib(inProcessData || []);
-        }
-
-        if (exchangeData[0].id == null) {
-          setReadyForExchangeLib([]);
-        } else {
-          setReadyForExchangeLib(exchangeData || []);
-        }
-
-        console.log(readData);
-        console.log(inProcessData);
-        console.log(exchangeData);
+  useEffect(() => {
+    if (activeTab === 0) {
+      // TODO: fetch all books
+      setDisplayBooks([]); 
+      setIsLoading(false);
+    } else {
+      const selectedLibIndex = activeTab - 1;
+      if (userLibs[selectedLibIndex]) {
+        fetchBooksForLibrary(userLibs[selectedLibIndex].id);
       }
-    };
-
-    loadData();
-  }, []);
+    }
+  }, [activeTab, userLibs, fetchBooksForLibrary]);
 
   return (
     <div>
@@ -96,31 +134,50 @@ const Library = () => {
                 className={activeTab === 0 ? "active" : ""}
                 onClick={() => setActiveTab(0)}
               >
-                {`Все (${(readLib?.length || 0) + (inProcessLib!.length || 0) + (readyForExchangeLib!.length || 0)})`}
+                Все
               </li>
-              <li
-                className={activeTab === 1 ? "active" : ""}
-                onClick={() => setActiveTab(1)}
-              >
-                {`Прочитанные (${readLib?.length || 0})`}
-              </li>
-              <li
-                className={activeTab === 2 ? "active" : ""}
-                onClick={() => setActiveTab(2)}
-              >
-                {`В процессе (${inProcessLib!.length || 0})`}
-              </li>
-              <li
-                className={activeTab === 3 ? "active" : ""}
-                onClick={() => setActiveTab(3)}
-              >
-                {`Доступны для обмена (${readyForExchangeLib!.length || 0})`}
-              </li>
+
+              {userLibs.map((lib, index) => (
+                <li
+                  key={lib.id}
+                  className={activeTab === index + 1 ? "active" : ""}
+                  onClick={() => setActiveTab(index + 1)}
+                >
+                  {lib.name}
+                </li>
+              ))}
             </ul>
           </nav>
         </section>
+
         <section id="books">
-          <div>Книга 1</div>
+          {isLoading ? (
+            <div style={{ padding: "20px", textAlign: "center", width: "100%" }}>
+              Загрузка книг...
+            </div>
+          ) : displayBooks.length > 0 ? (
+            displayBooks.map((book: DisplayBook) => (
+              <div className="libBookCard" key={book.id}>
+                <div className="libBookCover">
+                  {book.cover_url ? (
+                    <img src={book.cover_url} alt={book.title} loading="lazy" />
+                  ) : (
+                    <div className="cover-placeholder"></div>
+                  )}
+                </div>
+                <div className="libBookTitle">{book.title}</div>
+                <div className="libBookAuthor">{book.author}</div>
+              </div>
+            ))
+          ) : (
+            !isLoading && (
+              <div style={{ padding: "20px", textAlign: "center", width: "85vw", color: "#666" }}>
+                {activeTab === 0 
+                  ? "Выберите библиотеку или добавьте книги." 
+                  : "В этой библиотеке пока нет книг."}
+              </div>
+            )
+          )}
         </section>
       </section>
     </div>
