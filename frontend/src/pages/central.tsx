@@ -25,7 +25,7 @@ const Central = () => {
     const fetchRandomBooks = async () => {
       try {
         setLoading(true);
-        const res = await fetch("http://localhost/api/books/recommended");
+        const res = await fetch("http://localhost/api/books/recommended?limit=5");
         if (!res.ok) throw new Error("Failed to fetch books");
         const books = await res.json();
 

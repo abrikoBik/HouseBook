@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Header from "../modules/header";
 import SideBar from "../modules/sideBar";
+import BookModal from "../modules/bookModal";
 import "../styles/library.css";
 
 interface LibraryType {
@@ -11,7 +12,7 @@ interface LibraryType {
 
 interface LibBook {
   id: string;
-  exchange: boolean;
+  exchangeable: boolean;
 }
 
 interface ApiBook {
@@ -26,6 +27,7 @@ interface DisplayBook {
   title: string;
   author: string;
   cover_url: string;
+  exchangeable: boolean;
 }
 
 const Library = () => {
@@ -33,7 +35,13 @@ const Library = () => {
 
   const [userLibs, setUserLibs] = useState<LibraryType[]>([]);
   const [displayBooks, setDisplayBooks] = useState<DisplayBook[]>([]);
+  const [selectedBook, setSelectedBook] = useState<DisplayBook | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleBookUpdate = (updatedBook: DisplayBook) => {
+    setDisplayBooks(prev => prev.map(b => b.id === updatedBook.id ? updatedBook : b));
+    setSelectedBook(updatedBook);
+  };
 
   const fetchLibraries = useCallback(async () => {
     const id = localStorage.getItem("UserID");
@@ -77,6 +85,8 @@ const Library = () => {
 
           const bookData: ApiBook = await res.json();
 
+          console.log('Fetched libBooks:', libBooksList);
+
           return {
             id: bookData.id,
             title: bookData.title?.trim() || "Без названия",
@@ -84,6 +94,7 @@ const Library = () => {
             cover_url: bookData.image_uuid
               ? `http://localhost/cdn/${bookData.image_uuid}`
               : `https://via.placeholder.com/300x450?text=No+Cover`,
+            exchangeable: item.exchangeable
           };
         } catch (err) {
           console.warn(`Failed to load book ${item.id}`, err);
@@ -117,6 +128,7 @@ const Library = () => {
         fetchBooksForLibrary(userLibs[selectedLibIndex].id);
       }
     }
+    
   }, [activeTab, userLibs, fetchBooksForLibrary]);
 
   return (
@@ -156,9 +168,9 @@ const Library = () => {
             >
               Загрузка книг...
             </div>
-          ) : displayBooks.length > 0 ? (
+          ) : displayBooks.length > 0 ? ( 
             displayBooks.map((book: DisplayBook) => (
-              <div className="libBookCard" key={book.id}>
+              <div className="libBookCard" key={book.id} onClick={() => setSelectedBook(book)}>
                 <div className="libBookCover">
                   {book.cover_url ? (
                     <img src={book.cover_url} alt={book.title} loading="lazy" />
@@ -168,7 +180,15 @@ const Library = () => {
                 </div>
                 <div className="libBookTitle">{book.title}</div>
                 <div className="libBookAuthor">{book.author}</div>
-              </div>
+                <div id="exchangableSign" className={`${book.exchangeable ? "exchangeAvaible" : "exchangeNotAvaible"}`}>
+                  <span
+                    className="material-symbols-outlined"
+                  >
+                    swap_horiz
+                  </span>
+                  <div>{book.exchangeable ? "Available" : "Not available"}</div>
+                </div>
+              </div> 
             ))
           ) : (
             !isLoading && (
@@ -188,6 +208,16 @@ const Library = () => {
           )}
         </section>
       </section>
+
+      {/* Вызов модального окна */}
+      {selectedBook && (
+        <BookModal 
+          book={selectedBook} 
+          library_id={userLibs[activeTab == 0 ? 0 : activeTab-1].id}
+          onClose={() => setSelectedBook(null)} 
+          onStatusUpdate={handleBookUpdate}
+        />
+      )}
     </div>
   );
 };
