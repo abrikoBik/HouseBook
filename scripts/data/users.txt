@@ -1,0 +1,3 @@
+# Почта, логин, ФИО, пароль
+ivanov@example.ru,ivanov,Иванов Иван Иванович,qwerty123
+petrov@example2.ru,petrov,Петров Пётр Петрович,azerty321
