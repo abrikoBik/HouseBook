@@ -1,160 +1,189 @@
-/* Main container */
-.user {
+.profile-page {
+  display: flex;
+  min-height: 100vh;
+  /* 2. Инверсия цветов: Фон страницы теперь бежевый */
+  background-color: #f1eee3;
+}
+
+.profile-content {
+  flex-grow: 1;
+  margin-left: 100px;
+  /* 1. Исправление наложения на хедер: Отступ сверху больше высоты хедера (60px) */
+  padding-top: 80px;
+}
+
+.profile-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 20px;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
-    Cantarell, sans-serif;
-  background-color: #faf8f5;
-  min-height: 100vh;
+  padding: 0 40px 40px 40px;
 }
 
-/* Profile section */
-#aboutUser {
-  background: #f5f1e8;
-  border-radius: 16px;
-  padding: 32px;
-  margin-bottom: 32px;
+.profile-header {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.user-info {
   display: flex;
-  flex-direction: column;
+  gap: 24px;
   align-items: flex-start;
-  gap: 12px;
 }
 
-#aboutUser h4 {
-  font-size: 28px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0 0 16px 0;
-  align-self: flex-start;
-}
-
-#aboutUser > div:nth-child(2) {
-  font-size: 24px;
-  font-weight: 600;
-  color: #1a1a1a;
-}
-
-#aboutUser > div:nth-child(3) {
-  font-size: 14px;
-  color: #888;
-}
-
-#aboutUser > div:nth-child(4) {
-  font-size: 16px;
-  color: #555;
+.avatar-placeholder {
+  width: 150px;
+  height: 150px;
+  /* Аватар остается нейтральным или белым */
+  background-color: #ffffff;
+  border-radius: 8px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  font-size: 18px;
+  color: #666;
+  flex-shrink: 0;
+  border: 1px solid #e0e0e0;
 }
 
-#aboutUser > div:nth-child(4)::before {
-  content: "📍";
-  font-size: 14px;
+.user-details h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
 }
 
-#editProfile {
-  background: #e8e4dc;
-  border: none;
+.username {
+  font-size: 16px;
+  color: #888;
+  margin: 0 0 8px 0;
+}
+
+.city {
+  font-size: 16px;
+  color: #555;
+  margin: 0 0 16px 0;
+}
+
+.edit-btn {
+  background: #ffffff;
+  border: 1px solid #d4d0c8;
   padding: 10px 20px;
   border-radius: 8px;
   font-size: 14px;
   color: #333;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-top: 8px;
 }
 
-#editProfile:hover {
-  background: #d4d0c8;
-  transform: translateY(-1px);
+.edit-btn:hover {
+  background: #f9f9f9;
+  border-color: #bbb;
 }
 
-/* Stats section - contains both trades and stats */
-.stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 32px;
-  margin-bottom: 32px;
+/* 2. Карточка статистики теперь белая */
+.stats-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-/* Active trades */
-#aboutTrades {
-  background: transparent;
+.stats-card h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-#aboutTrades h4 {
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  font-size: 15px;
+  color: #333;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.stat-item:last-child {
+  border-bottom: none;
+}
+
+.stat-icon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+}
+
+.trades-section,
+.reviews-section {
+  margin-bottom: 40px;
+}
+
+.trades-section h2,
+.reviews-section h2 {
   font-size: 20px;
   font-weight: 600;
   color: #1a1a1a;
   margin: 0 0 20px 0;
 }
 
-#aboutTrades > div:nth-child(odd):not(h4) {
-  background: #f0ece4;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 16px;
+.trades-list {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 16px;
 }
 
-#aboutTrades > div:nth-child(2),
-#aboutTrades > div:nth-child(4) {
-  background: #f0ece4;
+/* 2. Карточка сделки теперь белая */
+.trade-card {
+  background: #ffffff;
   border-radius: 12px;
   padding: 20px;
-  margin-bottom: 16px;
   display: flex;
+  gap: 20px;
   align-items: center;
-  gap: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-/* Book cover placeholder */
-#aboutTrades > div:nth-child(2)::before,
-#aboutTrades > div:nth-child(4)::before {
-  content: "";
+.book-cover-placeholder {
   width: 80px;
   height: 110px;
   background: linear-gradient(135deg, #e63946 0%, #d62839 100%);
   border-radius: 6px;
-  display: block;
+  flex-shrink: 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-#aboutTrades > div:nth-child(2) > div:first-child,
-#aboutTrades > div:nth-child(4) > div:first-child {
-  flex: 1;
+.trade-info {
+  flex-grow: 1;
 }
 
-#aboutTrades > div:nth-child(2) > div:first-child div:first-child,
-#aboutTrades > div:nth-child(4) > div:first-child div:first-child {
+.trade-info h3 {
   font-size: 18px;
   font-weight: 600;
   color: #1a1a1a;
-  margin-bottom: 8px;
+  margin: 0 0 8px 0;
 }
 
-#aboutTrades > div:nth-child(2) > div:first-child div:nth-child(2),
-#aboutTrades > div:nth-child(4) > div:first-child div:nth-child(2) {
-  font-size: 13px;
+.trade-info p {
+  font-size: 14px;
   color: #666;
-  margin-bottom: 4px;
+  margin: 0 0 4px 0;
 }
 
-#aboutTrades > div:nth-child(2) > div:first-child div:nth-child(3),
-#aboutTrades > div:nth-child(4) > div:first-child div:nth-child(3) {
-  font-size: 12px;
+.trade-info .status {
   color: #999;
+  font-size: 13px;
 }
 
-#cancel {
+.cancel-btn {
   background: #2d2d2d;
   color: white;
   border: none;
-  padding: 8px 20px;
+  padding: 8px 16px;
   border-radius: 8px;
   font-size: 13px;
   cursor: pointer;
@@ -162,91 +191,29 @@
   white-space: nowrap;
 }
 
-#cancel:hover {
+.cancel-btn:hover {
   background: #1a1a1a;
-  transform: translateY(-1px);
 }
 
-/* Statistics */
-#aboutStats {
-  background: #f5f1e8;
-  border-radius: 16px;
-  padding: 24px;
-}
-
-#aboutStats h4 {
-  font-size: 20px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0 0 20px 0;
-}
-
-#aboutStats > div:not(h4) {
+.reviews-list {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 0;
-  font-size: 15px;
-  color: #333;
-  border-bottom: 1px solid #e8e4dc;
+  flex-direction: column;
+  gap: 16px;
 }
 
-#aboutStats > div:last-child {
-  border-bottom: none;
-}
-
-#aboutStats > div:not(h4)::before {
-  content: "•";
-  font-size: 20px;
-  color: #888;
-  width: 20px;
-  display: inline-block;
-}
-
-/* Reviews section */
-.reviews {
-  margin-top: 32px;
-}
-
-#views {
-  background: transparent;
-}
-
-#views h4 {
-  font-size: 20px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0 0 20px 0;
-}
-
-#views > div:not(h4) {
-  background: #f5f1e8;
+/* 2. Карточка отзыва теперь белая */
+.review-card {
+  background: #ffffff;
   border-radius: 12px;
   padding: 24px;
-  margin-bottom: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-#views > div:not(h4) > div:first-child {
-  flex: 1;
-}
-
-#views > div:not(h4) > div:first-child div:first-child {
-  font-size: 15px;
-  color: #333;
+.review-header {
   margin-bottom: 12px;
-  line-height: 1.5;
 }
 
-#views > div:not(h4) > div:first-child div:last-child {
-  font-size: 13px;
-  color: #999;
-}
-
-/* Star rating */
-#views > div:not(h4) > div:last-child {
+.stars {
   display: flex;
   gap: 4px;
 }
@@ -260,21 +227,56 @@
   color: #ffb800;
 }
 
-/* Responsive design */
-@media (max-width: 768px) {
-  .stats {
+.review-text {
+  font-size: 15px;
+  color: #333;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+}
+
+.review-author {
+  font-size: 13px;
+  color: #999;
+  margin: 0;
+}
+
+.empty-state {
+  color: #999;
+  font-size: 15px;
+  text-align: center;
+  padding: 40px;
+  background: #ffffff;
+  border-radius: 12px;
+}
+
+@media (max-width: 1024px) {
+  .profile-header {
     grid-template-columns: 1fr;
   }
 
-  #aboutUser {
-    padding: 24px;
+  .stats-card {
+    order: -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 0 20px 20px 20px;
   }
 
-  #aboutUser h4 {
-    font-size: 24px;
+  .user-info {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 
-  #aboutUser > div:nth-child(2) {
-    font-size: 20px;
+  .trade-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cancel-btn {
+    width: 100%;
+    margin-top: 12px;
   }
 }

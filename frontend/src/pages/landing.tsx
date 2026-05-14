@@ -17,12 +17,20 @@ const Landing: React.FC = () => {
       </section>
 
       <section id="features-grid">
+<<<<<<< HEAD
         <a href="/book/catalog" className="feature-card-link">
+=======
+        <a href="/central" className="feature-card-link">
+>>>>>>> f1dd9b79317a13d60f3574e18184830d91afdefb
           <div className="card-header">
             <img src={Lupa} alt="Иконка поиска" className="card-icon-inline" />
-            <h3>Каталог Книг</h3>
+            <h3>Рекомендации</h3>
           </div>
+<<<<<<< HEAD
           <p>Огромная база данных книг всех жанров и авторов.</p>
+=======
+          <p>Лучшие предложения только для вас!</p>
+>>>>>>> f1dd9b79317a13d60f3574e18184830d91afdefb
         </a>
 
         <a href="/library" className="feature-card-link">
@@ -37,7 +45,11 @@ const Landing: React.FC = () => {
           <p>Отслеживайте прочитанное, ставьте оценки и пишите рецензии.</p>
         </a>
 
+<<<<<<< HEAD
         <a href="/profile/trade" className="feature-card-link">
+=======
+        <a href="/profile/exchange" className="feature-card-link">
+>>>>>>> f1dd9b79317a13d60f3574e18184830d91afdefb
           <div className="card-header">
             <img
               src={LibraryBlack}
@@ -46,7 +58,11 @@ const Landing: React.FC = () => {
             />
             <h3>Меняйся!</h3>
           </div>
+<<<<<<< HEAD
           <p>Нет книги, которую хочешь прочитать? Поменяйся!</p>
+=======
+          <p>Нету книги, которую хочешь прочитать? Обменяйся!</p>
+>>>>>>> f1dd9b79317a13d60f3574e18184830d91afdefb
         </a>
 
         <a href="/profile" className="feature-card-link">

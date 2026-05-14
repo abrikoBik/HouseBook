@@ -13,7 +13,9 @@ import Profile from "./pages/profile.tsx";
 import Catalog from "./pages/catalog.tsx";
 import NotFound from "./pages/notfound.tsx";
 import Library from "./pages/library.tsx";
-import Trade from "./pages/trade.tsx";
+import Scrape from "./pages/scrape.tsx";
+import Central from "./pages/central.tsx";
+import Exchange from "./pages/exchange.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -28,8 +30,10 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/library" element={<Library />} />
           <Route path="/book/:uuid" element={<Book />} />
           <Route path="/book/catalog" element={<Catalog />} />
+          <Route path="/book/scrape" element={<Scrape />} />
           <Route path="/landing" element={<Landing />} />
-          <Route path="/profile/trade" element={<Trade />} />
+          <Route path="/central" element={<Central />} />
+          <Route path="/profile/exchange" element={<Exchange />} />
           <Route path="/*" element={<NotFound />} />
         </Routes>
       </Router>
