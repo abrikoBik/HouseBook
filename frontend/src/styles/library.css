@@ -134,7 +134,7 @@ nav li.active:hover {
 
   color: #f4f4f4;
 
-  &>div {
+  & > div {
     margin-left: 0.5rem;
   }
 }
@@ -192,7 +192,8 @@ nav li.active:hover {
   --accent-color: #6c5ce7;
   --success: #00b894;
   --danger: #d63031;
-  --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 /* Оверлей */
@@ -252,8 +253,12 @@ nav li.active:hover {
 }
 
 @media (max-width: 600px) {
-  .modal-grid { grid-template-columns: 1fr; }
-  .modal-image-section { height: 250px; }
+  .modal-grid {
+    grid-template-columns: 1fr;
+  }
+  .modal-image-section {
+    height: 250px;
+  }
 }
 
 /* Секция изображения */
@@ -270,7 +275,7 @@ nav li.active:hover {
   max-height: 400px;
   object-fit: contain;
   border-radius: 10px;
-  box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
 /* Секция информации */
@@ -307,8 +312,13 @@ nav li.active:hover {
   font-size: 0.95rem;
 }
 
-.label { color: var(--text-secondary); }
-.value { font-weight: 600; color: var(--text-main); }
+.label {
+  color: var(--text-secondary);
+}
+.value {
+  font-weight: 600;
+  color: var(--text-main);
+}
 
 /* Статус */
 .status-pill {
@@ -318,8 +328,14 @@ nav li.active:hover {
   font-weight: 600;
 }
 
-.status-pill.active { background: #e8faf4; color: var(--success); }
-.status-pill.inactive { background: #fff0f0; color: var(--danger); }
+.status-pill.active {
+  background: #e8faf4;
+  color: var(--success);
+}
+.status-pill.inactive {
+  background: #fff0f0;
+  color: var(--danger);
+}
 
 /* Кнопка */
 .action-btn {
@@ -337,21 +353,42 @@ nav li.active:hover {
   transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.btn-success { background: var(--accent-color); color: white; }
-.btn-success:hover { background: #5b4bc4; transform: translateY(-2px); }
+.btn-success {
+  background: var(--accent-color);
+  color: white;
+}
+.btn-success:hover {
+  background: #5b4bc4;
+  transform: translateY(-2px);
+}
 
-.btn-danger { background: #f1f2f6; color: var(--danger); }
-.btn-danger:hover { background: #ffebeb; }
+.btn-danger {
+  background: #f1f2f6;
+  color: var(--danger);
+}
+.btn-danger:hover {
+  background: #ffebeb;
+}
 
 /* Анимации */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scaleUp {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* Обертка для ID и иконки */
@@ -394,9 +431,17 @@ nav li.active:hover {
 }
 
 @keyframes bounceIn {
-  0% { transform: scale(0.5); opacity: 0; }
-  70% { transform: scale(1.2); }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* Улучшаем отображение меток в деталях */

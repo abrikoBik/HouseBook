@@ -15,18 +15,26 @@ interface BookModalProps {
   onStatusUpdate: (updatedBook: DisplayBook) => void;
 }
 
-const BookModal: React.FC<BookModalProps> = ({ book, library_id, onClose, onStatusUpdate }) => {
+const BookModal: React.FC<BookModalProps> = ({
+  book,
+  library_id,
+  onClose,
+  onStatusUpdate,
+}) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [copied, setCopied] = useState(false); // Состояние для анимации кнопки копирования
 
   const toggleExchangeStatus = async () => {
     setIsUpdating(true);
     try {
-      const response = await fetch(`/api/libraries/${library_id}/books/${book.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ exchangeable: !book.exchangeable })
-      });
+      const response = await fetch(
+        `/api/libraries/${library_id}/books/${book.id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ exchangeable: !book.exchangeable }),
+        },
+      );
 
       if (response.ok) {
         onStatusUpdate({ ...book, exchangeable: !book.exchangeable });
@@ -66,24 +74,34 @@ const BookModal: React.FC<BookModalProps> = ({ book, library_id, onClose, onStat
             <div className="modal-details">
               <div className="detail-item">
                 <span className="label">ID книги:</span>
-                <div className="copy-wrapper" onClick={copyToClipboard} title="Копировать ID">
+                <div
+                  className="copy-wrapper"
+                  onClick={copyToClipboard}
+                  title="Копировать ID"
+                >
                   <span className="value">#{book.id.slice(0, 8)}...</span>
-                  <span className={`material-symbols-outlined copy-icon ${copied ? 'copied' : ''}`}>
-                    {copied ? 'done' : 'content_copy'}
+                  <span
+                    className={`material-symbols-outlined copy-icon ${copied ? "copied" : ""}`}
+                  >
+                    {copied ? "done" : "content_copy"}
                   </span>
                 </div>
               </div>
-              
+
               <div className="detail-item">
                 <span className="label">Статус:</span>
-                <span className={`status-pill ${book.exchangeable ? "active" : "inactive"}`}>
-                  {book.exchangeable ? "Доступна для обмена" : "Личная коллекция"}
+                <span
+                  className={`status-pill ${book.exchangeable ? "active" : "inactive"}`}
+                >
+                  {book.exchangeable
+                    ? "Доступна для обмена"
+                    : "Личная коллекция"}
                 </span>
               </div>
             </div>
 
             <div className="modal-actions">
-              <button 
+              <button
                 className={`action-btn ${book.exchangeable ? "btn-danger" : "btn-success"}`}
                 onClick={toggleExchangeStatus}
                 disabled={isUpdating}
@@ -91,7 +109,11 @@ const BookModal: React.FC<BookModalProps> = ({ book, library_id, onClose, onStat
                 <span className="material-symbols-outlined">
                   {book.exchangeable ? "block" : "swap_horiz"}
                 </span>
-                {isUpdating ? "Загрузка..." : book.exchangeable ? "Убрать из обмена" : "Сделать доступной"}
+                {isUpdating
+                  ? "Загрузка..."
+                  : book.exchangeable
+                    ? "Убрать из обмена"
+                    : "Сделать доступной"}
               </button>
             </div>
           </div>
