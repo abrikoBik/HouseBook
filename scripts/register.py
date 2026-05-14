@@ -1,9 +1,12 @@
 from requests import post
 from multiprocessing import Process
+from sys import argv
 
 def split_and_register(user_str: str):
     # [0] = e-mail, [1] = login, [2] = name, [3] = password
     split = [s.strip() for s in user_str.split(",")]
+    if len(split) != 4:
+        return
     print(f"{split[1]}: registering")
     response = post(
         "http://localhost/api/users",
@@ -21,7 +24,7 @@ def split_and_register(user_str: str):
         print(f"{split[1]}: failed to register ({response_json.get("error")})")
 
 if __name__ == "__main__":
-    with open("users.txt") as users:
+    with open(argv[1]) as users:
         for user in users:
             if user[0] == "#" or user == "":
                 continue
