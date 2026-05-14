@@ -43,7 +43,7 @@ def scrape_and_upload(url: str):
         else:
             print(f"{url}: failed to update cover")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     with open("urls.txt") as urls:
         for url in urls:
             url = url.strip()
