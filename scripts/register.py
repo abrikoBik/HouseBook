@@ -26,6 +26,7 @@ def split_and_register(user_str: str):
 if __name__ == "__main__":
     with open(argv[1]) as users:
         for user in users:
+            user = user.strip()
             if user[0] == "#" or user == "":
                 continue
             process = Process(target=split_and_register, args=(user,))

@@ -51,7 +51,7 @@ if __name__ == "__main__":
     with open(argv[1]) as urls:
         for url in urls:
             url = url.strip()
-            if url == "":
+            if url[0] == "#" or url == "":
                 continue
             process = Process(target=scrape_and_upload, args=(url,))
             # FIX: this might make too many requests; introduce a semaphore?
