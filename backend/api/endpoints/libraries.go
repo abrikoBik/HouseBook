@@ -18,7 +18,10 @@ func routeLibraries(router chi.Router) {
 			r.Route(consts.BooksEndpoint, func(r chi.Router) {
 				r.With(middleware.JSONResponse).Get("/", handlers.ListLibraryBooks)
 				r.Patch("/", handlers.AddBookToLibrary)
-				r.Delete(consts.BookIDPath, handlers.DeleteBookFromLibrary)
+				r.Route(consts.BookIDPath, func(r chi.Router) {
+					r.Patch("/", handlers.ChangeBookExchangeable)
+					r.Delete("/", handlers.DeleteBookFromLibrary)
+				})
 			})
 		})
 	})

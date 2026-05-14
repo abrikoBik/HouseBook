@@ -55,6 +55,9 @@ func GetSearchPagination(query url.Values) (int32, int32, error) {
 		}
 		offset = int32(converted)
 	}
+	if limit < 0 || offset < 0 {
+		return 0, 0, errors.New("limit and offset cannot be negative")
+	}
 	return limit, offset, nil
 }
 

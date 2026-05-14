@@ -23,8 +23,8 @@ import (
 //
 //	@tags			Библиотеки
 //
-//	@param			userid	body		int		true	"ID владельца библиотеки"
-//	@param			name	body		string	true	"Название библиотеки"	Example(Избранное)
+//	@param			userid	body		pgtype.UUID	true	"UUID владельца библиотеки"
+//	@param			name	body		string		true	"Название библиотеки"	Example(Избранное)
 //
 //	@success		201		{object}	db.Library
 //	@failure		400		{object}	ErrorResponse
@@ -273,8 +273,7 @@ func ListUserLibraries(writer http.ResponseWriter, request *http.Request) {
 //	@tags			Библиотеки,Книги
 //
 //	@param			library-id	path		string		true	"UUID библиотеки"
-//	@param			bookid		body		pgtype.UUID	true	"ID книги"
-//	@param			quantity	body		int			false	"Количество экземпляров книги"
+//	@param			bookid		body		pgtype.UUID	true	"UUID книги"
 //
 //	@success		201			{string}	string		""
 //	@failure		400			{object}	ErrorResponse
@@ -404,8 +403,8 @@ func DeleteBookFromLibrary(writer http.ResponseWriter, request *http.Request) {
 		q      = db.New(database.Pool)
 	)
 
-	if params.Libraryid, err = util.PathUUID(consts.LibraryIDPath, request); err != nil {
-		RenderError(r, writer, ErrorBadID(err, consts.LibraryIDPath))
+	if params.Libraryid, err = util.PathUUID(consts.LibraryIDPathValue, request); err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.LibraryIDPathValue))
 		return
 	}
 	if params.Bookid, err = util.PathUUID(consts.BookIDPathValue, request); err != nil {
@@ -424,6 +423,56 @@ func DeleteBookFromLibrary(writer http.ResponseWriter, request *http.Request) {
 		Interface("libraryID", params.Libraryid).
 		Interface("bookID", params.Bookid).
 		Msg("book deleted from library")
+
+	writer.WriteHeader(http.StatusOK)
+}
+
+// ChangeBookExchangeable godoc
+//
+//	@summary		Изменить статус обмена книги
+//	@description	Сделать книгу доступной к обмену или наоборот.
+//	@accept			json
+//	@produce		json
+//
+//	@tags			Библиотеки,Книги
+//
+//	@param			library-id	path		string	true	"UUID библиотеки"
+//	@param			book-id		path		string	true	"UUID книги"
+//
+//	@success		200			{string}	string	""
+//	@failure		400			{object}	ErrorResponse
+//	@failure		500			{object}	ErrorResponse
+//	@router			/api/libraries/{library-id}/books/{book-id} [patch]
+func ChangeBookExchangeable(writer http.ResponseWriter, request *http.Request) {
+	var (
+		err    error
+		params db.ChangeBookExchangeableParams
+		r      = render.New()
+		q      = db.New(database.Pool)
+	)
+
+	if params.Libraryid, err = util.PathUUID(consts.LibraryIDPathValue, request); err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.LibraryIDPathValue))
+		return
+	}
+	if params.Bookid, err = util.PathUUID(consts.BookIDPathValue, request); err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	book, err := q.ChangeBookExchangeable(database.Context, params)
+	if err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+	Logger.Info().
+		Interface("libraryID", params.Libraryid).
+		Interface("bookID", params.Bookid).
+		Bool("exchangeable", book.Exchangeable).
+		Msg("exchangeable status of book changed")
 
 	writer.WriteHeader(http.StatusOK)
 }

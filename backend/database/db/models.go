@@ -9,19 +9,20 @@ import (
 )
 
 type Book struct {
-	ID          pgtype.UUID    `db:"id" json:"id"`
-	Title       string         `db:"title" json:"title"`
-	Author      string         `db:"author" json:"author"`
-	Isbn        string         `db:"isbn" json:"isbn"`
-	Genre       string         `db:"genre" json:"genre"`
-	Publisher   string         `db:"publisher" json:"publisher"`
-	Year        pgtype.Numeric `db:"year" json:"year"`
-	Language    pgtype.Text    `db:"language" json:"language"`
-	CoverType   pgtype.Text    `db:"cover_type" json:"cover_type"`
-	PageCount   pgtype.Numeric `db:"page_count" json:"page_count"`
-	Description pgtype.Text    `db:"description" json:"description"`
-	ImageUuid   pgtype.UUID    `db:"image_uuid" json:"image_uuid"`
-	Link        pgtype.Text    `db:"link" json:"link"`
+	ID          pgtype.UUID      `db:"id" json:"id"`
+	Title       string           `db:"title" json:"title"`
+	Author      string           `db:"author" json:"author"`
+	Isbn        string           `db:"isbn" json:"isbn"`
+	Genre       string           `db:"genre" json:"genre"`
+	Publisher   string           `db:"publisher" json:"publisher"`
+	Year        pgtype.Numeric   `db:"year" json:"year"`
+	Language    pgtype.Text      `db:"language" json:"language"`
+	CoverType   pgtype.Text      `db:"cover_type" json:"cover_type"`
+	PageCount   pgtype.Numeric   `db:"page_count" json:"page_count"`
+	Description pgtype.Text      `db:"description" json:"description"`
+	ImageUuid   pgtype.UUID      `db:"image_uuid" json:"image_uuid"`
+	Link        pgtype.Text      `db:"link" json:"link"`
+	AddedAt     pgtype.Timestamp `db:"added_at" json:"added_at"`
 }
 
 type Comment struct {
@@ -38,9 +39,9 @@ type Library struct {
 }
 
 type LibraryBook struct {
-	LibraryID pgtype.UUID    `db:"library_id" json:"library_id"`
-	BookID    pgtype.UUID    `db:"book_id" json:"book_id"`
-	Quantity  pgtype.Numeric `db:"quantity" json:"quantity"`
+	LibraryID    pgtype.UUID `db:"library_id" json:"library_id"`
+	BookID       pgtype.UUID `db:"book_id" json:"book_id"`
+	Exchangeable bool        `db:"exchangeable" json:"exchangeable"`
 }
 
 type Session struct {
@@ -61,9 +62,10 @@ type Trade struct {
 }
 
 type TradeBook struct {
-	TradeID pgtype.UUID `db:"trade_id" json:"trade_id"`
-	BookID  pgtype.UUID `db:"book_id" json:"book_id"`
-	OwnerID pgtype.UUID `db:"owner_id" json:"owner_id"`
+	TradeID   pgtype.UUID `db:"trade_id" json:"trade_id"`
+	BookID    pgtype.UUID `db:"book_id" json:"book_id"`
+	LibraryID pgtype.UUID `db:"library_id" json:"library_id"`
+	OwnerID   pgtype.UUID `db:"owner_id" json:"owner_id"`
 }
 
 type User struct {

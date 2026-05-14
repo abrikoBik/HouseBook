@@ -14,24 +14,43 @@ import (
 const addBookToLibrary = `-- name: AddBookToLibrary :exec
 insert into library_books (
     library_id,
-    book_id,
-    quantity
+    book_id
 ) values (
     $1,
-    $2,
-    $3
+    $2
 )
 `
 
 type AddBookToLibraryParams struct {
-	Libraryid pgtype.UUID    `db:"libraryid" json:"libraryid"`
-	Bookid    pgtype.UUID    `db:"bookid" json:"bookid"`
-	Quantity  pgtype.Numeric `db:"quantity" json:"quantity"`
+	Libraryid pgtype.UUID `db:"libraryid" json:"libraryid"`
+	Bookid    pgtype.UUID `db:"bookid" json:"bookid"`
 }
 
 func (q *Queries) AddBookToLibrary(ctx context.Context, arg AddBookToLibraryParams) error {
-	_, err := q.db.Exec(ctx, addBookToLibrary, arg.Libraryid, arg.Bookid, arg.Quantity)
+	_, err := q.db.Exec(ctx, addBookToLibrary, arg.Libraryid, arg.Bookid)
 	return err
+}
+
+const changeBookExchangeable = `-- name: ChangeBookExchangeable :one
+update library_books
+set
+    exchangeable = not exchangeable
+where
+    library_id = $1 and
+    book_id = $2
+returning library_id, book_id, exchangeable
+`
+
+type ChangeBookExchangeableParams struct {
+	Libraryid pgtype.UUID `db:"libraryid" json:"libraryid"`
+	Bookid    pgtype.UUID `db:"bookid" json:"bookid"`
+}
+
+func (q *Queries) ChangeBookExchangeable(ctx context.Context, arg ChangeBookExchangeableParams) (LibraryBook, error) {
+	row := q.db.QueryRow(ctx, changeBookExchangeable, arg.Libraryid, arg.Bookid)
+	var i LibraryBook
+	err := row.Scan(&i.LibraryID, &i.BookID, &i.Exchangeable)
+	return i, err
 }
 
 const createLibrary = `-- name: CreateLibrary :one
@@ -147,7 +166,7 @@ func (q *Queries) ListLibraries(ctx context.Context, arg ListLibrariesParams) ([
 }
 
 const listLibraryBooks = `-- name: ListLibraryBooks :many
-select books.id from libraries
+select books.id, library_books.exchangeable from libraries
 join users on libraries.user_id = users.id
 left join library_books on libraries.id = library_books.library_id
 left join books on library_books.book_id = books.id
@@ -162,19 +181,24 @@ type ListLibraryBooksParams struct {
 	ID     pgtype.UUID `db:"id" json:"id"`
 }
 
-func (q *Queries) ListLibraryBooks(ctx context.Context, arg ListLibraryBooksParams) ([]pgtype.UUID, error) {
+type ListLibraryBooksRow struct {
+	ID           pgtype.UUID `db:"id" json:"id"`
+	Exchangeable pgtype.Bool `db:"exchangeable" json:"exchangeable"`
+}
+
+func (q *Queries) ListLibraryBooks(ctx context.Context, arg ListLibraryBooksParams) ([]ListLibraryBooksRow, error) {
 	rows, err := q.db.Query(ctx, listLibraryBooks, arg.Limit, arg.Offset, arg.ID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []pgtype.UUID
+	var items []ListLibraryBooksRow
 	for rows.Next() {
-		var id pgtype.UUID
-		if err := rows.Scan(&id); err != nil {
+		var i ListLibraryBooksRow
+		if err := rows.Scan(&i.ID, &i.Exchangeable); err != nil {
 			return nil, err
 		}
-		items = append(items, id)
+		items = append(items, i)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import NotificationsIcon from "../assets/Notification.svg";
 import SearchIcon from "../assets/Lupa.svg";
 import "../styles/header.css";
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router";
 
 interface Book {
   id: string;
@@ -18,12 +20,46 @@ interface ApiBook {
   image_uuid?: string | null;
 }
 
+interface DecodedToken {
+  id: string;
+  exp?: number;
+  iat?: number;
+}
+
+// interface Username {
+//   name: string;
+// }
+
 const Header = () => {
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [allBooks, setAllBooks] = useState<Book[]>([]);
   const [results, setResults] = useState<Book[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const [username, setUsername] = useState<string>();
+
+  useEffect(() => {
+    const getUsername = async (id: string) => {
+      const response = await fetch(`/api/users/${id}`);
+      const respJSON = await response.json();
+
+      if (!response.ok) {
+        navigate("/auth");
+      } else {
+        setUsername(respJSON["name"]);
+      }
+    };
+
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decoded = jwtDecode<DecodedToken>(token!);
+      localStorage.setItem("UserID", decoded.id);
+      getUsername(decoded.id);
+    } else {
+      navigate("/auth");
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const fetchCatalog = async () => {
@@ -144,7 +180,7 @@ const Header = () => {
         <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
           <a href="/profile" className="profile-link">
             <div id="icon"></div>
-            <div id="name">Шиловский Максим</div>
+            <div id="name">{username}</div>
           </a>
           <div id="notifications">
             <img src={NotificationsIcon} alt="notifications" />

@@ -48,6 +48,22 @@ const postScrapedBook = async (book: BookT) => {
   return result as BookT;
 };
 
+const updateCoverImage = async (
+  bookID: string,
+  coverID: string | undefined,
+) => {
+  if (coverID === undefined) return;
+  const response = await fetch(`/api/books/${bookID}/cover`, {
+    method: "PUT",
+    body: JSON.stringify({ imageuuid: coverID }),
+  });
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error((result as Error).error);
+  }
+  return result as BookT;
+};
+
 const Scraper = ({ url }: { url: string }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const handleScrapeSubmit = async () => {
@@ -59,8 +75,12 @@ const Scraper = ({ url }: { url: string }) => {
       alert("👍 (книжка есть)");
       const apiResponse = await postScrapedBook(book!);
       console.log(apiResponse);
-      alert(`👍 (книжка теперь на сервере, ${apiResponse.id})`);
-      // TODO: retrieve book cover on the backend, then call PATCH here with the returned image id
+      alert(`👍 (книжка теперь на сервере, ${apiResponse?.id})`);
+      const coverResponse = await updateCoverImage(
+        apiResponse?.id,
+        book?.image_uuid,
+      );
+      alert(`👍 (обложка теперь на сервере, ${coverResponse?.image_uuid})`);
     } catch (err: unknown) {
       alert(`👎 (${err})`);
       console.error(err as Error);

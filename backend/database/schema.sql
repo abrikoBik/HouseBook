@@ -14,7 +14,8 @@ create table books (
     description text,
 
     image_uuid uuid,
-    link text
+    link text,
+    added_at timestamp not null default current_timestamp
 );
 
 create table users (
@@ -38,8 +39,8 @@ create table users (
 create table trades (
     id uuid primary key default uuidv7(),
 
-    owner_id uuid not null references users(id),
-    buyer_id uuid not null references users(id),
+    owner_id uuid not null references users(id) on delete cascade,
+    buyer_id uuid not null references users(id) on delete cascade,
     owner_confirmed boolean not null default false,
     buyer_confirmed boolean not null default false,
 
@@ -47,23 +48,24 @@ create table trades (
     completed_at timestamp
 );
 
-create table trade_books (
-    trade_id uuid references trades(id) on delete cascade,
-    book_id uuid references books(id),
-    owner_id uuid not null references users(id),
-    primary key (trade_id, book_id)
-);
-
 create table libraries (
     id uuid primary key default uuidv7(),
-    user_id uuid not null references users(id),
+    user_id uuid not null references users(id) on delete cascade,
     name text not null default 'Библиотека'
+);
+
+create table trade_books (
+    trade_id uuid references trades(id) on delete cascade,
+    book_id uuid references books(id) on delete cascade,
+    library_id uuid references libraries(id) on delete cascade,
+    owner_id uuid not null references users(id) on delete cascade,
+    primary key (trade_id, book_id)
 );
 
 create table library_books (
     library_id uuid references libraries(id) on delete cascade,
-    book_id uuid references books(id),
-    quantity numeric not null default 1,
+    book_id uuid references books(id) on delete cascade,
+    exchangeable boolean not null default false,
     primary key (library_id, book_id)
 );
 

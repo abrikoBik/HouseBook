@@ -109,6 +109,15 @@ func ErrorWrongPassword(err error) ErrorResponse {
 	}
 }
 
+func ErrorTrade(err error, explanation string) ErrorResponse {
+	return ErrorResponse{
+		Status:      http.StatusBadRequest,
+		Error:       "trade error",
+		Explanation: explanation,
+		err:         err,
+	}
+}
+
 func ErrorGeneric(err error) ErrorResponse {
 	return ErrorResponse{
 		Status: http.StatusInternalServerError,
