@@ -30,7 +30,7 @@ interface DisplayBook {
 
 const Library = () => {
   const [activeTab, setActiveTab] = useState(0);
-  
+
   const [userLibs, setUserLibs] = useState<LibraryType[]>([]);
   const [displayBooks, setDisplayBooks] = useState<DisplayBook[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -74,9 +74,9 @@ const Library = () => {
         try {
           const res = await fetch(`/api/books/${item.id}`);
           if (!res.ok) return null;
-          
+
           const bookData: ApiBook = await res.json();
-          
+
           return {
             id: bookData.id,
             title: bookData.title?.trim() || "Без названия",
@@ -92,10 +92,9 @@ const Library = () => {
       });
 
       const results = await Promise.all(booksDetailsPromises);
-      
+
       const validBooks = results.filter((b): b is DisplayBook => b !== null);
       setDisplayBooks(validBooks);
-
     } catch (error) {
       console.error("Error loading books for library:", error);
     } finally {
@@ -110,7 +109,7 @@ const Library = () => {
   useEffect(() => {
     if (activeTab === 0) {
       // TODO: fetch all books
-      setDisplayBooks([]); 
+      setDisplayBooks([]);
       setIsLoading(false);
     } else {
       const selectedLibIndex = activeTab - 1;
@@ -152,7 +151,9 @@ const Library = () => {
 
         <section id="books">
           {isLoading ? (
-            <div style={{ padding: "20px", textAlign: "center", width: "100%" }}>
+            <div
+              style={{ padding: "20px", textAlign: "center", width: "100%" }}
+            >
               Загрузка книг...
             </div>
           ) : displayBooks.length > 0 ? (
@@ -171,9 +172,16 @@ const Library = () => {
             ))
           ) : (
             !isLoading && (
-              <div style={{ padding: "20px", textAlign: "center", width: "85vw", color: "#666" }}>
-                {activeTab === 0 
-                  ? "Выберите библиотеку или добавьте книги." 
+              <div
+                style={{
+                  padding: "20px",
+                  textAlign: "center",
+                  width: "85vw",
+                  color: "#666",
+                }}
+              >
+                {activeTab === 0
+                  ? "Выберите библиотеку или добавьте книги."
                   : "В этой библиотеке пока нет книг."}
               </div>
             )
