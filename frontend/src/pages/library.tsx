@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import Header from "../modules/header";
 import SideBar from "../modules/sideBar";
 import BookModal from "../modules/bookModal";
+import AddBookTab from "../modules/addBookTab";
 import "../styles/library.css";
 
 interface LibraryType {
@@ -32,6 +33,7 @@ interface DisplayBook {
 
 const Library = () => {
   const [activeTab, setActiveTab] = useState(0);
+  const [addBookActive, setAddBookActive] = useState(false); // Изначально false — модалка закрыта
 
   const [userLibs, setUserLibs] = useState<LibraryType[]>([]);
   const [displayBooks, setDisplayBooks] = useState<DisplayBook[]>([]);
@@ -62,10 +64,46 @@ const Library = () => {
     }
   }, []);
 
+  const fetchBookDetails = async (
+    item: LibBook,
+  ): Promise<DisplayBook | null> => {
+    try {
+      const res = await fetch(`/api/books/${item.id}`);
+      if (!res.ok) return null;
+
+      const bookData: ApiBook = await res.json();
+
+      return {
+        id: bookData.id,
+        title: bookData.title?.trim() || "Без названия",
+        author: bookData.author?.trim() || "Неизвестный автор",
+        cover_url: bookData.image_uuid
+          ? `http://localhost/cdn/${bookData.image_uuid}`
+          : `https://via.placeholder.com/300x450?text=No+Cover`,
+        exchangeable: item.exchangeable,
+      };
+    } catch (err) {
+      console.warn(`Failed to load book ${item.id}`, err);
+      return null;
+    }
+  };
+
   const fetchLibBookIds = async (libId: string): Promise<LibBook[]> => {
     const response = await fetch(`/api/libraries/${libId}/books`);
     if (!response.ok) return [];
     return await response.json();
+  };
+
+  const getBooksForLibrary = async (libId: string): Promise<DisplayBook[]> => {
+    const libBooksList = await fetchLibBookIds(libId);
+    if (libBooksList.length === 0) return [];
+
+    const booksDetailsPromises = libBooksList.map((item: LibBook) =>
+      fetchBookDetails(item),
+    );
+    const results = await Promise.all(booksDetailsPromises);
+
+    return results.filter((b): b is DisplayBook => b !== null);
   };
 
   const fetchBooksForLibrary = useCallback(async (libId: string) => {
@@ -73,40 +111,7 @@ const Library = () => {
     setDisplayBooks([]);
 
     try {
-      const libBooksList = await fetchLibBookIds(libId);
-
-      if (libBooksList.length === 0) {
-        setIsLoading(false);
-        return;
-      }
-
-      const booksDetailsPromises = libBooksList.map(async (item: LibBook) => {
-        try {
-          const res = await fetch(`/api/books/${item.id}`);
-          if (!res.ok) return null;
-
-          const bookData: ApiBook = await res.json();
-
-          console.log("Fetched libBooks:", libBooksList);
-
-          return {
-            id: bookData.id,
-            title: bookData.title?.trim() || "Без названия",
-            author: bookData.author?.trim() || "Неизвестный автор",
-            cover_url: bookData.image_uuid
-              ? `http://localhost/cdn/${bookData.image_uuid}`
-              : `https://via.placeholder.com/300x450?text=No+Cover`,
-            exchangeable: item.exchangeable,
-          };
-        } catch (err) {
-          console.warn(`Failed to load book ${item.id}`, err);
-          return null;
-        }
-      });
-
-      const results = await Promise.all(booksDetailsPromises);
-
-      const validBooks = results.filter((b): b is DisplayBook => b !== null);
+      const validBooks = await getBooksForLibrary(libId);
       setDisplayBooks(validBooks);
     } catch (error) {
       console.error("Error loading books for library:", error);
@@ -115,31 +120,96 @@ const Library = () => {
     }
   }, []);
 
-  useEffect(() => {
-    fetchLibraries();
-  }, [fetchLibraries]);
-
-  useEffect(() => {
+  const handleAddBookClose = () => {
+    setAddBookActive(false);
+    // Обновляем список книг после добавления
     if (activeTab === 0) {
-      // TODO: fetch all books
-      setDisplayBooks([]);
-      setIsLoading(false);
+      fetchAllBooks();
     } else {
       const selectedLibIndex = activeTab - 1;
       if (userLibs[selectedLibIndex]) {
         fetchBooksForLibrary(userLibs[selectedLibIndex].id);
       }
     }
-  }, [activeTab, userLibs, fetchBooksForLibrary]);
+  };
+
+  const fetchAllBooks = useCallback(async () => {
+    if (userLibs.length === 0) {
+      setDisplayBooks([]);
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setDisplayBooks([]);
+
+    try {
+      const allLibsBooksPromises = userLibs.map((lib) =>
+        fetchLibBookIds(lib.id),
+      );
+      const allLibsBooksArrays = await Promise.all(allLibsBooksPromises);
+      const flatLibBooksList: LibBook[] = allLibsBooksArrays.flat();
+
+      if (flatLibBooksList.length === 0) {
+        setDisplayBooks([]);
+        return;
+      }
+
+      const booksDetailsPromises = flatLibBooksList.map((item: LibBook) =>
+        fetchBookDetails(item),
+      );
+      const results = await Promise.all(booksDetailsPromises);
+
+      const validBooks = results.filter((b): b is DisplayBook => b !== null);
+      setDisplayBooks(validBooks);
+    } catch (error) {
+      console.error("Error loading all books:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userLibs]);
+
+  useEffect(() => {
+    fetchLibraries();
+  }, [fetchLibraries]);
+
+  useEffect(() => {
+    setIsLoading(true);
+
+    if (activeTab === 0) {
+      fetchAllBooks();
+    } else {
+      const selectedLibIndex = activeTab - 1;
+      if (userLibs[selectedLibIndex]) {
+        fetchBooksForLibrary(userLibs[selectedLibIndex].id);
+      } else {
+        setIsLoading(false);
+        setDisplayBooks([]);
+      }
+    }
+  }, [activeTab, userLibs, fetchBooksForLibrary, fetchAllBooks]);
 
   return (
     <div>
       <SideBar />
       <Header />
 
+      {addBookActive && <AddBookTab onClose={handleAddBookClose} />}
+
       <section id="libraryLayout">
         <section id="info">
           <h4>Моя библиотека</h4>
+
+          {/* 🔘 Кнопка добавления книги */}
+          <button
+            className="add-book-btn"
+            onClick={() => setAddBookActive(true)}
+            title="Добавить книгу"
+          >
+            <span className="material-symbols-outlined">add</span>
+            <span>Добавить книгу</span>
+          </button>
+
           <nav>
             <ul>
               <li
@@ -190,7 +260,9 @@ const Library = () => {
                   className={`${book.exchangeable ? "exchangeAvaible" : "exchangeNotAvaible"}`}
                 >
                   <span className="material-symbols-outlined">swap_horiz</span>
-                  <div>{book.exchangeable ? "Available" : "Not available"}</div>
+                  <div style={{ fontWeight: "bold" }}>
+                    {book.exchangeable ? "Доступна" : "Недоступна"}
+                  </div>
                 </div>
               </div>
             ))
@@ -205,7 +277,7 @@ const Library = () => {
                 }}
               >
                 {activeTab === 0
-                  ? "Выберите библиотеку или добавьте книги."
+                  ? "У вас пока нет книг ни в одной библиотеке."
                   : "В этой библиотеке пока нет книг."}
               </div>
             )
@@ -213,11 +285,16 @@ const Library = () => {
         </section>
       </section>
 
-      {/* Вызов модального окна */}
       {selectedBook && (
         <BookModal
           book={selectedBook}
-          library_id={userLibs[activeTab == 0 ? 0 : activeTab - 1].id}
+          library_id={
+            userLibs.length > 0
+              ? activeTab === 0
+                ? userLibs[0].id
+                : userLibs[activeTab - 1].id
+              : ""
+          }
           onClose={() => setSelectedBook(null)}
           onStatusUpdate={handleBookUpdate}
         />

@@ -1,6 +1,6 @@
 #libraryLayout {
   max-width: 93vw;
-  margin: 5vh auto 0;
+  margin: 0 auto 0;
   margin-left: 7vw;
   padding: 40px 24px;
   min-height: 100vh;
@@ -243,7 +243,6 @@ nav li.active:hover {
 
 .modal-close-icon:hover {
   background: #dfe6e9;
-  transform: rotate(90deg);
 }
 
 /* Сетка */

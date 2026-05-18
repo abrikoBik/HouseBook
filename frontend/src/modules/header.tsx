@@ -74,7 +74,7 @@ const Header = () => {
           title: b.title?.trim() || "Без названия",
           author: b.author?.trim() || "Неизвестный автор",
           cover_url: b.image_uuid
-            ? `/api/images/${b.image_uuid}`
+            ? `http://localhost/cdn/${b.image_uuid}`
             : b.cover_url || undefined,
         }));
 

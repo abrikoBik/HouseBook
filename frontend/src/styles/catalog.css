@@ -72,7 +72,7 @@
   border-color: #000;
 }
 
-#book-grid {
+#catalog-book-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 30px;
@@ -83,7 +83,7 @@
 /* === ИЗОЛИРОВАННЫЕ СТИЛИ КАРТОЧЕК (Только для Каталога) === */
 
 /* Привязка к #catalog-body, чтобы не конфликтовать с central */
-#catalog-body .book-card {
+#catalog-body .catalog-book-card {
   display: flex;
   flex-direction: column;
   cursor: pointer;
@@ -92,11 +92,11 @@
 }
 
 /* Уменьшили подъём с -8px до -4px */
-#catalog-body .book-card:hover {
+#catalog-body .catalog-book-card:hover {
   transform: translateY(-12px);
 }
 
-#catalog-body .book-cover {
+#catalog-body .catalog-book-cover {
   width: 100%;
   aspect-ratio: 2/3;
   overflow: hidden;
@@ -106,7 +106,7 @@
   margin-bottom: 12px;
 }
 
-#catalog-body .book-cover img {
+#catalog-body .catalog-book-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -114,11 +114,11 @@
 }
 
 /* Уменьшили увеличение с 1.05 до 1.02 */
-#catalog-body .book-card:hover .book-cover img {
+#catalog-body .catalog-book-card:hover .catalog-book-cover img {
   transform: scale(1.05);
 }
 
-#catalog-body .book-info {
+#catalog-body .catalog-book-info {
   padding: 0;
   flex-grow: 1;
   display: flex;
@@ -126,7 +126,7 @@
   justify-content: flex-start;
 }
 
-#catalog-body .book-title {
+#catalog-body .catalog-book-title {
   font-size: 15px;
   font-weight: 600;
   color: #333;
@@ -140,7 +140,7 @@
   -webkit-box-orient: vertical;
 }
 
-#catalog-body .book-author {
+#catalog-body .catalog-book-author {
   font-size: 13px;
   color: #7f8c8d;
   margin: 0;
@@ -159,33 +159,33 @@
 }
 
 @media (max-width: 1200px) {
-  #book-grid {
+  #catalog-book-grid {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 24px;
   }
 }
 
 @media (max-width: 768px) {
-  #book-grid {
+  #catalog-book-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 20px;
   }
-  #catalog-body .book-title {
+  #catalog-body .catalog-book-title {
     font-size: 14px;
   }
-  #catalog-body .book-author {
+  #catalog-body .catalog-book-author {
     font-size: 12px;
   }
 }
 
 @media (max-width: 480px) {
-  #book-grid {
+  #catalog-book-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
 }
 
-#book-grid a {
+#catalog-book-grid a {
   text-decoration: none;
   color: inherit;
   display: block;

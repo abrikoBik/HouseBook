@@ -193,17 +193,17 @@ const Catalog = () => {
             </nav>
           </section>
 
-          <section id="book-grid">
+          <section id="catalog-book-grid">
             {filteredBooks.length > 0 ? (
               filteredBooks.map((book) => (
                 <a href={`/book/${book.id}`} key={book.id}>
-                  <div className="book-card">
-                    <div className="book-cover">
+                  <div className="catalog-book-card">
+                    <div className="catalog-book-cover">
                       <img src={book.cover_url} alt={book.title} />
                     </div>
-                    <div className="book-info">
-                      <h3 className="book-title">{book.title}</h3>
-                      <p className="book-author">{book.author}</p>
+                    <div className="catalog-book-info">
+                      <h3 className="catalog-book-title">{book.title}</h3>
+                      <p className="catalog-book-author">{book.author}</p>
                     </div>
                   </div>
                 </a>
