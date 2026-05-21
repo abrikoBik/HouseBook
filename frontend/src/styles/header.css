@@ -1,7 +1,6 @@
 #top_menu {
   position: absolute;
   width: 90vw;
-  margin-left: 10vw;
   position: fixed;
   width: calc(100vw - 89px);
   top: 0;
