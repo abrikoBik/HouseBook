@@ -3,103 +3,52 @@ import SideBar from "../modules/sideBar";
 import Header from "../modules/header";
 import "../styles/profile.css";
 
-interface UserProfile {
+interface UserAPI {
+  email: string;
+  finished_reading_id: string;
   id: string;
+  image_uuid: string;
+  login: string;
   name: string;
-  username: string;
-  city: string;
-  avatar_url?: string;
-  stats: {
-    total_books: number;
-    read: number;
-    reading: number;
-    available_for_exchange: number;
-    rating: number;
-  };
-  active_trades: Array<{
-    id: string;
-    book_title: string;
-    book_cover_url?: string;
-    partner_username: string;
-    status: string;
-  }>;
-  reviews: Array<{
-    id: string;
-    author_username: string;
-    text: string;
-    rating: number;
-  }>;
+  now_reading_id: string;
+  rating: number;
+  trade_ready_id: string;
 }
 
-// ============================================================================
-// TODO: API — Эту функцию заменить на реальный fetch при подключении бэкенда
-// ============================================================================
-const mockFetchUserProfile = async (): Promise<UserProfile> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        id: "1",
-        name: "Шиловский Максим",
-        username: "@krutoi.chelik",
-        city: "Таганрог",
-        avatar_url: "",
-        stats: {
-          total_books: 7,
-          read: 5,
-          reading: 1,
-          available_for_exchange: 5,
-          rating: 4.9,
-        },
-        active_trades: [
-          {
-            id: "1",
-            book_title: "Лао-цзы",
-            book_cover_url: "",
-            partner_username: "@fawatafa",
-            status: "Ожидает подтверждения",
-          },
-          {
-            id: "2",
-            book_title: "Облако",
-            book_cover_url: "",
-            partner_username: "@genius1337",
-            status: "Передача книги",
-          },
-        ],
-        reviews: [
-          {
-            id: "1",
-            author_username: "@zayanozlaya",
-            text: "Хороший и самое главное быстрый обмен, пока ждала у меня умерли все близкие",
-            rating: 5,
-          },
-          {
-            id: "2",
-            author_username: "@mezulina",
-            text: "Прочитала предыдущий отзыв, надеялась произойдет тоже самое",
-            rating: 1,
-          },
-        ],
-      });
-    }, 500);
-  });
-};
-
 const Profile = () => {
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState<UserAPI | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Получение userId из localStorage
+  const getUserId = (): string | null => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("UserID");
+    }
+    return null;
+  };
 
   useEffect(() => {
     const loadProfile = async () => {
       try {
         setLoading(true);
-        // TODO: API — Заменить на реальный вызов, например:
-        // const response = await fetch(`/api/users/${currentUserId}`);
-        // const data = await response.json();
-        const data = await mockFetchUserProfile();
+        setError(null);
+
+        const userId = getUserId();
+        if (!userId) {
+          throw new Error("Пользователь не авторизован");
+        }
+
+        const response = await fetch(`/api/users/${userId}`);
+        if (!response.ok) {
+          throw new Error("Ошибка загрузки профиля");
+        }
+
+        const data: UserAPI = await response.json();
         setUser(data);
       } catch (error) {
         console.error("Failed to load profile:", error);
+        setError("Не удалось загрузить профиль");
       } finally {
         setLoading(false);
       }
@@ -122,14 +71,14 @@ const Profile = () => {
     );
   }
 
-  if (!user) {
+  if (error || !user) {
     return (
       <section className="profile-page">
         <SideBar />
         <main className="profile-content">
           <Header />
           <div style={{ textAlign: "center", padding: "100px", color: "red" }}>
-            Не удалось загрузить профиль
+            {error || "Не удалось загрузить профиль"}
           </div>
         </main>
       </section>
@@ -144,11 +93,17 @@ const Profile = () => {
         <div className="profile-container">
           <div className="profile-header">
             <div className="user-info">
-              <div className="avatar-placeholder">Фото</div>
+              <div className="avatar-placeholder">
+                {user.image_uuid ? (
+                  <img src={`/api/images/${user.image_uuid}`} alt="Avatar" />
+                ) : (
+                  "Фото"
+                )}
+              </div>
               <div className="user-details">
                 <h1>{user.name}</h1>
-                <p className="username">{user.username}</p>
-                <p className="city">📍 {user.city}</p>
+                <p className="username">@{user.login}</p>
+                <p className="city">📍 Таганрог</p>
                 <button className="edit-btn">Редактировать профиль</button>
               </div>
             </div>
@@ -156,82 +111,23 @@ const Profile = () => {
             <div className="stats-card">
               <h2>Статистика</h2>
               <div className="stat-item">
-                <span className="stat-icon">📚</span>
-                <span>Всего книг: {user.stats.total_books}</span>
+                <span className="stat-icon">⭐</span>
+                <span>Рейтинг: {user.rating.toFixed(1)}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-icon">📖</span>
+                <span>Читает сейчас: {user.now_reading_id || "—"}</span>
               </div>
               <div className="stat-item">
                 <span className="stat-icon">✅</span>
-                <span>Прочитано: {user.stats.read}</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-icon">⏳</span>
-                <span>В процессе: {user.stats.reading}</span>
+                <span>Прочитано: {user.finished_reading_id || "—"}</span>
               </div>
               <div className="stat-item">
                 <span className="stat-icon">🔄</span>
-                <span>
-                  Доступны для обмена: {user.stats.available_for_exchange}
-                </span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-icon">⭐</span>
-                <span>Рейтинг: {user.stats.rating}</span>
+                <span>Готов к обмену: {user.trade_ready_id || "—"}</span>
               </div>
             </div>
           </div>
-
-          <section className="trades-section">
-            <h2>Активные сделки</h2>
-            {user.active_trades.length > 0 ? (
-              <div className="trades-list">
-                {user.active_trades.map((trade) => (
-                  <div key={trade.id} className="trade-card">
-                    <div className="book-cover-placeholder"></div>
-                    <div className="trade-info">
-                      <h3>{trade.book_title}</h3>
-                      <p>
-                        ⇄ Обмен с – <strong>{trade.partner_username}</strong>
-                      </p>
-                      <p className="status">◷ {trade.status}</p>
-                    </div>
-                    <button className="cancel-btn">✕ Отменить</button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="empty-state">Нет активных сделок</p>
-            )}
-          </section>
-
-          <section className="reviews-section">
-            <h2>Отзывы</h2>
-            {user.reviews.length > 0 ? (
-              <div className="reviews-list">
-                {user.reviews.map((review) => (
-                  <div key={review.id} className="review-card">
-                    <div className="review-header">
-                      <div className="stars">
-                        {[...Array(5)].map((_, i) => (
-                          <span
-                            key={i}
-                            className={
-                              i < review.rating ? "star filled" : "star"
-                            }
-                          >
-                            ☆
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <p className="review-text">{review.text}</p>
-                    <p className="review-author">– {review.author_username}</p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="empty-state">Пока нет отзывов</p>
-            )}
-          </section>
         </div>
       </main>
     </section>

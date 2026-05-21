@@ -33,19 +33,19 @@ const SideBar = () => {
               <img src={isCentralActive ? HomeWhite : HomeBlack} alt="home" />
             </Link>
           </div>
-          <div className={`menu-item ${isLibraryActive ? "active" : ""}`}>
-            <Link to="/library">
-              <img
-                src={isLibraryActive ? FavoritesWhite : FavoritesBlack}
-                alt="favorites"
-              />
-            </Link>
-          </div>
           <div className={`menu-item ${isExchangeActive ? "active" : ""}`}>
             <Link to="/profile/exchange">
               <img
-                src={isExchangeActive ? LibraryWhite : LibraryBlack}
+                src={isExchangeActive ? FavoritesWhite : FavoritesBlack}
                 alt="exchange"
+              />
+            </Link>
+          </div>
+          <div className={`menu-item ${isLibraryActive ? "active" : ""}`}>
+            <Link to="/library">
+              <img
+                src={isLibraryActive ? LibraryWhite : LibraryBlack}
+                alt="library"
               />
             </Link>
           </div>

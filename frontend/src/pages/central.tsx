@@ -3,41 +3,45 @@ import SideBar from "../modules/sideBar";
 import Header from "../modules/header";
 import "../styles/central.css";
 
-interface Book {
+interface ApiBook {
+  id: string;
+  title: string | null;
+  author: string | null;
+  image_uuid: string | null;
+}
+
+interface DisplayBook {
   id: string;
   title: string;
   author: string;
-  cover_url?: string;
+  cover_url: string;
 }
 
-// interface Category {
-//   id: string;
-//   name: string;
-//   icon_url: string;
-// }
-
-// interface ApiBook {
-//   id: string;
-//   title?: string | null;
-//   author?: string | null;
-//   cover_url?: string | null;
-//   image_uuid?: string | null;
-// }
-
 const Central = () => {
-  const [recommendedBooks, setRecommendedBooks] = useState<Book[]>([]);
+  const [recommendedBooks, setRecommendedBooks] = useState<DisplayBook[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // ... (импорты и интерфейсы без изменений) ...
 
   useEffect(() => {
     const fetchRandomBooks = async () => {
       try {
         setLoading(true);
-        const res = await fetch("http://localhost/api/books/recommended");
+        const res = await fetch(
+          "http://localhost/api/books/recommended?limit=5",
+        );
         if (!res.ok) throw new Error("Failed to fetch books");
         const books = await res.json();
-        setRecommendedBooks(books);
+
+        const mapped: DisplayBook[] = books.map((book: ApiBook) => ({
+          id: book.id,
+          title: book.title?.trim() || "Без названия",
+          author: book.author?.trim() || "Неизвестный автор",
+          // Заглушка для обложки, если нет реального URL
+          cover_url: book.image_uuid
+            ? `http://localhost/cdn/${book.image_uuid}`
+            : `https://via.placeholder.com/300x450?text=${encodeURIComponent(book.title || "Book")}`,
+        }));
+
+        setRecommendedBooks(mapped);
       } catch (error) {
         console.error("Error loading recommendations:", error);
       } finally {
@@ -47,8 +51,6 @@ const Central = () => {
 
     fetchRandomBooks();
   }, []);
-
-  // ... (остальной код без изменений) ...
 
   return (
     <section className="central-page">
