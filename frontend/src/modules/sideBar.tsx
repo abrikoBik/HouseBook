@@ -1,11 +1,6 @@
-<<<<<<< HEAD
-
-import HomeIcon from "../assets/Home_Black.svg";
-=======
 import { Link, useLocation } from "react-router-dom";
 import HomeBlack from "../assets/Home_Black.svg";
 import HomeWhite from "../assets/Home_White.svg";
->>>>>>> f1dd9b79317a13d60f3574e18184830d91afdefb
 import LogoIcon from "../assets/LogoWOText.svg";
 import FavoritesBlack from "../assets/Favourite_Black.svg";
 import FavoritesWhite from "../assets/Favourite_White.svg";
@@ -13,7 +8,6 @@ import LibraryBlack from "../assets/Library_Black.svg";
 import LibraryWhite from "../assets/Library_White.svg";
 import ExitIcon from "../assets/Exit_Black.svg";
 import "../styles/sideBar.css";
-import { useNavigate } from "react-router";
 
 const SideBar = () => {
   const location = useLocation();

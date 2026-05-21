@@ -1,16 +1,9 @@
 #top_menu {
-<<<<<<< HEAD
   position: absolute;
   width: 90vw;
   margin-left: 10vw;
-=======
   position: fixed;
-<<<<<<< HEAD
-  width: calc(100vw - 100px);
->>>>>>> f1dd9b79317a13d60f3574e18184830d91afdefb
-=======
   width: calc(100vw - 89px);
->>>>>>> 8bc8a617f1b17727c16a439adad043c344983269
   top: 0;
   left: 89px;
   background-color: #f1eee393;
@@ -27,11 +20,6 @@
   height: 100%;
 }
 
-<<<<<<< HEAD
-  margin-top: 20px;
-  margin-left: 20px;
-  margin-right: 40px;
-=======
 /* Контейнер поиска — отдельный овал */
 #searchBar {
   position: relative;
@@ -199,7 +187,6 @@
 
 .profile-link:hover {
   background-color: rgba(0, 0, 0, 0.05);
->>>>>>> f1dd9b79317a13d60f3574e18184830d91afdefb
 }
 
 #icon {
