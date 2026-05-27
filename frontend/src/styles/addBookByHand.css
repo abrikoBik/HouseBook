@@ -1,35 +1,192 @@
-#manual-body > div > ul {
-  list-style-type: none;
 
-  margin: 0;
+/* addBookByHand.css */
 
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+#manual-visual-img {
+  position: absolute;
+  right: 0;
+  top:0;
+  opacity: 75%;
 }
 
-#manual-cover {
-  width: 220px;
-  height: 330px;
-  background-color: lightgrey;
+#manual-body {
+  margin-left: 120px;
+  margin-top: 50px;
+}
+
+#manual-body h2 {
+  font-size: 52px;
+  font-weight: 600;
+  color: #1f1f1f;
+  margin-bottom: 10px;
+  font-family: "Cormorant Garamond", serif;
+  position: relative;
+  z-index: 2;
+}
+
+#manual-body p {
+  color: #8a8178;
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 2;
 }
 
 #manual-inputs {
   display: flex;
+  gap: 60px;
+  align-items: flex-start;
+  position: relative;
+  z-index: 2;
+}
 
-  & > div {
-    display: flex;
+/* левая карточка */
+#manual-inputs > div:first-child {
+  width: 320px;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border-radius: 28px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+/* обложка */
+#manual-cover {
+  width: 100%;
+  height: 480px;
+  object-fit: cover;
+  border-radius: 20px;
+  background: linear-gradient(145deg, #efe5da, #f8f4ef);
+  border: 1px solid #e6ddd2;
+  margin-bottom: 20px;
+}
+
+/* кнопка загрузки */
+#manual-inputs > div:first-child button {
+  width: 100%;
+  height: 50px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #4d433d, #2d2723);
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.25s;
+  margin-bottom: 15px;
+}
+
+#manual-inputs > div:first-child button:hover {
+  transform: translateY(-2px);
+  opacity: 0.92;
+}
+
+/* форма */
+#manual-inputs ul {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 28px;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  max-width: 850px;
+}
+
+/* textarea во всю ширину */
+#manual-description-box {
+  grid-column: span 2;
+}
+
+#manual-description-box textarea {
+  min-height: 160px;
+  resize: none;
+}
+
+/* инпуты */
+#manual-inputs input,
+#manual-inputs textarea {
+  width: 100%;
+  padding: 18px 20px;
+  border-radius: 18px;
+  border: 1px solid #ddd2c5;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(8px);
+  font-size: 15px;
+  color: #2a2a2a;
+  outline: none;
+  transition: 0.2s;
+  box-sizing: border-box;
+}
+
+#manual-inputs input::placeholder,
+#manual-inputs textarea::placeholder {
+  color: #9c9185;
+}
+
+#manual-inputs input:focus,
+#manual-inputs textarea:focus {
+  border-color: #b89d7f;
+  box-shadow: 0 0 0 4px rgba(184, 157, 127, 0.15);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* кнопка создать */
+#manual-body > button {
+  margin-top: 40px;
+  width: 260px;
+  height: 58px;
+  border: none;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #c7a98b, #9f7f61);
+  color: white;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 10px 25px rgba(159, 127, 97, 0.25);
+}
+
+#manual-body > button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(159, 127, 97, 0.35);
+}
+
+/* адаптив */
+@media (max-width: 1200px) {
+  #manual-inputs {
     flex-direction: column;
+  }
+
+  #manual-inputs > div:first-child {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  #manual-inputs ul {
+    grid-template-columns: 1fr;
+  }
+
+  #manual-description-box {
+    grid-column: span 1;
   }
 }
 
-#manual-body {
-  margin-top: 10vh;
-  margin-left: 7vw;
-}
+@media (max-width: 768px) {
+  #manual-body {
+    margin-left: 0;
+    padding: 30px 20px;
+  }
 
-#description {
-  resize: none;
-  width: 20vw;
-  height: 10vh;
+  #manual-body h2 {
+    font-size: 38px;
+  }
+
+  #manual-cover {
+    height: 380px;
+  }
+
+  #manual-body > button {
+    width: 100%;
+  }
 }
