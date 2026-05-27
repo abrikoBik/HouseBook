@@ -3,11 +3,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  
+
   /* ✅ ОТСТУП ПОД САЙДБАР */
-  margin-left: 100px; 
+  margin-left: 100px;
   width: calc(100% - 100px);
-  
+
   padding-top: 40px;
   padding-bottom: 80px;
   min-height: 100vh;
@@ -27,11 +27,11 @@
   display: flex;
   align-items: flex-end;
   gap: 50px;
-  
+
   /* ✅ СМЕЩЕНИЕ ВНИЗ: Опускаем блок относительно верха контейнера */
-  margin-top: 60px; 
+  margin-top: 60px;
   margin-bottom: 60px;
-  
+
   position: relative;
   z-index: 1;
 }
@@ -48,7 +48,7 @@
   object-fit: cover;
   border-radius: 8px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  
+
   /* ✅ УБРАНА АНИМАЦИЯ: Нет transition и transform:hover */
 }
 
@@ -89,13 +89,15 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 #bronya-btn:hover {
   background-color: #3b404f;
-  transform: translateY(-2px); /* Кнопка может немного всплывать, это нормально */
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  transform: translateY(
+    -2px
+  ); /* Кнопка может немного всплывать, это нормально */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 #favorite-btn {
@@ -129,7 +131,7 @@
   border-radius: 24px;
   padding: 50px;
   box-sizing: border-box;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
 }
 
 .content-grid {
@@ -139,7 +141,8 @@
   margin-bottom: 60px;
 }
 
-.description-col h3, .details-col h3 {
+.description-col h3,
+.details-col h3 {
   font-size: 1.2rem;
   font-weight: 700;
   color: #1a1a1a;
@@ -220,11 +223,11 @@
     grid-template-columns: 1fr;
     gap: 40px;
   }
-  
+
   .hero-cover {
     width: 220px;
   }
-  
+
   .book-title {
     font-size: 2.5rem;
   }
@@ -245,38 +248,38 @@
     margin-top: 40px; /* Меньший отступ на мобильных */
     margin-bottom: 40px;
   }
-  
+
   .hero-cover-wrapper {
     margin-bottom: 10px;
   }
-  
+
   .hero-cover {
     width: 180px;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
   }
-  
+
   .hero-info {
     padding-bottom: 0;
   }
-  
+
   .book-title {
     font-size: 2rem;
   }
-  
+
   .book-author {
     font-size: 1.1rem;
   }
-  
+
   .hero-actions {
     justify-content: center;
     width: 100%;
   }
-  
+
   .book-content-card {
     padding: 30px 20px;
     border-radius: 20px 20px 0 0;
   }
-  
+
   .details-col {
     padding: 20px;
   }

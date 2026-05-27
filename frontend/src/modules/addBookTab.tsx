@@ -128,7 +128,7 @@ const AddBookTab: React.FC<AddBookTabProps> = ({ onClose }) => {
         <div className="search-wrapper">
           <input
             type="text"
-            className="book-search-input"
+            className="add-book-search-input"
             placeholder="Поиск по названию, автору или ISBN..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -179,21 +179,21 @@ const AddBookTab: React.FC<AddBookTabProps> = ({ onClose }) => {
                       <div className="cover-placeholder">📚</div>
                     )}
                   </div>
-                  <div className="book-info">
-                    <div className="book-title">
+                  <div className="add-book-info">
+                    <div className="add-book-title">
                       {book.title || "Без названия"}
                     </div>
-                    <div className="book-author">
+                    <div className="add-book-author">
                       {book.author || "Неизвестный автор"}
                     </div>
                     {book.isbn && (
-                      <div className="book-isbn">ISBN: {book.isbn}</div>
+                      <div className="add-book-isbn">ISBN: {book.isbn}</div>
                     )}
                     {book.genre && (
-                      <span className="book-genre">{book.genre}</span>
+                      <span className="add-book-genre">{book.genre}</span>
                     )}
                   </div>
-                  <div className="book-action">
+                  <div className="add-book-action">
                     <span className="material-symbols-outlined">
                       add_circle
                     </span>
