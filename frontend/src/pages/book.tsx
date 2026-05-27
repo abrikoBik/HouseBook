@@ -1,4 +1,4 @@
-import FavoritesIcon from "../assets/Favourite_Black.svg";
+import FavoritesIcon from "../assets/Favourite_Black_Book.svg";
 import "../styles/book.css";
 import SideBar from "../modules/sideBar";
 import Header from "../modules/header";

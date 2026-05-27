@@ -17,8 +17,7 @@ const SideBar = () => {
   const isLibraryActive =
     currentPath === "/library" || currentPath.startsWith("/library/");
   const isExchangeActive =
-    currentPath === "/trade" ||
-    currentPath.startsWith("/trade");
+    currentPath === "/trade" || currentPath.startsWith("/trade");
 
   return (
     <aside id="side_menu">

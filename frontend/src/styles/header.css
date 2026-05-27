@@ -2,7 +2,7 @@
   position: absolute;
   width: 90vw;
   position: fixed;
-  width: calc(100vw - 89px); /* Или 100px, зависит от сайдбара */
+  width: 100px; /* Или 100px, зависит от сайдбара */
   top: 0;
   left: 89px;
   background-color: #f1eee3;
