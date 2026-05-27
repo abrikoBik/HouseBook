@@ -54,24 +54,24 @@ const AddBookByHand = () => {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
-    
+
     const cover_file = await new Promise<File | null>((resolve) => {
       input.onchange = (e) => {
         const target = e.target as HTMLInputElement;
-        resolve(target.files?.[0] || null); 
+        resolve(target.files?.[0] || null);
       };
 
       input.oncancel = () => resolve(null);
       input.click();
     });
 
-    if(cover_file) {
+    if (cover_file) {
       const cover_data = new FormData();
       cover_data.append("image", cover_file);
 
       const response = await fetch("http://localhost/cdn/", {
         method: "POST",
-        body: cover_data
+        body: cover_data,
       });
 
       const cover_json = await response.json();
@@ -82,12 +82,12 @@ const AddBookByHand = () => {
     } else {
       alert("Обложка не был загружен!");
     }
-  }
+  };
 
   const sendForm = async () => {
     const response = await fetch("/api/books", {
-        method: "POST",
-        body: JSON.stringify(bookForm),
+      method: "POST",
+      body: JSON.stringify(bookForm),
     });
 
     alert(`${bookForm.title} была добавлена!`);
@@ -96,17 +96,17 @@ const AddBookByHand = () => {
 
     const put_cover = await fetch(`/api/books/${book_json["id"]}/cover`, {
       method: "PUT",
-      body: `{"imageuuid":"${imageID}"}`
+      body: `{"imageuuid":"${imageID}"}`,
     });
 
-    if(put_cover.ok) {
+    if (put_cover.ok) {
       alert("Обложка была успешно добавлена!");
     } else {
       await fetch(`/api/books/${book_json["id"]}`, {
-        method: "DELETE"
+        method: "DELETE",
       });
     }
-  }
+  };
 
   return (
     <section>
