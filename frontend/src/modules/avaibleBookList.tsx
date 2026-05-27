@@ -43,6 +43,7 @@ const ExchangeBookCard = ({
         } else {
           setUserName("Пользователь не найден");
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         setUserName(err);
       }
@@ -57,6 +58,7 @@ const ExchangeBookCard = ({
         } else {
           setLibraryName("Библиотека не найдена");
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         setLibraryName(err);
       }
@@ -141,6 +143,7 @@ const AvailableBookList = ({
         } else {
           setBooks(fetchedBooks);
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         console.error("Failed to load exchangeable books:", err);
         setError(err.message || "Произошла ошибка при загрузке");
@@ -205,6 +208,7 @@ const AvailableBookList = ({
 
       alert("Запрос на обмен успешно отправлен!");
       onClose();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Trade creation error:", err);
       setError(err.message || "Ошибка при оформлении обмена");
