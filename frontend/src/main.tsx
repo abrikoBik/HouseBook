@@ -16,7 +16,6 @@ import Library from "./pages/library.tsx";
 import Scrape from "./pages/scrape.tsx";
 import Central from "./pages/central.tsx";
 import Exchange from "./pages/exchange.tsx";
-import Trade from "./pages/trade.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -35,7 +34,6 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/landing" element={<Landing />} />
           <Route path="/central" element={<Central />} />
           <Route path="/profile/exchange" element={<Exchange />} />
-          <Route path="/trade" element={<Trade />} />
           <Route path="/*" element={<NotFound />} />
         </Routes>
       </Router>

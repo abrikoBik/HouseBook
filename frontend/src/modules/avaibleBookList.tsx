@@ -43,7 +43,6 @@ const ExchangeBookCard = ({
         } else {
           setUserName("Пользователь не найден");
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         setUserName(err);
       }
@@ -58,7 +57,6 @@ const ExchangeBookCard = ({
         } else {
           setLibraryName("Библиотека не найдена");
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         setLibraryName(err);
       }
@@ -103,6 +101,9 @@ const AvailableBookList = ({
   const [isTrading, setIsTrading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Храним признак того, была ли скрыта книга текущего пользователя
+  const [hasUserBookHidden, setHasUserBookHidden] = useState<boolean>(false);
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -110,6 +111,8 @@ const AvailableBookList = ({
       try {
         setIsLoading(true);
         setError(null);
+        setHasUserBookHidden(false);
+
         const response = await fetch(`/api/books/${bookId}/exchangeable`);
         const result = await response.json();
 
@@ -119,8 +122,25 @@ const AvailableBookList = ({
           );
         }
 
-        setBooks((result || []) as ExchangeableBookT[]);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const fetchedBooks = (result || []) as ExchangeableBookT[];
+        const currentUserId = localStorage
+          .getItem("UserID")
+          ?.toString()
+          .trim()
+          .toLowerCase();
+
+        // Проверяем совпадение ID владельца с текущим пользователем
+        const hasOwnBook = fetchedBooks.some((book) => {
+          if (!book.user_id || !currentUserId) return false;
+          return book.user_id.toString().trim().toLowerCase() === currentUserId;
+        });
+
+        if (hasOwnBook) {
+          setHasUserBookHidden(true);
+          setBooks([]); // Очищаем массив предложений
+        } else {
+          setBooks(fetchedBooks);
+        }
       } catch (err: any) {
         console.error("Failed to load exchangeable books:", err);
         setError(err.message || "Произошла ошибка при загрузке");
@@ -134,10 +154,8 @@ const AvailableBookList = ({
 
   // Функция создания сделки
   const handleCreateTrade = async (ownerId: string, libraryId: string) => {
-    // Достаем актуальный UserID текущего пользователя из localStorage
     const currentUserId = localStorage.getItem("UserID");
 
-    // Если токена или ID нет, отправляем на страницу авторизации
     if (!currentUserId) {
       alert("Сессия истекла. Пожалуйста, авторизуйтесь заново.");
       navigate("/auth");
@@ -148,13 +166,12 @@ const AvailableBookList = ({
       setIsTrading(true);
       setError(null);
 
-      // Шаг 1: Создание сделки (POST /api/trades)
       const tradeResponse = await fetch("/api/trades", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ownerid: ownerId,
-          buyerid: currentUserId, // Передаем полученный из локалсторейджа ID
+          buyerid: currentUserId,
         }),
       });
 
@@ -168,7 +185,6 @@ const AvailableBookList = ({
 
       const tradeId = tradeResult.id;
 
-      // Шаг 2: Добавление книги в сделку (PATCH /api/trades/{trade-id}/books)
       const bookResponse = await fetch(`/api/trades/${tradeId}/books`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -189,7 +205,6 @@ const AvailableBookList = ({
 
       alert("Запрос на обмен успешно отправлен!");
       onClose();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Trade creation error:", err);
       setError(err.message || "Ошибка при оформлении обмена");
@@ -246,9 +261,11 @@ const AvailableBookList = ({
                   />
                 ))
               ) : (
+                /* Меняем текст внутри существующего класса no-books-message на основе флага */
                 <p className="no-books-message">
-                  К сожалению, сейчас нет доступных предложений для обмена этой
-                  книги.
+                  {hasUserBookHidden
+                    ? "У вас уже есть такая книга в библиотеке"
+                    : "К сожалению, сейчас нет доступных предложений для обмена этой книги."}
                 </p>
               )}
             </div>

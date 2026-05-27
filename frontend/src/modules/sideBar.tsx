@@ -2,8 +2,6 @@ import { Link, useLocation } from "react-router-dom";
 import HomeBlack from "../assets/Home_Black.svg";
 import HomeWhite from "../assets/Home_White.svg";
 import LogoIcon from "../assets/LogoWOText.svg";
-import FavoritesBlack from "../assets/Favourite_Black.svg";
-import FavoritesWhite from "../assets/Favourite_White.svg";
 import LibraryBlack from "../assets/Library_Black.svg";
 import LibraryWhite from "../assets/Library_White.svg";
 import ExitIcon from "../assets/Exit_Black.svg";
@@ -16,8 +14,6 @@ const SideBar = () => {
     currentPath === "/central" || currentPath.startsWith("/main/");
   const isLibraryActive =
     currentPath === "/library" || currentPath.startsWith("/library/");
-  const isExchangeActive =
-    currentPath === "/trade" || currentPath.startsWith("/trade");
 
   return (
     <aside id="side_menu">
@@ -30,14 +26,6 @@ const SideBar = () => {
           <div className={`menu-item ${isCentralActive ? "active" : ""}`}>
             <Link to="/central">
               <img src={isCentralActive ? HomeWhite : HomeBlack} alt="home" />
-            </Link>
-          </div>
-          <div className={`menu-item ${isExchangeActive ? "active" : ""}`}>
-            <Link to="/trade">
-              <img
-                src={isExchangeActive ? FavoritesWhite : FavoritesBlack}
-                alt="exchange"
-              />
             </Link>
           </div>
           <div className={`menu-item ${isLibraryActive ? "active" : ""}`}>

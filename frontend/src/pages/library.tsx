@@ -29,22 +29,26 @@ interface DisplayBook {
   author: string;
   cover_url: string;
   exchangeable: boolean;
+  library_id: string; // ДОБАВЛЕНО: Теперь книга помнит, из какой она библиотеки
 }
 
 const Library = () => {
   const [activeTab, setActiveTab] = useState(0);
-  const [addBookActive, setAddBookActive] = useState(false); // Изначально false — модалка закрыта
+  const [addBookActive, setAddBookActive] = useState(false);
 
   const [userLibs, setUserLibs] = useState<LibraryType[]>([]);
   const [displayBooks, setDisplayBooks] = useState<DisplayBook[]>([]);
   const [selectedBook, setSelectedBook] = useState<DisplayBook | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleBookUpdate = (updatedBook: DisplayBook) => {
+  // Изменено: принимаем loose-тип (any), чтобы избежать конфликта интерфейсов с BookModal
+  const handleBookUpdate = (updatedBook: any) => {
     setDisplayBooks((prev) =>
-      prev.map((b) => (b.id === updatedBook.id ? updatedBook : b)),
+      prev.map((b) => (b.id === updatedBook.id ? { ...b, ...updatedBook } : b)),
     );
-    setSelectedBook(updatedBook);
+    setSelectedBook((prev) =>
+      prev && prev.id === updatedBook.id ? { ...prev, ...updatedBook } : prev,
+    );
   };
 
   const fetchLibraries = useCallback(async () => {
@@ -64,8 +68,10 @@ const Library = () => {
     }
   }, []);
 
+  // ИСПРАВЛЕНО: Теперь передаем libraryId при сборке деталей книги
   const fetchBookDetails = async (
     item: LibBook,
+    libraryId: string,
   ): Promise<DisplayBook | null> => {
     try {
       const res = await fetch(`/api/books/${item.id}`);
@@ -81,6 +87,7 @@ const Library = () => {
           ? `http://localhost/cdn/${bookData.image_uuid}`
           : `https://via.placeholder.com/300x450?text=No+Cover`,
         exchangeable: item.exchangeable,
+        library_id: libraryId, // Привязываем книгу к библиотеке
       };
     } catch (err) {
       console.warn(`Failed to load book ${item.id}`, err);
@@ -99,7 +106,7 @@ const Library = () => {
     if (libBooksList.length === 0) return [];
 
     const booksDetailsPromises = libBooksList.map((item: LibBook) =>
-      fetchBookDetails(item),
+      fetchBookDetails(item, libId),
     );
     const results = await Promise.all(booksDetailsPromises);
 
@@ -122,7 +129,6 @@ const Library = () => {
 
   const handleAddBookClose = () => {
     setAddBookActive(false);
-    // Обновляем список книг после добавления
     if (activeTab === 0) {
       fetchAllBooks();
     } else {
@@ -144,30 +150,59 @@ const Library = () => {
     setDisplayBooks([]);
 
     try {
-      const allLibsBooksPromises = userLibs.map((lib) =>
-        fetchLibBookIds(lib.id),
+      // Запрашиваем книги для каждой библиотеки отдельно, чтобы не потерять связь с library_id
+      const allBooksPromises = userLibs.map((lib) =>
+        getBooksForLibrary(lib.id),
       );
-      const allLibsBooksArrays = await Promise.all(allLibsBooksPromises);
-      const flatLibBooksList: LibBook[] = allLibsBooksArrays.flat();
+      const allBooksArrays = await Promise.all(allBooksPromises);
+      const flatBooksList = allBooksArrays.flat();
 
-      if (flatLibBooksList.length === 0) {
-        setDisplayBooks([]);
-        return;
-      }
-
-      const booksDetailsPromises = flatLibBooksList.map((item: LibBook) =>
-        fetchBookDetails(item),
-      );
-      const results = await Promise.all(booksDetailsPromises);
-
-      const validBooks = results.filter((b): b is DisplayBook => b !== null);
-      setDisplayBooks(validBooks);
+      setDisplayBooks(flatBooksList);
     } catch (error) {
       console.error("Error loading all books:", error);
     } finally {
       setIsLoading(false);
     }
   }, [userLibs]);
+
+  // ФУНКЦИЯ УДАЛЕНИЯ КНИГИ
+  const handleDeleteBook = async (
+    e: React.MouseEvent,
+    libraryId: string,
+    bookId: string,
+  ) => {
+    e.stopPropagation(); // Чтобы при нажатии на крестик не открывалась модалка книги
+
+    if (
+      !window.confirm("Вы уверены, что хотите удалить эту книгу из библиотеки?")
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/libraries/${libraryId}/books/${bookId}`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      if (response.ok) {
+        // Удаляем книгу из локального стейта
+        setDisplayBooks((prev) =>
+          prev.filter(
+            (book) => !(book.id === bookId && book.library_id === libraryId),
+          ),
+        );
+        alert("Книга успешно удалена.");
+      } else {
+        alert("Не удалось удалить книгу из библиотеки.");
+      }
+    } catch (error) {
+      console.error("Delete book error:", error);
+      alert("Произошла ошибка при удалении книги.");
+    }
+  };
 
   useEffect(() => {
     fetchLibraries();
@@ -200,7 +235,6 @@ const Library = () => {
         <section id="info">
           <h4>Моя библиотека</h4>
 
-          {/* 🔘 Кнопка добавления книги */}
           <button
             className="add-book-btn"
             onClick={() => setAddBookActive(true)}
@@ -243,9 +277,19 @@ const Library = () => {
             displayBooks.map((book: DisplayBook) => (
               <div
                 className="libBookCard"
-                key={book.id}
+                key={`${book.library_id}-${book.id}`} // Составной ключ защищает от дубликатов, если книга в разных либах
                 onClick={() => setSelectedBook(book)}
+                style={{ position: "relative" }} // Нужно для абсолютного позиционирования крестика
               >
+                {/* ❌ КНОПКА УДАЛЕНИЯ КНИГИ */}
+                <button
+                  className="delete-book-card-btn"
+                  onClick={(e) => handleDeleteBook(e, book.library_id, book.id)}
+                  title="Удалить из библиотеки"
+                >
+                  &times;
+                </button>
+
                 <div className="libBookCover">
                   {book.cover_url ? (
                     <img src={book.cover_url} alt={book.title} loading="lazy" />
@@ -287,14 +331,8 @@ const Library = () => {
 
       {selectedBook && (
         <BookModal
-          book={selectedBook}
-          library_id={
-            userLibs.length > 0
-              ? activeTab === 0
-                ? userLibs[0].id
-                : userLibs[activeTab - 1].id
-              : ""
-          }
+          book={selectedBook as any} // Приведение к any предотвратит конфликты типов с BookModal
+          library_id={selectedBook.library_id} // ИСПРАВЛЕНО: Передаем точный ID библиотеки, где лежит эта книга
           onClose={() => setSelectedBook(null)}
           onStatusUpdate={handleBookUpdate}
         />
