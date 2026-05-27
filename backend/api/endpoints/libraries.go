@@ -21,6 +21,7 @@ func routeLibraries(router chi.Router) {
 				r.Route(consts.BookIDPath, func(r chi.Router) {
 					r.Patch("/", handlers.ChangeBookExchangeable)
 					r.Delete("/", handlers.DeleteBookFromLibrary)
+					r.Patch("/move", handlers.MoveBooksBetweenLibraries)
 				})
 			})
 		})

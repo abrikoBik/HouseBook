@@ -66,3 +66,12 @@ where
     library_id = @libraryID and
     book_id = @bookID
 returning *;
+
+-- name: MoveBookBetweenLibraries :one
+update library_books
+set
+    library_id = @newLibraryID
+where
+    library_id = @libraryID and
+    book_id = @bookID
+returning *;

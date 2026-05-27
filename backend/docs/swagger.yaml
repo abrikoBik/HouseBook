@@ -1107,6 +1107,47 @@ paths:
       tags:
       - Библиотеки
       - Книги
+  /api/libraries/{library-id}/books/{book-id}/move:
+    patch:
+      consumes:
+      - application/json
+      description: Переместить книгу из одной библиотеки в другую.
+      parameters:
+      - description: UUID библиотеки
+        in: path
+        name: library-id
+        required: true
+        type: string
+      - description: UUID книги
+        in: path
+        name: book-id
+        required: true
+        type: string
+      - description: UUID новой библиотеки
+        in: body
+        name: newlibraryid
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Переместить книгу
+      tags:
+      - Библиотеки
+      - Книги
   /api/sessions/{session-id}:
     delete:
       consumes:
