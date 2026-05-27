@@ -172,11 +172,11 @@ const Book = () => {
         </div>
       </main>
 
-      <AvailableBookList 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        bookId={uuid!} 
-        currentBook={book} 
+      <AvailableBookList
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        bookId={uuid!}
+        currentBook={book}
       />
     </section>
   );

@@ -25,7 +25,11 @@ interface ExchangeBookCardProps {
   disabled: boolean;
 }
 
-const ExchangeBookCard = ({ book, onSelect, disabled }: ExchangeBookCardProps) => {
+const ExchangeBookCard = ({
+  book,
+  onSelect,
+  disabled,
+}: ExchangeBookCardProps) => {
   const [userName, setUserName] = useState<string>("Загрузка...");
   const [libraryName, setLibraryName] = useState<string>("Загрузка...");
 
@@ -63,15 +67,19 @@ const ExchangeBookCard = ({ book, onSelect, disabled }: ExchangeBookCardProps) =
   }, [book.user_id, book.library_id]);
 
   return (
-    <div 
-      className={`exchange-book-item ${disabled ? "disabled" : ""}`} 
+    <div
+      className={`exchange-book-item ${disabled ? "disabled" : ""}`}
       onClick={() => !disabled && onSelect(book.user_id, book.library_id)}
       style={{ cursor: disabled ? "not-allowed" : "pointer" }}
     >
       <div className="exchange-book-info">
         <div className="exchange-book-meta">
-          <p><strong>Владелец:</strong> {userName}</p>
-          <p><strong>Библиотека:</strong> {libraryName}</p>
+          <p>
+            <strong>Владелец:</strong> {userName}
+          </p>
+          <p>
+            <strong>Библиотека:</strong> {libraryName}
+          </p>
         </div>
       </div>
     </div>
@@ -81,7 +89,12 @@ const ExchangeBookCard = ({ book, onSelect, disabled }: ExchangeBookCardProps) =
 /* ==========================================================================
    Основной компонент Модального Окна
    ========================================================================== */
-const AvailableBookList = ({ isOpen, onClose, bookId, currentBook }: AvailableBookListProps) => {
+const AvailableBookList = ({
+  isOpen,
+  onClose,
+  bookId,
+  currentBook,
+}: AvailableBookListProps) => {
   const navigate = useNavigate();
   const [books, setBooks] = useState<ExchangeableBookT[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -99,7 +112,9 @@ const AvailableBookList = ({ isOpen, onClose, bookId, currentBook }: AvailableBo
         const result = await response.json();
 
         if (!response.ok) {
-          throw new Error((result as Error).error || "Не удалось загрузить список книг");
+          throw new Error(
+            (result as Error).error || "Не удалось загрузить список книг",
+          );
         }
 
         setBooks((result || []) as ExchangeableBookT[]);
@@ -143,7 +158,9 @@ const AvailableBookList = ({ isOpen, onClose, bookId, currentBook }: AvailableBo
       const tradeResult = await tradeResponse.json();
 
       if (!tradeResponse.ok) {
-        throw new Error((tradeResult as Error).error || "Не удалось открыть сделку");
+        throw new Error(
+          (tradeResult as Error).error || "Не удалось открыть сделку",
+        );
       }
 
       const tradeId = tradeResult.id;
@@ -161,12 +178,14 @@ const AvailableBookList = ({ isOpen, onClose, bookId, currentBook }: AvailableBo
 
       if (!bookResponse.ok) {
         const bookResult = await bookResponse.json();
-        throw new Error((bookResult as Error).error || "Сделка создана, но привязать книгу не удалось");
+        throw new Error(
+          (bookResult as Error).error ||
+            "Сделка создана, но привязать книгу не удалось",
+        );
       }
 
       alert("Запрос на обмен успешно отправлен!");
       onClose();
-      
     } catch (err: any) {
       console.error("Trade creation error:", err);
       setError(err.message || "Ошибка при оформлении обмена");
@@ -180,7 +199,6 @@ const AvailableBookList = ({ isOpen, onClose, bookId, currentBook }: AvailableBo
   return (
     <div className="modal-overlay" onClick={isTrading ? undefined : onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        
         <div className="modal-header">
           <div className="modal-title-block">
             <h3>Книги, доступные для обмена</h3>
@@ -190,9 +208,9 @@ const AvailableBookList = ({ isOpen, onClose, bookId, currentBook }: AvailableBo
               </p>
             )}
           </div>
-          <button 
-            className="modal-close-btn" 
-            onClick={onClose} 
+          <button
+            className="modal-close-btn"
+            onClick={onClose}
             disabled={isTrading}
             aria-label="Закрыть"
           >
@@ -201,8 +219,14 @@ const AvailableBookList = ({ isOpen, onClose, bookId, currentBook }: AvailableBo
         </div>
 
         <div className="modal-body">
-          {isLoading && <div className="modal-loading">Загрузка списка предложений...</div>}
-          {isTrading && <div className="modal-loading" style={{ color: "#007bff" }}>Оформление сделки, пожалуйста, подождите...</div>}
+          {isLoading && (
+            <div className="modal-loading">Загрузка списка предложений...</div>
+          )}
+          {isTrading && (
+            <div className="modal-loading" style={{ color: "#007bff" }}>
+              Оформление сделки, пожалуйста, подождите...
+            </div>
+          )}
 
           {error && <div className="modal-error">{error}</div>}
 
@@ -210,20 +234,22 @@ const AvailableBookList = ({ isOpen, onClose, bookId, currentBook }: AvailableBo
             <div className="exchange-books-list">
               {books.length > 0 ? (
                 books.map((item) => (
-                  <ExchangeBookCard 
-                    key={item.id} 
-                    book={item} 
+                  <ExchangeBookCard
+                    key={item.id}
+                    book={item}
                     disabled={isTrading}
-                    onSelect={handleCreateTrade} 
+                    onSelect={handleCreateTrade}
                   />
                 ))
               ) : (
-                <p className="no-books-message">К сожалению, сейчас нет доступных предложений для обмена этой книги.</p>
+                <p className="no-books-message">
+                  К сожалению, сейчас нет доступных предложений для обмена этой
+                  книги.
+                </p>
               )}
             </div>
           )}
         </div>
-
       </div>
     </div>
   );
