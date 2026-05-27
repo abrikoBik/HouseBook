@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import "../styles/DropDown.css";
+import React, { useState, useRef, useEffect } from "react";
 
 interface DisplayBook {
   id: string;
@@ -6,6 +7,7 @@ interface DisplayBook {
   author: string;
   cover_url: string;
   exchangeable: boolean;
+  status?: "read" | "reading" | "exchangeable";
 }
 
 interface BookModalProps {
@@ -22,22 +24,69 @@ const BookModal: React.FC<BookModalProps> = ({
   onStatusUpdate,
 }) => {
   const [isUpdating, setIsUpdating] = useState(false);
-  const [copied, setCopied] = useState(false); // Состояние для анимации кнопки копирования
+  const [copied, setCopied] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const toggleExchangeStatus = async () => {
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Конфигурация доступных вариантов для меню
+  const statusOptions = [
+    { id: "read", label: "Прочитано", class: "status-read" },
+    { id: "reading", label: "В процессе", class: "status-reading" },
+    {
+      id: "exchangeable",
+      label: "Доступна для обмена",
+      class: "status-exchange",
+    },
+  ] as const;
+
+  // Определение текущего выбранного значения
+  const currentStatusId =
+    book.status || (book.exchangeable ? "exchangeable" : "reading");
+  const currentStatus =
+    statusOptions.find((opt) => opt.id === currentStatusId) || statusOptions[1];
+
+  // Закрытие дропдауна при клике извне
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const updateBookState = async (
+    statusId: "read" | "reading" | "exchangeable",
+  ) => {
     setIsUpdating(true);
+    setIsDropdownOpen(false);
+
+    const isExchangeable = statusId === "exchangeable";
+
     try {
       const response = await fetch(
         `/api/libraries/${library_id}/books/${book.id}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ exchangeable: !book.exchangeable }),
+          body: JSON.stringify({
+            exchangeable: isExchangeable,
+            status: statusId,
+          }),
         },
       );
 
       if (response.ok) {
-        onStatusUpdate({ ...book, exchangeable: !book.exchangeable });
+        onStatusUpdate({
+          ...book,
+          exchangeable: isExchangeable,
+          status: statusId,
+        });
       }
     } catch (err) {
       console.error("Ошибка обновления:", err);
@@ -46,11 +95,18 @@ const BookModal: React.FC<BookModalProps> = ({
     }
   };
 
-  // Функция копирования
+  const handleActionButtonClick = () => {
+    if (book.exchangeable) {
+      updateBookState("reading");
+    } else {
+      updateBookState("exchangeable");
+    }
+  };
+
   const copyToClipboard = () => {
     navigator.clipboard.writeText(book.id);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000); // Сброс статуса через 2 секунды
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -72,6 +128,7 @@ const BookModal: React.FC<BookModalProps> = ({
             </div>
 
             <div className="modal-details">
+              {/* Блок ID */}
               <div className="detail-item">
                 <span className="label">ID книги:</span>
                 <div
@@ -88,6 +145,7 @@ const BookModal: React.FC<BookModalProps> = ({
                 </div>
               </div>
 
+              {/* Блок Статус (исходный вид) */}
               <div className="detail-item">
                 <span className="label">Статус:</span>
                 <span
@@ -98,12 +156,47 @@ const BookModal: React.FC<BookModalProps> = ({
                     : "Личная коллекция"}
                 </span>
               </div>
+
+              {/* Блок Библиотека (новое поле с выпадающим меню) */}
+              <div className="detail-item">
+                <span className="label">Библиотека:</span>
+
+                <div id="bm-dropdown-container" ref={dropdownRef}>
+                  <div
+                    id="bm-dropdown-trigger"
+                    className={currentStatus.class}
+                    onClick={() =>
+                      !isUpdating && setIsDropdownOpen(!isDropdownOpen)
+                    }
+                  >
+                    <span>{currentStatus.label}</span>
+                    <span className="material-symbols-outlined arrow-icon">
+                      {isDropdownOpen ? "expand_less" : "expand_more"}
+                    </span>
+                  </div>
+
+                  {isDropdownOpen && (
+                    <ul id="bm-dropdown-menu">
+                      {statusOptions.map((option) => (
+                        <li
+                          key={option.id}
+                          className={`bm-dropdown-option ${option.id === currentStatusId ? "active-option" : ""}`}
+                          onClick={() => updateBookState(option.id)}
+                        >
+                          <span className={`status-dot ${option.class}`}></span>
+                          {option.label}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
             </div>
 
             <div className="modal-actions">
               <button
                 className={`action-btn ${book.exchangeable ? "btn-danger" : "btn-success"}`}
-                onClick={toggleExchangeStatus}
+                onClick={handleActionButtonClick}
                 disabled={isUpdating}
               >
                 <span className="material-symbols-outlined">
