@@ -1,8 +1,8 @@
 import Header from "../modules/header";
 import SideBar from "../modules/sideBar";
 import "../styles/addBookByHand.css";
-import Placeholder from "../assets/placeholderBook.png"
-import BgBook from "../assets/bgBookAdd.png"
+import Placeholder from "../assets/placeholderBook.png";
+import BgBook from "../assets/bgBookAdd.png";
 import { useState } from "react";
 
 interface BookT {
@@ -115,15 +115,15 @@ const AddBookByHand = () => {
       <Header />
       <SideBar />
       <section id="manual-body">
-        <img 
-                src={BgBook} 
-                alt="Decorative books" 
-                id="manual-visual-img"
-              />
+        <img src={BgBook} alt="Decorative books" id="manual-visual-img" />
         <h2>Добавление новой книги</h2>
         <div id="manual-inputs">
           <div>
-            <img src={`${imageID ? "/cdn/${imageID}" : Placeholder}`} id="manual-cover" alt="Book" />
+            <img
+              src={`${imageID ? "/cdn/${imageID}" : Placeholder}`}
+              id="manual-cover"
+              alt="Book"
+            />
             <button onClick={handleCover}>Изменить обложку</button>
           </div>
           <ul>
