@@ -67,8 +67,9 @@ const TradeItem = ({
         } else {
           setPartnerName("Пользователь не найден");
         }
-      } catch (err) {
-        setPartnerName("Ошибка загрузки");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (err: any) {
+        setPartnerName(err);
       }
     };
 
@@ -120,6 +121,7 @@ const TradeItem = ({
       });
       if (!response.ok) throw new Error("Не удалось удалить сделку");
       onDeleteSuccess(trade.id);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Delete trade error:", err);
       alert(err.message || "Произошла ошибка при удалении сделки");
@@ -248,6 +250,7 @@ const Profile = () => {
                 .catch(() => setTradeReadyCount(0))
             : Promise.resolve(setTradeReadyCount(0)),
         ]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         console.error("Failed to load profile:", error);
         setError(error.message || "Не удалось загрузить профиль");

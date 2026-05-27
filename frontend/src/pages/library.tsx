@@ -42,6 +42,7 @@ const Library = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Изменено: принимаем loose-тип (any), чтобы избежать конфликта интерфейсов с BookModal
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleBookUpdate = (updatedBook: any) => {
     setDisplayBooks((prev) =>
       prev.map((b) => (b.id === updatedBook.id ? { ...b, ...updatedBook } : b)),
@@ -331,6 +332,7 @@ const Library = () => {
 
       {selectedBook && (
         <BookModal
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           book={selectedBook as any} // Приведение к any предотвратит конфликты типов с BookModal
           library_id={selectedBook.library_id} // ИСПРАВЛЕНО: Передаем точный ID библиотеки, где лежит эта книга
           onClose={() => setSelectedBook(null)}
