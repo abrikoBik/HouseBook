@@ -476,3 +476,58 @@ func ChangeBookExchangeable(writer http.ResponseWriter, request *http.Request) {
 
 	writer.WriteHeader(http.StatusOK)
 }
+
+// MoveBooksBetweenLibraries godoc
+//
+//	@summary		Переместить книгу
+//	@description	Переместить книгу из одной библиотеки в другую.
+//	@accept			json
+//	@produce		json
+//
+//	@tags			Библиотеки,Книги
+//
+//	@param			library-id		path		string		true	"UUID библиотеки"
+//	@param			book-id			path		string		true	"UUID книги"
+//	@param			newlibraryid	body		pgtype.UUID	true	"UUID новой библиотеки"
+//
+//	@success		200				{string}	string		""
+//	@failure		400				{object}	ErrorResponse
+//	@failure		500				{object}	ErrorResponse
+//	@router			/api/libraries/{library-id}/books/{book-id}/move [patch]
+func MoveBooksBetweenLibraries(writer http.ResponseWriter, request *http.Request) {
+	var (
+		err    error
+		params db.MoveBookBetweenLibrariesParams
+		r      = render.New()
+		q      = db.New(database.Pool)
+	)
+
+	if err := json.NewDecoder(request.Body).Decode(&params); err != nil {
+		RenderError(r, writer, ErrorBadJSON(err))
+		return
+	}
+	if params.Libraryid, err = util.PathUUID(consts.LibraryIDPathValue, request); err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.LibraryIDPathValue))
+		return
+	}
+	if params.Bookid, err = util.PathUUID(consts.BookIDPathValue, request); err != nil {
+		RenderError(r, writer, ErrorBadID(err, consts.BookIDPathValue))
+		return
+	}
+
+	if PingDB(r, writer) != nil {
+		return
+	}
+	book, err := q.MoveBookBetweenLibraries(database.Context, params)
+	if err != nil {
+		RenderError(r, writer, ErrorGeneric(err))
+		return
+	}
+	Logger.Info().
+		Interface("libraryID", params.Libraryid).
+		Interface("bookID", params.Bookid).
+		Interface("newLibraryID", book.LibraryID).
+		Msg("book moved")
+
+	writer.WriteHeader(http.StatusOK)
+}

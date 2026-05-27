@@ -238,3 +238,26 @@ func (q *Queries) ListUserLibraries(ctx context.Context, arg ListUserLibrariesPa
 	}
 	return items, nil
 }
+
+const moveBookBetweenLibraries = `-- name: MoveBookBetweenLibraries :one
+update library_books
+set
+    library_id = $1
+where
+    library_id = $2 and
+    book_id = $3
+returning library_id, book_id, exchangeable
+`
+
+type MoveBookBetweenLibrariesParams struct {
+	Newlibraryid pgtype.UUID `db:"newlibraryid" json:"newlibraryid"`
+	Libraryid    pgtype.UUID `db:"libraryid" json:"libraryid"`
+	Bookid       pgtype.UUID `db:"bookid" json:"bookid"`
+}
+
+func (q *Queries) MoveBookBetweenLibraries(ctx context.Context, arg MoveBookBetweenLibrariesParams) (LibraryBook, error) {
+	row := q.db.QueryRow(ctx, moveBookBetweenLibraries, arg.Newlibraryid, arg.Libraryid, arg.Bookid)
+	var i LibraryBook
+	err := row.Scan(&i.LibraryID, &i.BookID, &i.Exchangeable)
+	return i, err
+}
