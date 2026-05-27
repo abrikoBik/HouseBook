@@ -1,0 +1,203 @@
+/* Фоновая полупрозрачная подложка */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Чтобы окно было поверх сайдбара и хедера */
+  backdrop-filter: blur(4px); /* Легкое размытие заднего плана */
+}
+
+/* Контейнер модального окна */
+.modal-content {
+  background-color: #ffffff;
+  width: 90%;
+  max-width: 550px;
+  max-height: 80vh;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: fadeInModal 0.25s ease-out;
+}
+
+/* Анимация плавного появления */
+@keyframes fadeInModal {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Шапка окна */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+/* Кнопка закрытия (крестик) */
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.2s;
+  padding: 0;
+}
+
+.modal-close-btn:hover {
+  color: #333;
+}
+
+/* Прокручиваемая область с контентом */
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+/* Список книг */
+.exchange-books-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Карточка книги внутри списка */
+.exchange-book-item {
+  display: flex;
+  gap: 16px;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  transition:
+    background-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.exchange-book-item:hover {
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+}
+
+/* Обложка */
+.exchange-book-cover {
+  width: 70px;
+  height: 105px;
+  object-fit: cover;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+}
+
+/* Инфо о книге */
+.exchange-book-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.exchange-book-info h4 {
+  margin: 0 0 6px 0;
+  font-size: 1rem;
+  color: #222;
+}
+
+.exchange-book-author {
+  margin: 0 0 6px 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.exchange-book-publisher {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #999;
+}
+
+/* Системные состояния внутри модалки */
+.modal-loading,
+.modal-error,
+.no-books-message {
+  text-align: center;
+  padding: 20px 0;
+  color: #666;
+}
+
+.modal-error {
+  color: #dc3545;
+}
+
+/* Контейнер для мета-информации (Владелец и Библиотека) */
+.exchange-book-meta {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px dashed #eee;
+}
+
+.exchange-book-meta p {
+  margin: 2px 0 0 0;
+  font-size: 0.85rem;
+  color: #444;
+  line-height: 1.4;
+}
+
+.exchange-book-meta strong {
+  color: #666;
+  font-weight: 600;
+}
+
+/* Эффект загрузки для текста, пока эндпоинты отвечают */
+.exchange-book-meta p:contains("Загрузка...") {
+  color: #999;
+  font-style: italic;
+}
+
+/* Группировка заголовков в шапке */
+.modal-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modal-title-block h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #222;
+}
+
+/* Стили для вывода названия и автора */
+.modal-subtitle {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Так как мы убрали заголовки из карточек, можно убрать лишние отступы в мета-данных */
+.exchange-book-meta {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}

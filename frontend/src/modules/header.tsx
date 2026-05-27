@@ -66,7 +66,6 @@ const Header = () => {
       const res = await fetch(`/api/books/combinedSearch?query=${query}`);
       if (!res.ok) throw new Error("Failed to fetch catalog");
       const data: ApiBook[] = await res.json();
-      console.log(data);
 
       // 🔁 Единая логика формирования URL обложки (как в Catalog.tsx)
       const mapped: Book[] = data.map((b) => ({

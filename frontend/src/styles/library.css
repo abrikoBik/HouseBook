@@ -110,7 +110,6 @@ nav li.active:hover {
   margin: 0;
   /* Обрезка до 2 строк */
   display: -webkit-box;
-  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -449,4 +448,41 @@ nav li.active:hover {
   justify-content: space-between;
   align-items: center; /* Центрируем по вертикали */
   margin-bottom: 15px;
+}
+
+/* Кнопка удаления на карточке книги */
+.delete-book-card-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #dc3545;
+  border: 1px solid #ffccd0;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  opacity: 0; /* Изначально скрываем крестик */
+  transition:
+    opacity 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* Показываем крестик только при наведении на карточку книги */
+.libBookCard:hover .delete-book-card-btn {
+  opacity: 1;
+}
+
+/* Эффект при наведении на сам крестик */
+.delete-book-card-btn:hover {
+  background-color: #dc3545;
+  color: #ffffff;
+  border-color: #dc3545;
 }
