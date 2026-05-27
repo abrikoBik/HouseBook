@@ -176,7 +176,7 @@ const Book = () => {
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         bookId={uuid!} 
-        currentBook={book}
+        currentBook={book} 
       />
     </section>
   );
