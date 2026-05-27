@@ -70,7 +70,7 @@ const Book = () => {
         </div>
 
         <section className="bookDescription">
-          <div id="description">
+          <div id="book_description">
             <div>
               <h4>Описание</h4>
               <p>{book?.description}</p>

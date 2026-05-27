@@ -108,7 +108,7 @@
   min-width: 70vw;
 }
 
-#description {
+#book_description {
   display: flex;
   flex-direction: row;
   align-items: start;

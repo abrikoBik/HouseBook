@@ -200,7 +200,6 @@ const Library = () => {
         <section id="info">
           <h4>Моя библиотека</h4>
 
-          {/* 🔘 Кнопка добавления книги */}
           <button
             className="add-book-btn"
             onClick={() => setAddBookActive(true)}
