@@ -61,29 +61,31 @@ const Header = () => {
     }
   }, [navigate]);
 
+  const fetchCatalog = async (query: string) => {
+    try {
+      const res = await fetch(`/api/books/combinedSearch?query=${query}`);
+      if (!res.ok) throw new Error("Failed to fetch catalog");
+      const data: ApiBook[] = await res.json();
+      console.log(data);
+
+      // 🔁 Единая логика формирования URL обложки (как в Catalog.tsx)
+      const mapped: Book[] = data.map((b) => ({
+        id: b.id,
+        title: b.title?.trim() || "Без названия",
+        author: b.author?.trim() || "Неизвестный автор",
+        cover_url: b.image_uuid
+          ? `http://localhost/cdn/${b.image_uuid}` // ← Изменено на /cdn/
+          : `https://via.placeholder.com/300x450?text=${encodeURIComponent(b.title || "Book")}`, // ← Заглушка как в каталоге
+      }));
+
+      setAllBooks(mapped);
+    } catch (err) {
+      console.error("Catalog fetch error:", err);
+    }
+  };
+
   useEffect(() => {
-    const fetchCatalog = async () => {
-      try {
-        const res = await fetch("/api/books");
-        if (!res.ok) throw new Error("Failed to fetch catalog");
-        const data: ApiBook[] = await res.json();
-
-        // Единая логика формирования URL обложки
-        const mapped: Book[] = data.map((b) => ({
-          id: b.id,
-          title: b.title?.trim() || "Без названия",
-          author: b.author?.trim() || "Неизвестный автор",
-          cover_url: b.image_uuid
-            ? `http://localhost/cdn/${b.image_uuid}`
-            : b.cover_url || undefined,
-        }));
-
-        setAllBooks(mapped);
-      } catch (err) {
-        console.error("Catalog fetch error:", err);
-      }
-    };
-    fetchCatalog();
+    fetchCatalog(query);
   }, []);
 
   useEffect(() => {
@@ -120,6 +122,11 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Обработчик ошибок загрузки изображений
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    e.currentTarget.src = `https://via.placeholder.com/300x450?text=${encodeURIComponent("No Cover")}`;
+  };
+
   return (
     <header id="top_menu">
       <div id="top_actions">
@@ -132,7 +139,11 @@ const Header = () => {
             type="text"
             placeholder="Поиск по названию книги, автору, изданию"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              fetchCatalog(query);
+              setTimeout(() => {}, 300);
+            }}
             onFocus={() => query.length >= 2 && setShowDropdown(true)}
           />
 
@@ -154,11 +165,11 @@ const Header = () => {
                       <div className="search-book-author">{book.author}</div>
                     </div>
                     <div className="search-book-cover">
-                      {book.cover_url ? (
-                        <img src={book.cover_url} alt={book.title} />
-                      ) : (
-                        <div className="cover-placeholder-mini"></div>
-                      )}
+                      <img
+                        src={book.cover_url}
+                        alt={book.title}
+                        onError={handleImageError}
+                      />
                     </div>
                   </a>
                 ))
@@ -167,7 +178,7 @@ const Header = () => {
               )}
 
               <a
-                href="/books/scrape"
+                href="/book/scrape"
                 className="search-suggestion"
                 onClick={() => setShowDropdown(false)}
               >

@@ -304,7 +304,7 @@ nav li.active:hover {
   border-top: 1px solid #eee;
 }
 
-.detail-item {
+.lib_detail-item {
   display: flex;
   justify-content: space-between;
   margin-bottom: 15px;
@@ -444,7 +444,7 @@ nav li.active:hover {
 }
 
 /* Улучшаем отображение меток в деталях */
-.detail-item {
+.lib_detail-item {
   display: flex;
   justify-content: space-between;
   align-items: center; /* Центрируем по вертикали */

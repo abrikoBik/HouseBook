@@ -2,12 +2,13 @@
   position: absolute;
   width: 90vw;
   position: fixed;
-  width: calc(100vw - 89px);
+  width: calc(100vw - 89px); /* Или 100px, зависит от сайдбара */
   top: 0;
   left: 89px;
-  background-color: #f1eee393;
+  background-color: #f1eee3;
   z-index: 9999;
   height: 60px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Легкая тень для отделения от контента */
 }
 
 #top_actions {
@@ -19,7 +20,6 @@
   height: 100%;
 }
 
-/* Контейнер поиска — отдельный овал */
 #searchBar {
   position: relative;
   display: flex;
@@ -27,14 +27,43 @@
   max-width: 500px;
   width: 50%;
   margin-left: 50px;
-  padding: 5px;
-  border-radius: 50px;
-  background-color: #f1eee394;
+  height: 40px;
+  border-radius: 50px; /* Овал */
+  padding: 0 15px;
+  box-sizing: border-box;
+
+  /* По умолчанию: фон как у хедера, без рамок */
+  background-color: transparent;
+  border: 2px solid transparent;
+
+  transition: all 0.2s ease;
+}
+
+#searchBar:hover:not(.active) {
+  border-color: rgba(0, 0, 0, 0.15);
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* При фокусе (активный): белый овал с белой обводкой */
+#searchBar.active {
+  background-color: #ffffff;
+  border-color: #ffffff; /* Белая обводка, чтобы выделить овал на фоне */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Тень для объема */
 }
 
 #searchBar > label {
-  width: 25px;
-  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+#searchBar > label img {
+  width: 100%;
+  height: 100%;
+  opacity: 0.6;
 }
 
 #searchBar > input {
@@ -50,6 +79,7 @@
 #searchBar > input::placeholder {
   color: #999;
 }
+
 #searchBar > input:focus {
   outline: none;
 }
@@ -57,7 +87,7 @@
 /* Выпадающий список */
 .search-dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 5px); /* Небольшой отступ, но визуально часть овала */
   left: 0;
   width: 100%;
   background: #ffffff;
@@ -72,7 +102,7 @@
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateY(-5px);
   }
   to {
     opacity: 1;
@@ -80,7 +110,7 @@
   }
 }
 
-/* Карточка результата: название слева, обложка справа */
+/* Карточка результата */
 .search-item {
   display: flex;
   align-items: center;
@@ -95,6 +125,7 @@
 .search-item:last-child {
   border-bottom: none;
 }
+
 .search-item:hover {
   background: #faf8f5;
 }
@@ -120,10 +151,10 @@
   color: #888;
 }
 
-/* Мини-обложка справа */
+/* Мини-обложка */
 .search-book-cover {
   width: 28px;
-  height: 38px; /* Пропорция ~2/3 */
+  height: 38px;
   border-radius: 6px;
   overflow: hidden;
   background: #f0f0f0;
@@ -135,12 +166,6 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.cover-placeholder-mini {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #e63946 0%, #d62839 100%);
 }
 
 .search-empty {
@@ -166,12 +191,14 @@
 .search-suggestion:hover {
   background: #e8e4dc;
 }
+
 .search-suggestion span {
   color: #e0616a;
   font-weight: 600;
   margin-left: 6px;
 }
 
+/* Профиль */
 .profile-link {
   display: flex;
   align-items: center;

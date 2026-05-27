@@ -2,46 +2,20 @@ import { useState, useEffect } from "react";
 import SideBar from "../modules/sideBar";
 import Header from "../modules/header";
 import "../styles/central.css";
-
-interface ApiBook {
-  id: string;
-  title: string | null;
-  author: string | null;
-  image_uuid: string | null;
-}
-
-interface DisplayBook {
-  id: string;
-  title: string;
-  author: string;
-  cover_url: string;
-}
+import type BookT from "../types/book";
 
 const Central = () => {
-  const [recommendedBooks, setRecommendedBooks] = useState<DisplayBook[]>([]);
+  const [recommendedBooks, setRecommendedBooks] = useState<BookT[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchRandomBooks = async () => {
       try {
         setLoading(true);
-        const res = await fetch(
-          "http://localhost/api/books/recommended?limit=5",
-        );
+        const res = await fetch("http://localhost/api/books/recommended");
         if (!res.ok) throw new Error("Failed to fetch books");
         const books = await res.json();
-
-        const mapped: DisplayBook[] = books.map((book: ApiBook) => ({
-          id: book.id,
-          title: book.title?.trim() || "Без названия",
-          author: book.author?.trim() || "Неизвестный автор",
-          // Заглушка для обложки, если нет реального URL
-          cover_url: book.image_uuid
-            ? `http://localhost/cdn/${book.image_uuid}`
-            : `https://via.placeholder.com/300x450?text=${encodeURIComponent(book.title || "Book")}`,
-        }));
-
-        setRecommendedBooks(mapped);
+        setRecommendedBooks(books);
       } catch (error) {
         console.error("Error loading recommendations:", error);
       } finally {
@@ -51,6 +25,8 @@ const Central = () => {
 
     fetchRandomBooks();
   }, []);
+
+  // ... (остальной код без изменений) ...
 
   return (
     <section className="central-page">
@@ -81,8 +57,11 @@ const Central = () => {
                   >
                     <div className="book-card">
                       <div className="book-cover">
-                        {book.cover_url ? (
-                          <img src={book.cover_url} alt={book.title} />
+                        {book.image_uuid ? (
+                          <img
+                            src={`/cdn/${book.image_uuid}`}
+                            alt={book.title}
+                          />
                         ) : (
                           <div className="cover-placeholder"></div>
                         )}

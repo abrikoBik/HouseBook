@@ -34,7 +34,7 @@ const SideBar = () => {
             </Link>
           </div>
           <div className={`menu-item ${isExchangeActive ? "active" : ""}`}>
-            <Link to="/profile/exchange">
+            <Link to="/trade">
               <img
                 src={isExchangeActive ? FavoritesWhite : FavoritesBlack}
                 alt="exchange"
