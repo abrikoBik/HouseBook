@@ -196,7 +196,7 @@
   flex-shrink: 0;
 }
 
-#name {
+#header_name {
   font-weight: bold;
   font-size: 15px;
   white-space: nowrap;

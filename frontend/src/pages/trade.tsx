@@ -150,9 +150,7 @@ const TradePage: React.FC = () => {
     <div className="trade-inv-section">
       <div className="trade-inv-header">
         <div className="trade-inv-dropdown">
-          <span>📚</span>
           <span>{label}</span>
-          <span>▼</span>
         </div>
         <div className="trade-inv-search">
           <input

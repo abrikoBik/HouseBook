@@ -180,7 +180,7 @@ const Header = () => {
         <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
           <a href="/profile" className="profile-link">
             <div id="icon"></div>
-            <div id="name">{username}</div>
+            <div id="header_name">{username}</div>
           </a>
           <div id="notifications">
             <img src={NotificationsIcon} alt="notifications" />

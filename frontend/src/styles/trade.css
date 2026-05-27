@@ -17,6 +17,8 @@
   margin: 0 auto;
 }
 .trade-wrap {
+  margin-left: 8%;
+  margin-top: 2%;
   display: flex;
   gap: 24px;
   align-items: flex-start;
@@ -170,8 +172,8 @@
 }
 
 /* --- Inputs & Actions --- */
-input,
-textarea {
+#trade-wrap > input,
+#trade-wrap > textarea {
   width: 100%;
   background: var(--bg-page);
   border: 1px solid transparent;
@@ -183,13 +185,13 @@ textarea {
   margin-bottom: 12px;
 }
 
-input:hover,
-textarea:hover {
+#trade-wrap > input:hover,
+#trade-wrap > textarea:hover {
   background: #fff;
   border-color: var(--border);
 }
-input:focus,
-textarea:focus {
+#trade-wrap > input:focus,
+#trade-wrap > textarea:focus {
   background: #fff;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(212, 114, 126, 0.1);
