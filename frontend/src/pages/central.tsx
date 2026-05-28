@@ -8,8 +8,6 @@ const Central = () => {
   const [recommendedBooks, setRecommendedBooks] = useState<BookT[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // ... (импорты и интерфейсы без изменений) ...
-
   useEffect(() => {
     const fetchRandomBooks = async () => {
       try {

@@ -1,12 +1,12 @@
-import FavoritesIcon from "../assets/Favourite_Black.svg";
+import FavoritesIcon from "../assets/Favourite_Black_Book.svg";
 import "../styles/book.css";
+import AvailableBookList from "../modules/avaibleBookList";
 import SideBar from "../modules/sideBar";
 import Header from "../modules/header";
 import Comment from "../modules/comment";
 import CommentArea from "../modules/commentArea";
 import type Error from "../types/error";
 import type BookT from "../types/book";
-// ⚠️ Убедись, что CommentT импортируется из правильного файла, обычно types/comment.ts
 import type CommentT from "../types/book";
 
 import { useEffect, useState } from "react";
@@ -17,6 +17,7 @@ const Book = () => {
   const { uuid } = useParams();
   const [book, setBook] = useState<BookT>();
   const [bookComments, setBookComments] = useState<CommentT[]>();
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const getComments = async (id: string) => {
     try {
@@ -102,7 +103,9 @@ const Book = () => {
               <h2 className="book-author">{book.author}</h2>
 
               <div className="hero-actions">
-                <button id="bronya-btn">Забронировать</button>
+                <button id="bronya-btn" onClick={() => setIsModalOpen(true)}>
+                  Список доступных для обмена книг
+                </button>
                 <button id="favorite-btn" aria-label="Добавить в избранное">
                   <img src={FavoritesIcon} alt="favorites" />
                 </button>
@@ -168,6 +171,13 @@ const Book = () => {
           </section>
         </div>
       </main>
+
+      <AvailableBookList
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        bookId={uuid!}
+        currentBook={book}
+      />
     </section>
   );
 };

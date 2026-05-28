@@ -1,6 +1,6 @@
 .central-page {
   display: flex;
-  min-height: 100vh;
+  height: 50rem;
   background-color: #f1eee3;
 }
 

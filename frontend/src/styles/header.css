@@ -1,4 +1,6 @@
 #top_menu {
+  position: absolute;
+  width: 90vw;
   position: fixed;
   width: calc(100vw - 89px); /* Или 100px, зависит от сайдбара */
   top: 0;
@@ -221,7 +223,7 @@
   flex-shrink: 0;
 }
 
-#name {
+#header_name {
   font-weight: bold;
   font-size: 15px;
   white-space: nowrap;

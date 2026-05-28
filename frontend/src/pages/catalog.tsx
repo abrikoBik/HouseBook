@@ -5,16 +5,16 @@ import Header from "../modules/header";
 import "../styles/catalog.css";
 
 const API_URL = "http://localhost/api/books";
-const ITEMS_PER_PAGE = 10;
 
+// Обновленный список из 12 жанров (как на главной)
 const genres = [
   "Все",
   "Фантастика",
-  "Детективы",
+  "Детективы", // Обрати внимание: во множественном числе, как в Central
   "Триллеры",
   "Ужасы",
   "Приключения",
-  "Научная фантастика",
+  "Научная фантастика", // Соответствует Sci-Fi
   "История",
   "Комедия",
   "Документальное",
@@ -43,66 +43,35 @@ const Catalog = () => {
   const [searchParams] = useSearchParams();
   const urlGenre = searchParams.get("genre");
 
+  // Проверяем, есть ли такой жанр в нашем новом списке
   const initialGenre = urlGenre && genres.includes(urlGenre) ? urlGenre : "Все";
 
   const [activeGenre, setActiveGenre] = useState(initialGenre);
-  const [currentPageBooks, setCurrentPageBooks] = useState<DisplayBook[]>([]);
+  const [books, setBooks] = useState<DisplayBook[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hasNextPage, setHasNextPage] = useState(false);
-
-  useEffect(() => {
-    if (urlGenre && genres.includes(urlGenre)) {
-      setActiveGenre(urlGenre);
-    } else {
-      setActiveGenre("Все");
-    }
-    setCurrentPage(1);
-  }, [urlGenre]);
 
   useEffect(() => {
     const fetchBooks = async () => {
       try {
         setLoading(true);
-
-        const params = new URLSearchParams({
-          limit: (ITEMS_PER_PAGE + 1).toString(),
-          offset: ((currentPage - 1) * ITEMS_PER_PAGE).toString(),
-        });
-
-        if (activeGenre !== "Все") {
-          params.append("genre", activeGenre);
-        }
-
-        const res = await fetch(`${API_URL}?${params}`);
+        const res = await fetch(API_URL);
         if (!res.ok) throw new Error(`Ошибка сервера: ${res.status}`);
 
         const data: ApiBook[] = await res.json();
 
-        const hasMore = data.length > ITEMS_PER_PAGE;
-        setHasNextPage(hasMore);
-
-        let booksToShow = data.slice(0, ITEMS_PER_PAGE);
-
-        if (activeGenre !== "Все") {
-          booksToShow = booksToShow.filter(
-            (book: ApiBook) => book.genre !== "Неизвестен",
-          );
-        }
-
-        const mapped: DisplayBook[] = booksToShow.map((book: ApiBook) => ({
+        const mapped: DisplayBook[] = data.map((book) => ({
           id: book.id,
           title: book.title?.trim() || "Без названия",
           author: book.author?.trim() || "Неизвестный автор",
-          genre: book.genre?.trim() || "Неизвестен",
+          genre: book.genre?.trim() || "Другое",
+          // Заглушка для обложки, если нет реального URL
           cover_url: book.image_uuid
             ? `http://localhost/cdn/${book.image_uuid}`
             : `https://via.placeholder.com/300x450?text=${encodeURIComponent(book.title || "Book")}`,
         }));
 
-        setCurrentPageBooks(mapped);
+        setBooks(mapped);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Не удалось загрузить каталог",
@@ -113,23 +82,23 @@ const Catalog = () => {
     };
 
     fetchBooks();
-  }, [activeGenre, currentPage]);
+  }, []);
 
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage((p) => p - 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+  // Синхронизация состояния при изменении URL (кнопка назад/вперед браузера)
+  useEffect(() => {
+    if (urlGenre && genres.includes(urlGenre)) {
+      setActiveGenre(urlGenre);
+    } else {
+      setActiveGenre("Все");
     }
-  };
+  }, [urlGenre]);
 
-  const handleNextPage = () => {
-    if (hasNextPage) {
-      setCurrentPage((p) => p + 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
+  const filteredBooks =
+    activeGenre === "Все"
+      ? books
+      : books.filter((b) => b.genre === activeGenre);
 
-  if (loading && currentPage === 1) {
+  if (loading) {
     return (
       <section id="catalog-body">
         <SideBar />
@@ -176,6 +145,28 @@ const Catalog = () => {
           <section id="catalog-header-section">
             <h1>Каталог</h1>
 
+            {activeGenre !== "Все" && (
+              <p style={{ marginBottom: "10px", color: "#666" }}>
+                Фильтр: <strong>{activeGenre}</strong>
+                <button
+                  onClick={() => {
+                    setActiveGenre("Все");
+                    window.history.pushState({}, "", "/book/catalog");
+                  }}
+                  style={{
+                    marginLeft: "10px",
+                    border: "none",
+                    background: "none",
+                    color: "#E0616A",
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                  }}
+                >
+                  Сбросить
+                </button>
+              </p>
+            )}
+
             <nav className="genre-nav">
               <ul>
                 {genres.map((genre) => (
@@ -184,7 +175,6 @@ const Catalog = () => {
                     className={activeGenre === genre ? "active" : ""}
                     onClick={() => {
                       setActiveGenre(genre);
-                      setCurrentPage(1);
                       if (genre === "Все") {
                         window.history.pushState({}, "", "/book/catalog");
                       } else {
@@ -203,17 +193,17 @@ const Catalog = () => {
             </nav>
           </section>
 
-          <section id="book-grid">
-            {currentPageBooks.length > 0 ? (
-              currentPageBooks.map((book) => (
+          <section id="catalog-book-grid">
+            {filteredBooks.length > 0 ? (
+              filteredBooks.map((book) => (
                 <a href={`/book/${book.id}`} key={book.id}>
-                  <div className="book-card">
-                    <div className="book-cover">
+                  <div className="catalog-book-card">
+                    <div className="catalog-book-cover">
                       <img src={book.cover_url} alt={book.title} />
                     </div>
-                    <div className="book-info">
-                      <h3 className="book-title">{book.title}</h3>
-                      <p className="book-author">{book.author}</p>
+                    <div className="catalog-book-info">
+                      <h3 className="catalog-book-title">{book.title}</h3>
+                      <p className="catalog-book-author">{book.author}</p>
                     </div>
                   </div>
                 </a>
@@ -224,30 +214,6 @@ const Catalog = () => {
               </div>
             )}
           </section>
-
-          {/* Пагинация: показываем если есть куда вернуться ИЛИ если на первой странице 10+ книг и есть следующие */}
-          {(currentPage > 1 ||
-            (hasNextPage && currentPageBooks.length >= ITEMS_PER_PAGE)) && (
-            <div className="pagination">
-              <button
-                className="pagination-btn"
-                onClick={handlePrevPage}
-                disabled={currentPage === 1}
-              >
-                ← Назад
-              </button>
-
-              <span className="pagination-info">Страница {currentPage}</span>
-
-              <button
-                className="pagination-btn"
-                onClick={handleNextPage}
-                disabled={!hasNextPage}
-              >
-                Вперёд →
-              </button>
-            </div>
-          )}
         </div>
       </main>
     </section>

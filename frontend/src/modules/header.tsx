@@ -66,7 +66,6 @@ const Header = () => {
       const res = await fetch(`/api/books/combinedSearch?query=${query}`);
       if (!res.ok) throw new Error("Failed to fetch catalog");
       const data: ApiBook[] = await res.json();
-      console.log(data);
 
       // 🔁 Единая логика формирования URL обложки (как в Catalog.tsx)
       const mapped: Book[] = data.map((b) => ({
@@ -191,7 +190,7 @@ const Header = () => {
         <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
           <a href="/profile" className="profile-link">
             <div id="icon"></div>
-            <div id="name">{username}</div>
+            <div id="header_name">{username}</div>
           </a>
           <div id="notifications">
             <img src={NotificationsIcon} alt="notifications" />

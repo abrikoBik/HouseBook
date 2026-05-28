@@ -284,3 +284,11 @@
     padding: 20px;
   }
 }
+
+#bookTitle {
+  font-size: 3rem !important;
+}
+
+#bookAuthor {
+  font-size: 1.2rem !important;
+}

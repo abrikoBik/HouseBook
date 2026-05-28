@@ -1,0 +1,134 @@
+/* Основной контейнер кастомного селекта */
+#bm-dropdown-container {
+  position: relative;
+  display: inline-block;
+  min-width: 220px;
+  vertical-align: middle;
+}
+
+/* Кнопка-триггер выпадающего списка */
+#bm-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+#bm-dropdown-trigger:hover {
+  filter: brightness(0.96);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+#bm-dropdown-trigger .arrow-icon {
+  font-size: 18px;
+  margin-left: 8px;
+  color: inherit;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+}
+
+/* Выпадающее меню с опциями */
+#bm-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 22px rgba(0, 0, 0, 0.15);
+  padding: 6px 0;
+  margin: 0;
+  list-style: none;
+  z-index: 999;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+  animation: fadeInDropdown 0.15s ease-out;
+}
+
+/* Каждая отдельная строка выбора (вариант) */
+.bm-dropdown-option {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  font-size: 14px;
+  color: #333333;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.bm-dropdown-option:hover {
+  background-color: #f5f7fb;
+}
+
+/* Подсветка уже выбранного варианта внутри меню */
+.bm-dropdown-option.active-option {
+  background-color: #f0f4ff;
+  font-weight: 600;
+  color: #1a73e8;
+}
+
+/* ==========================================================================
+   Цветовая палитра для статусов и маркеров
+   ========================================================================== */
+
+/* 1. Вариант "Доступна для обмена" (Бирюзовый/Зеленый) */
+.status-exchange {
+  background-color: #d6f6ec !important;
+  color: #00bfa5 !important;
+}
+
+/* 2. Вариант "В процессе" (Оранжевый) */
+.status-reading {
+  background-color: #fff3e0 !important;
+  color: #ff9800 !important;
+}
+
+/* 3. Вариант "Прочитано" (Зеленый) */
+.status-read {
+  background-color: #e8f5e9 !important;
+  color: #4caf50 !important;
+}
+
+/* Цветные маркеры (круглые точки) внутри списка вариантов */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 10px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.status-dot.status-exchange {
+  background-color: #00bfa5 !important;
+}
+
+.status-dot.status-reading {
+  background-color: #ff9800 !important;
+}
+
+.status-dot.status-read {
+  background-color: #4caf50 !important;
+}
+
+/* ==========================================================================
+   Анимации
+   ========================================================================== */
+@keyframes fadeInDropdown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
