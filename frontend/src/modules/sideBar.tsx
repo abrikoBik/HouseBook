@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom"; // Добавили useNavigate
 import HomeBlack from "../assets/Home_Black.svg";
 import HomeWhite from "../assets/Home_White.svg";
 import LogoIcon from "../assets/LogoWOText.svg";
@@ -9,11 +9,20 @@ import "../styles/sideBar.css";
 
 const SideBar = () => {
   const location = useLocation();
+  const navigate = useNavigate(); // Инициализируем навигатор
   const currentPath = location.pathname;
+
   const isCentralActive =
     currentPath === "/central" || currentPath.startsWith("/main/");
   const isLibraryActive =
     currentPath === "/library" || currentPath.startsWith("/library/");
+
+  // Функция для очистки сессии и выхода
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("UserID");
+    navigate("/"); // Перенаправление на лендинг
+  };
 
   return (
     <aside id="side_menu">
@@ -37,9 +46,12 @@ const SideBar = () => {
             </Link>
           </div>
         </section>
-        <div id="exit_button">
+
+        {/* НАЧАЛО ИЗМЕНЕНИЙ: Добавлен onClick обработчик */}
+        <div id="exit_button" onClick={handleLogout}>
           <img src={ExitIcon} alt="exit" />
         </div>
+        {/* КОНЕЦ ИЗМЕНЕНИЙ */}
       </nav>
     </aside>
   );

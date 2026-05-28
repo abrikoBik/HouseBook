@@ -24,12 +24,19 @@
   height: 300px;
 }
 
+/* Найти существующий селектор #exit_button и дополнить его */
 #exit_button {
   display: flex;
   align-self: center;
   justify-content: center;
   height: 25px;
   margin-bottom: 10%;
+  cursor: pointer; /* Делаем элемент кликабельным визуально */
+  transition: opacity 0.2s ease;
+}
+
+#exit_button:hover {
+  opacity: 0.6; /* Эффект затухания при наведении */
 }
 
 .logo {

@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom"; // Используем Link для плавной навигации
 import LogoWText from "../assets/LogoWText.svg";
 import Lupa from "../assets/Lupa.svg";
 import HomeBlack from "../assets/Home_Black.svg";
@@ -8,6 +9,17 @@ import Natification from "../assets/Notification.svg";
 import "../styles/landing.css";
 
 const Landing: React.FC = () => {
+  // Состояние для проверки авторизации
+  const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
+
+  useEffect(() => {
+    // Проверяем наличие токена при загрузке страницы
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsAuthorized(true);
+    }
+  }, []);
+
   return (
     <section id="header">
       <section id="landing-hero">
@@ -61,6 +73,18 @@ const Landing: React.FC = () => {
           <p>Следи за статистикой, отслеживай сделки и делись впечатлениями!</p>
         </a>
       </section>
+
+      {/* Кнопки показываются ТОЛЬКО если пользователь НЕ авторизован */}
+      {!isAuthorized && (
+        <section id="landing-actions">
+          <Link to="/auth?mode=login" className="btn-landing btn-login">
+            Войти
+          </Link>
+          <Link to="/auth?mode=register" className="btn-landing btn-register">
+            Зарегистрироваться
+          </Link>
+        </section>
+      )}
     </section>
   );
 };

@@ -1,8 +1,8 @@
 import Logo from "../assets/LogoWText.svg";
 import AuthPhoto from "../assets/AuthPhoto.png";
 import "../styles/auth.css";
-import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 interface RegisterForm {
   email: string;
@@ -19,7 +19,12 @@ interface LoginForm {
 
 const Auth = () => {
   const navigate = useNavigate();
-  const [active, setActive] = useState<boolean>(false);
+  const [searchParams] = useSearchParams();
+  const mode = searchParams.get("mode");
+
+  // Инициализируем состояние вкладки в зависимости от параметра URL
+  const [active, setActive] = useState<boolean>(mode === "register");
+
   const [visibility, setVisibility] = useState<boolean>(true);
   const [checkPassVisibility, setCheckVisibility] = useState<boolean>(true);
   const [checkPass, setCheckPass] = useState<string>("");
@@ -39,6 +44,15 @@ const Auth = () => {
     login: "",
     password: "",
   });
+
+  // Синхронизируем состояние, если параметр URL изменится без перезагрузки страницы
+  useEffect(() => {
+    if (mode === "register") {
+      setActive(true);
+    } else if (mode === "login") {
+      setActive(false);
+    }
+  }, [mode]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (active) {
